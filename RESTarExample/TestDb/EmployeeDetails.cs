@@ -9,7 +9,7 @@ namespace RESTarExample.TestDb
     [Database, RESTar]
     public class EmployeeDetails : TestBase
     {
-        public int Salary;
-        public DateTime DateOfEmployment;
+        public int Salary { get; set; }
+        public DateTime DateOfEmployment { get; set; }
     }
 }

@@ -9,8 +9,8 @@ namespace RESTarExample.TestDb
     [Database, RESTar]
     public class Company : TestBase
     {
-        public string Name;
-        public Employee CEO;
+        public string Name { get; set; }
+        public Employee CEO { get; set; }
 
         [RESTarMember(ignore: true)]
         public IEnumerable<Employee> Employees

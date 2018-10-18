@@ -957,7 +957,7 @@ namespace RESTarTester
     [RESTar]
     public class MyDict2 : DDictionary, IDDictionary<MyDict2, MyDict2Kvp>
     {
-        public Resource1 R;
+        public Resource1 R { get; set; }
 
         public MyDict2Kvp NewKeyPair(MyDict2 dict, string key, object value = null)
         {
@@ -1074,22 +1074,22 @@ namespace RESTarTester
             }
         }
 
-        public sbyte Sbyte;
-        public byte Byte;
-        public short Short;
-        public ushort Ushort;
-        public int Int;
-        public uint Uint;
-        public long Long;
-        public ulong Ulong;
-        public float Float;
-        public double Double;
-        public decimal Decimal;
-        public string String;
-        public bool Bool;
-        public DateTime DateTime;
-        public MyDict MyDict;
-        public bool ABool;
+        public sbyte Sbyte { get; set; }
+        public byte Byte { get; set; }
+        public short Short { get; set; }
+        public ushort Ushort { get; set; }
+        public int Int { get; set; }
+        public uint Uint { get; set; }
+        public long Long { get; set; }
+        public ulong Ulong { get; set; }
+        public float Float { get; set; }
+        public double Double { get; set; }
+        public decimal Decimal { get; set; }
+        public string String { get; set; }
+        public bool Bool { get; set; }
+        public DateTime DateTime { get; set; }
+        public MyDict MyDict { get; set; }
+        public bool ABool { get; set; }
     }
 
     [Database, RESTar]
@@ -1100,62 +1100,62 @@ namespace RESTarTester
         public DateTime[] Dts => new[] {System.DateTime.Now, System.DateTime.MaxValue, System.DateTime.MinValue};
         public decimal[] Dcs => new[] {1M, 123.321M, 32123.123321M, -123321.12321M};
 
-        public sbyte? Sbyte;
-        public byte? Byte;
-        public short? Short;
-        public ushort? Ushort;
-        public int? Int;
-        public uint? Uint;
-        public long? Long;
-        public ulong? Ulong;
-        public float? Float;
-        public double? Double;
-        public decimal? Decimal;
-        public string String;
-        public bool? Bool;
-        public DateTime? DateTime;
-        public bool BBool;
+        public sbyte? Sbyte { get; set; }
+        public byte? Byte { get; set; }
+        public short? Short { get; set; }
+        public ushort? Ushort { get; set; }
+        public int? Int { get; set; }
+        public uint? Uint { get; set; }
+        public long? Long { get; set; }
+        public ulong? Ulong { get; set; }
+        public float? Float { get; set; }
+        public double? Double { get; set; }
+        public decimal? Decimal { get; set; }
+        public string String { get; set; }
+        public bool? Bool { get; set; }
+        public DateTime? DateTime { get; set; }
+        public bool BBool { get; set; }
     }
 
     [Database, RESTar]
     public class Resource3 : Base
     {
-        public sbyte? Sbyte;
-        public byte? Byte;
-        public short? Short;
-        public ushort? Ushort;
-        public int? Int;
-        public uint? Uint;
-        public long? Long;
-        public ulong? Ulong;
-        public float? Float;
-        public double? Double;
-        public decimal? Decimal;
-        public string String;
-        public bool? Bool;
-        public DateTime? DateTime;
-        public Resource1 Resource1;
-        public Resource2 Resource2;
+        public sbyte? Sbyte { get; set; }
+        public byte? Byte { get; set; }
+        public short? Short { get; set; }
+        public ushort? Ushort { get; set; }
+        public int? Int { get; set; }
+        public uint? Uint { get; set; }
+        public long? Long { get; set; }
+        public ulong? Ulong { get; set; }
+        public float? Float { get; set; }
+        public double? Double { get; set; }
+        public decimal? Decimal { get; set; }
+        public string String { get; set; }
+        public bool? Bool { get; set; }
+        public DateTime? DateTime { get; set; }
+        public Resource1 Resource1 { get; set; }
+        public Resource2 Resource2 { get; set; }
     }
 
     [Database, RESTar]
     public class Resource4 : Base
     {
-        [IgnoreDataMember] public sbyte? Sbyte;
-        [IgnoreDataMember] public byte? Byte;
-        [IgnoreDataMember] public short? Short;
-        [IgnoreDataMember] public ushort? Ushort;
-        [DataMember(Name = "RENAMED_Int")] public int? Int;
-        [DataMember(Name = "RENAMED_Uint")] public uint? Uint;
-        [DataMember(Name = "RENAMED_Long")] public long? Long;
-        [DataMember(Name = "RENAMED_Ulong")] public ulong? Ulong;
-        public float? Float;
-        public double? Double;
-        public decimal? Decimal;
-        public string String;
-        public bool? Bool;
-        public DateTime? DateTime;
-        public Resource1 Resource1;
-        public Resource2 Resource2;
+        [IgnoreDataMember] public sbyte? Sbyte { get; set; }
+        [IgnoreDataMember] public byte? Byte { get; set; }
+        [IgnoreDataMember] public short? Short { get; set; }
+        [IgnoreDataMember] public ushort? Ushort { get; set; }
+        [DataMember(Name = "RENAMED_Int")] public int? Int { get; set; }
+        [DataMember(Name = "RENAMED_Uint")] public uint? Uint { get; set; }
+        [DataMember(Name = "RENAMED_Long")] public long? Long { get; set; }
+        [DataMember(Name = "RENAMED_Ulong")] public ulong? Ulong { get; set; }
+        public float? Float { get; set; }
+        public double? Double { get; set; }
+        public decimal? Decimal { get; set; }
+        public string String { get; set; }
+        public bool? Bool { get; set; }
+        public DateTime? DateTime { get; set; }
+        public Resource1 Resource1 { get; set; }
+        public Resource2 Resource2 { get; set; }
     }
 }

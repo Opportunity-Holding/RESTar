@@ -11,11 +11,11 @@ namespace RESTarExample.TestDb
     [Database, RESTar]
     public class Employee : TestBase
     {
-        public string Name;
+        public string Name { get; set; }
 
-        [DataMember(Name = "Details")] public ulong? DetailsObjectNo;
-        [DataMember(Name = "Boss")] public ulong? BossObjectNo;
-        [DataMember(Name = "Company")] public ulong? CompanyObjectNo;
+        [DataMember(Name = "Details")] public ulong? DetailsObjectNo { get; set; }
+        [DataMember(Name = "Boss")] public ulong? BossObjectNo { get; set; }
+        [DataMember(Name = "Company")] public ulong? CompanyObjectNo { get; set; }
 
         [RESTarMember(ignore: true)] public EmployeeDetails Details
         {

@@ -14,10 +14,10 @@ namespace RESTarExample
     [Database]
     public class Employee
     {
-        public string Name;
-        public EmployeeDetails Details;
-        public string Title;
-        public Employee Boss;
+        public string Name { get; set; }
+        public EmployeeDetails Details { get; set; }
+        public string Title { get; set; }
+        public Employee Boss { get; set; }
 
         public IEnumerable<Employee> Subordinates =>
             Db.SQL<Employee>($"SELECT t FROM {typeof(Employee)} t WHERE t.Boss =?", this);
@@ -26,8 +26,8 @@ namespace RESTarExample
     [Database]
     public class EmployeeDetails
     {
-        public int Salary;
-        public DateTime DateOfEmployment;
+        public int Salary { get; set; }
+        public DateTime DateOfEmployment { get; set; }
     }
 
     // The 'Employee_01' table will, however, not serialize and deserialize 
@@ -46,10 +46,10 @@ namespace RESTarExample
     [Database, RESTar]
     public class BetterEmployee
     {
-        public string Name;
-        public string Title;
+        public string Name { get; set; }
+        public string Title { get; set; }
 
-        public EmployeeDetails Details;
+        public EmployeeDetails Details { get; set; }
 
         /// <summary>
         /// 'Boss' is an object reference. When serializing an entity in the resource 
@@ -116,7 +116,7 @@ namespace RESTarExample
         /// attribute. This way we still have control over what the resulting JSON will 
         /// look like.
         /// </summary>
-        [DataMember(Name = "Boss")] public ulong? BossObjectNo;
+        [DataMember(Name = "Boss")] public ulong? BossObjectNo { get; set; }
 
         // This means that an entity of this resource will be serialized as (for example):
         // {

@@ -162,7 +162,7 @@ namespace RESTarExample
     [Database, RESTar]
     public class R1
     {
-        public int I;
+        public int I { get; set; }
 
         [JsonConstructor]
         private R1(int i)
@@ -261,8 +261,8 @@ namespace RESTarExample
     [Database]
     public class DbClass
     {
-        public string MyString;
-        public int MyInt;
+        public string MyString { get; set; }
+        public int MyInt { get; set; }
     }
 
     [RESTar]
@@ -674,9 +674,9 @@ namespace RESTarExample
     [Database]
     public class Table
     {
-        public string STR;
-        public DateTime? DT;
-        public DateTime DT2;
+        public string STR { get; set; }
+        public DateTime? DT { get; set; }
+        public DateTime DT2 { get; set; }
     }
 
     [RESTar(Method.GET, Singleton = true)]
@@ -719,10 +719,10 @@ namespace RESTarExample
     [Database, RESTar]
     public class MyResource
     {
-        public int MyId;
-        public decimal MyDecimal;
-        public string MyMember;
-        public string SomeMember;
+        public int MyId { get; set; }
+        public decimal MyDecimal { get; set; }
+        public string MyMember { get; set; }
+        public string SomeMember { get; set; }
 
         [RESTar(Method.GET, Description = "Returns a fine object")]
         public class Get : JObject, ISelector<Get>
@@ -735,7 +735,7 @@ namespace RESTarExample
     [Database, RESTar]
     public class MyClass
     {
-        public int MyInt;
+        public int MyInt { get; set; }
         private int prInt;
 
         public int OtherInt
@@ -805,7 +805,7 @@ namespace RESTarExample
     [Database, RESTar]
     public class MyOther
     {
-        public string Str;
+        public string Str { get; set; }
     }
 
     [DList(typeof(MyElement))]
