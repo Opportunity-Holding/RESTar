@@ -116,7 +116,7 @@ namespace RESTar.Requests
         /// <param name="error">A RESTarError describing the error, or null if valid</param>
         /// <param name="resource">The resource referenced in the URI</param>
         /// <param name="uriComponents">The URI components of the uri, if valid. Otherwise null</param>
-        public bool UriIsValid(string uri, out Results.Error error, out IResource resource, out IUriComponents uriComponents)
+        public bool UriIsValid(string uri, out Error error, out IResource resource, out IUriComponents uriComponents)
         {
             if (uri == null) throw new ArgumentNullException(nameof(uri));
             var parameters = new RequestParameters(this, (Method) (-1), uri, null, null);
@@ -124,7 +124,7 @@ namespace RESTar.Requests
             if (parameters.Error != null)
             {
                 var invalidParametersRequest = new InvalidParametersRequest(parameters);
-                error = (Results.Error) parameters.Error.AsResultOf(invalidParametersRequest);
+                error = (Error) parameters.Error.AsResultOf(invalidParametersRequest);
                 resource = null;
                 return false;
             }
@@ -136,7 +136,7 @@ namespace RESTar.Requests
                 error = null;
                 return true;
             }
-            error = request.Evaluate() as Results.Error;
+            error = request.Evaluate() as Error;
             return false;
         }
 
@@ -202,7 +202,7 @@ namespace RESTar.Requests
         /// <summary>
         /// The context of internal webhook requests
         /// </summary>
-        internal static Context Webhook(string apiKey, out Results.Error error)
+        internal static Context Webhook(string apiKey, out Error error)
         {
             WebhookContext.TryCreate(apiKey, out var context, out error);
             return context;

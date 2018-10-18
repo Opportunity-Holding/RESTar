@@ -32,47 +32,47 @@ namespace RESTar.Admin
         /// <summary>
         /// The date and time when this error was created
         /// </summary>
-        public DateTime Time;
+        public DateTime Time { get; private set; }
 
         /// <summary>
         /// The name of the resource that the request was aimed at
         /// </summary>
-        public string ResourceName;
+        public string ResourceName { get; private set; }
 
         /// <summary>
         /// The method used when the error was created
         /// </summary>
-        public Method Method;
+        public Method Method { get; private set; }
 
         /// <summary>
         /// The error code of the error
         /// </summary>
-        public ErrorCodes ErrorCode;
+        public ErrorCodes ErrorCode { get; private set; }
 
         /// <summary>
         /// The runtime stack trace for the thrown exception
         /// </summary>
-        public string StackTrace;
+        public string StackTrace { get; private set; }
 
         /// <summary>
         /// A message describing the error
         /// </summary>
-        public string Message;
+        public string Message { get; private set; }
 
         /// <summary>
         /// The URI of the request that generated the error
         /// </summary>
-        public string Uri;
+        public string Uri { get; private set; }
 
         /// <summary>
         /// The headers of the request that generated the error (API keys are not saved here)
         /// </summary>
-        public string Headers;
+        public string Headers { get; private set; }
 
         /// <summary>
         /// The body of the request that generated the error
         /// </summary>
-        public string Body;
+        public string Body { get; private set; }
 
         private Error() { }
 

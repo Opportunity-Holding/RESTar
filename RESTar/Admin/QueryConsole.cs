@@ -27,13 +27,13 @@ namespace RESTar.Admin
         /// <inheritdoc />
         public override void Dispose() => Consoles.Remove(this);
 
-        internal static void Publish<T>(string query, object[] args, IEnumerable<T> enumerable)
+        internal static void Publish<T>(string query, object[] args, Func<IEnumerator<T>> getEnumerator)
         {
             if (Consoles.Count == 0) return;
             var argsString = args == null ? null : "\r\nArgs: " + string.Join(", ", args);
             string queryPlan;
-            if (enumerable != null)
-                using (var enumerator = enumerable.GetEnumerator())
+            if (getEnumerator != null)
+                using (var enumerator = getEnumerator())
                     queryPlan = enumerator.ToString();
             else queryPlan = "No query plan available";
             var message = $"{DateTime.UtcNow:O}: {query}{argsString}\r\n{queryPlan.Replace("\t", "  ")}";

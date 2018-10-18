@@ -34,7 +34,6 @@ using static System.StringComparison;
 using static RESTar.ErrorCodes;
 using static RESTar.Internal.ContentTypeController;
 using static RESTar.Requests.Operators;
-using static Starcounter.DbHelper;
 using Operator = RESTar.Internal.Operator;
 using UriComponents = RESTar.Requests.UriComponents;
 
@@ -218,14 +217,14 @@ namespace RESTar
         /// </summary>
         /// <param name="objectNo">The Starcounter ObjectNo to get the extension for</param>
         /// <returns>The object with the specified ObjectNo</returns>
-        public static T GetReference<T>(this ulong? objectNo) where T : class => FromID(objectNo ?? 0) as T;
+        public static T GetReference<T>(this ulong? objectNo) where T : class => Db.FromId(objectNo ?? 0) as T;
 
         /// <summary>
         /// Gets the object for a Starcounter object number
         /// </summary>
         /// <param name="objectNo">The Starcounter ObjectNo to get the extension for</param>
         /// <returns>The object with the specified ObjectNo</returns>
-        public static T GetReference<T>(this ulong objectNo) where T : class => FromID(objectNo) as T;
+        public static T GetReference<T>(this ulong objectNo) where T : class => Db.FromId(objectNo) as T;
 
         internal static bool EqualsNoCase(this string s1, string s2) => string.Equals(s1, s2, OrdinalIgnoreCase);
         internal static string ToMethodsString(this IEnumerable<Method> ie) => string.Join(", ", ie);

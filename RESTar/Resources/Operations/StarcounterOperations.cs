@@ -32,7 +32,7 @@ namespace RESTar.Resources.Operations
                 case 0:
                     var sql = $"{select}{GetOrderbyString(request, out _)}";
                     var result = Db.SQL<T>(sql);
-                    QueryConsole.Publish(sql, null, result);
+                    QueryConsole.Publish(sql, null, () => result.GetEnumerator());
                     return result;
                 case 1 when request.Conditions[0] is var only && only.Operator == Operators.EQUALS:
                     if (string.Equals(ObjectNo, only.Key, OrdinalIgnoreCase))
@@ -45,14 +45,14 @@ namespace RESTar.Resources.Operations
                     var (where, values) = request.Conditions.GetSQL().MakeWhereClause(orderByIndexName, out var useOrderBy);
                     sql = useOrderBy ? $"{select}{where}{orderBy}" : $"{select}{where}";
                     result = Db.SQL<T>(sql, values);
-                    QueryConsole.Publish(sql, values, result);
+                    QueryConsole.Publish(sql, values, () => result.GetEnumerator());
                     return !request.Conditions.HasPost(out var post) ? result : result.Where(post);
             }
         }
 
         private static IEnumerable<T> GetFromObjectNo(ulong objectNo)
         {
-            QueryConsole.Publish($"FROMID {objectNo}", null, default(IEnumerable<T>));
+            QueryConsole.Publish<T>($"FROMID {objectNo}", null, null);
             if (objectNo == 0) return null;
             return Db.FromId(objectNo) is T t ? new[] {t} : null;
         }

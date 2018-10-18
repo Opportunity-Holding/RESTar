@@ -106,7 +106,7 @@ namespace RESTarExample
         public BetterEmployee Boss // then we make it into a property like so:
         {
             // ReSharper disable once SuspiciousTypeConversion.Global
-            get => DbHelper.FromID(BossObjectNo.GetValueOrDefault()) as BetterEmployee;
+            get => Db.FromId(BossObjectNo.GetValueOrDefault()) as BetterEmployee;
             set => BossObjectNo = value.GetObjectNo();
         }
 

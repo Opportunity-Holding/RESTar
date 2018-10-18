@@ -66,7 +66,7 @@ namespace RESTar.Internal.Sc
                     CreateIndex(index);
                     count += 1;
                 }
-                catch (SqlException e)
+                catch (DbException e)
                 {
                     throw new Exception($"Could not create index '{index.Name}' on Starcounter database resource " +
                                         $"'{index.Resource.Name}'. Indexes must point to statically defined instance " +
@@ -89,7 +89,7 @@ namespace RESTar.Internal.Sc
                     CreateIndex(index);
                     count += 1;
                 }
-                catch (SqlException e)
+                catch (DbException e)
                 {
                     throw new Exception($"Could not update index '{index.Name}' on Starcounter database resource " +
                                         $"'{index.Resource.Name}'. Indexes must point to statically defined instance " +

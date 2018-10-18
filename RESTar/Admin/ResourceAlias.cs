@@ -42,7 +42,7 @@ namespace RESTar.Admin
             }
         }
 
-        internal string _resource;
+        private string _resource;
 
         /// <summary>
         /// The name of the resource to bind the alias to
