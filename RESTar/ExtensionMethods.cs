@@ -209,8 +209,17 @@ namespace RESTar
 
         #region Other
 
-        internal static string UriEncode(this string str) => Uri.EscapeDataString(str);
-        internal static string UriDecode(this string str) => Uri.UnescapeDataString(str);
+        internal static string UriEncode(this string str)
+        {
+            if (str == null) return null;
+            return Uri.EscapeDataString(str);
+        }
+
+        internal static string UriDecode(this string str)
+        {
+            if (str == null) return null;
+            return Uri.UnescapeDataString(str);
+        }
 
         /// <summary>
         /// Gets the object for a Starcounter object number

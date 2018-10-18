@@ -91,7 +91,7 @@ namespace RESTar.Meta
         /// </summary>
         [RESTarMember(ignore: true)] public IEnumerable<Index> ScIndexesWhereFirst => ScIndexableColumn is Column column
             ? Db.SQL<Index>("SELECT t.\"Index\" FROM Starcounter.Metadata.IndexedColumn t " +
-                            "WHERE t.\"Column\" =? AND t.\"Position\" =?", column, 0)
+                            "WHERE t.\"Column\" =? AND t.\"Position\" =?", column, 0UL)
             : null;
 
         /// <summary>

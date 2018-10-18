@@ -134,9 +134,9 @@ namespace RESTarTester
                 {
                     new Webhook {Destination = "/wr1", EventSelector = $"/{typeof(ENotification).FullName}"},
                     new Webhook {Destination = "/wr2", EventSelector = $"/{typeof(ENotification).FullName}"},
-                    new Webhook {Destination = "http://localhost:8202/wrStream", EventSelector = $"/{typeof(EStream).FullName}"},
-                    new Webhook {Destination = "http://localhost:8202/wrBytes", EventSelector = $"/{typeof(EBytes).FullName}"},
-                    new Webhook {Destination = "http://localhost:8202/wrString", EventSelector = $"/{typeof(EString).FullName}"},
+                    new Webhook {Destination = "http://localhost:8103/wrStream", EventSelector = $"/{typeof(EStream).FullName}"},
+                    new Webhook {Destination = "http://localhost:8103/wrBytes", EventSelector = $"/{typeof(EBytes).FullName}"},
+                    new Webhook {Destination = "http://localhost:8103/wrString", EventSelector = $"/{typeof(EString).FullName}"},
                     new Webhook
                     {
                         Destination = "/wrResource1",
@@ -666,6 +666,8 @@ namespace RESTarTester
             var res5 = r5.Evaluate().Serialize();
             var res6 = r6.Evaluate().Serialize();
 
+            // Vad innehåller resource1?
+
             Debug.Assert(res5.Headers.ContentType == ContentType.Excel);
             Debug.Assert(res5.Body.Length > 1);
 
@@ -680,7 +682,7 @@ namespace RESTarTester
 
             Do.Schedule(() => Db.TransactAsync(() => new MyDict() {["Aaa"] = "Wook"}), TimeSpan.FromSeconds(10)).Wait();
 
-            DatabaseIndex.Register<MyDict2>("MyFineIdex", "R");
+            DatabaseIndex.Register<MyDict2>("MyFineIdex", "$R");
 
             Db.TransactAsync(() => { new MyDict2 {["Snoo"] = 123, R = new Resource1 {Byte = 123, String = "Googfoo"}}; });
 

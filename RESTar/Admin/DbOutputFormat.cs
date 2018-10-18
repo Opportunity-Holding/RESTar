@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -107,19 +107,30 @@ namespace RESTar.Admin
             : new Formatter(Name, RegularPre, RegularPost, StartIndent);
 
         internal static Formatter Default => Db.SQL<DbOutputFormat>(ByDefault, true).FirstOrDefault()?.Format ?? default;
-        internal static Formatter Raw => default;
+        internal static Formatter Raw => Db.SQL<DbOutputFormat>(ByName, nameof(Raw)).FirstOrDefault()?.Format ?? default;
         internal static IEnumerable<DbOutputFormat> GetAll() => Db.SQL<DbOutputFormat>(All);
         internal static DbOutputFormat GetByName(string formatName) => Db.SQL<DbOutputFormat>(ByName, formatName).FirstOrDefault();
-
 
         internal static void Init()
         {
             if (GetAll().All(format => format.Name != "Raw"))
-                Db.TransactAsync(() => new DbOutputFormat {Name = "Raw", RegularPattern = RawPattern});
+                Db.TransactAsync(() => new DbOutputFormat
+                {
+                    Name = "Raw",
+                    RegularPattern = RawPattern
+                });
             if (GetAll().All(format => format.Name != "Simple"))
-                Db.TransactAsync(() => new DbOutputFormat {Name = "Simple", RegularPattern = SimplePattern});
+                Db.TransactAsync(() => new DbOutputFormat
+                {
+                    Name = "Simple",
+                    RegularPattern = SimplePattern
+                });
             if (GetAll().All(format => format.Name != "JSend"))
-                Db.TransactAsync(() => new DbOutputFormat {Name = "JSend", RegularPattern = JSendPattern});
+                Db.TransactAsync(() => new DbOutputFormat
+                {
+                    Name = "JSend",
+                    RegularPattern = JSendPattern
+                });
             if (GetAll().All(format => !format.IsDefault))
             {
                 var raw = Db.SQL<DbOutputFormat>(ByName, "Raw").First();
