@@ -11,7 +11,7 @@ namespace RESTar.Internal
         {
             var indexA = Array.IndexOf(RESTarConfig.Methods, a);
             var indexB = Array.IndexOf(RESTarConfig.Methods, b);
-            return indexA < indexB ? -1 : (indexB < indexA ? 1 : 0);
+            return indexA < indexB ? -1 : indexB < indexA ? 1 : 0;
         }
     }
 }

@@ -245,8 +245,7 @@ namespace RESTar
                 var newMacro = new Macro(macro.Name)
                 {
                     Uri = macro.SafeSelect(m => m.UriString) ?? Macro.GetErrorURI(macro.Name, "not available", "Invalid URI syntax"),
-                    Body = macro.SafeSelect(m => m.HasBody ? JToken.Parse(m.BodyUTF8) : null),
-                    OverwriteBody = macro.OverwriteBody,
+                    Body = macro.SafeSelect(m => m.HasBody ? JToken.Parse(m.BodyUTF8) : null), OverwriteBody = macro.OverwriteBody,
                     OverwriteHeaders = macro.OverwriteHeaders
                 };
                 macro.HeadersDictionary?.ForEach(header => newMacro.Headers.Add(header));
@@ -298,31 +297,24 @@ namespace RESTar
 
         private static void ReadApiKeys(JToken apiKeyToken)
         {
-            var currentKeys = new List<string>();
-
-            void recursor(JToken token)
+            IEnumerable<string> recurseApiKeys(JToken token)
             {
                 switch (token)
                 {
                     case JObject apiKey:
                         var keyString = apiKey["Key"].Value<string>();
                         if (keyString == null || Regex.IsMatch(keyString, @"[\(\)]") || !Regex.IsMatch(keyString, RegEx.ApiKey))
-                            throw new Exception(
-                                "An API key contained invalid characters. Must be a non-empty string, not containing whitespace or parentheses, " +
-                                "and only containing ASCII characters from 33 to 126");
+                            throw new Exception("An API key contained invalid characters. Must be a non-empty string, not containing " +
+                                                "whitespace or parentheses, and only containing ASCII characters 33 through 126");
                         var key = keyString.SHA256();
-                        currentKeys.Add(key);
-                        var accessRightList = new List<AccessRight>();
 
-                        void recurseAllowAccess(JToken allowAccessToken)
+                        IEnumerable<AccessRight> recurseAllowAccess(JToken allowAccessToken)
                         {
-                            HashSet<IResource> resourceSet = null;
                             switch (allowAccessToken)
                             {
                                 case JObject allowAccess:
-                                    resourceSet = new HashSet<IResource>();
 
-                                    void recurseResources(JToken resourceToken)
+                                    IEnumerable<IResource> recurseResources(JToken resourceToken)
                                     {
                                         switch (resourceToken)
                                         {
@@ -332,34 +324,39 @@ namespace RESTar
                                                     .Cast<IResourceInternal>()
                                                     .Where(r => r.InnerResources != null)
                                                     .SelectMany(r => r.InnerResources));
-                                                resourceSet.UnionWith(includingInner);
-                                                return;
+                                                foreach (var resource in includingInner)
+                                                    yield return resource;
+                                                yield break;
                                             case JArray resources:
-                                                resources.ForEach(recurseResources);
-                                                return;
+                                                foreach (var resource in resources.SelectMany(recurseResources))
+                                                    yield return resource;
+                                                yield break;
                                             default: throw new Exception("Invalid API key XML syntax in config file");
                                         }
                                     }
 
-                                    recurseResources(allowAccess["Resource"]);
-                                    accessRightList.Add(new AccessRight
-                                    {
-                                        Resources = resourceSet.OrderBy(r => r.Name).ToList(),
-                                        AllowedMethods = allowAccess["Methods"].Value<string>().ToUpper().ToMethodsArray()
-                                    });
-                                    return;
+                                    yield return new AccessRight
+                                    (
+                                        resources: recurseResources(allowAccess["Resource"])
+                                            .OrderBy(r => r.Name)
+                                            .ToList(),
+                                        allowedMethods: allowAccess["Methods"]
+                                            .Value<string>()
+                                            .ToUpper()
+                                            .ToMethodsArray()
+                                    );
+                                    yield break;
 
                                 case JArray allowAccesses:
-                                    allowAccesses.ForEach(recurseAllowAccess);
-                                    return;
+                                    foreach (var allowAccess in allowAccesses.SelectMany(recurseAllowAccess))
+                                        yield return allowAccess;
+                                    yield break;
 
                                 default: throw new Exception("Invalid API key XML syntax in config file");
                             }
                         }
 
-                        recurseAllowAccess(token["AllowAccess"]);
-
-                        var accessRights = AccessRights.ToAccessRights(accessRightList, key);
+                        var accessRights = AccessRights.ToAccessRights(recurseAllowAccess(token["AllowAccess"]), key);
                         foreach (var resource in Resources.Where(r => r.GETAvailableToAll))
                         {
                             if (accessRights.TryGetValue(resource, out var methods))
@@ -375,17 +372,19 @@ namespace RESTar
                             accessRights.ForEach(pair => existing[pair.Key] = pair.Value);
                         }
                         else Authenticator.ApiKeys[key] = accessRights;
-                        break;
+                        yield return key;
+                        yield break;
+
                     case JArray apiKeys:
-                        accessRightList = null;
-                        foreach (var k in apiKeys)
-                            recursor(k);
-                        break;
+                        foreach (var _key in apiKeys.SelectMany(recurseApiKeys))
+                            yield return _key;
+                        yield break;
+
                     default: throw new Exception("Invalid API key XML syntax in config file");
                 }
             }
 
-            recursor(apiKeyToken);
+            var currentKeys = recurseApiKeys(apiKeyToken).ToList();
             Authenticator.ApiKeys.Keys.Except(currentKeys).ToList().ForEach(key =>
             {
                 if (Authenticator.ApiKeys.TryGetValue(key, out var accessRights))

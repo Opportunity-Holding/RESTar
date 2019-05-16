@@ -119,7 +119,7 @@ namespace RESTar.Internal.Sc
             {
                 if (!properties.TryGetValue(c.Name, out var property))
                     throw new Exception($"Unknown property '{c.Name}' of resource '{index.ResourceName}'");
-                var name = property.ScIndexableColumnName ?? c.Name;
+                var name = property.ScIndexableColumnName ?? property.ActualName;
                 return $"{name.Fnuttify()}{(c.Descending ? " DESC" : "")}";
             });
             Db.SQL($"CREATE INDEX {index.Name.Fnuttify()} ON {index.Resource.Type.RESTarTypeName().Fnuttify()} " +

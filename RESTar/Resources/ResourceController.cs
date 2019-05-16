@@ -79,9 +79,7 @@ namespace RESTar.Resources
             if (string.IsNullOrWhiteSpace(name))
                 throw new Exception("Missing or invalid name for new resource");
             ResolveDynamicResourceName(ref name);
-            if (methods?.Any() != true)
-                methods = RESTarConfig.Methods;
-            var methodsArray = methods.ResolveMethodsCollection().ToArray();
+            var methodsArray = methods.ResolveMethodRestrictions().ToArray();
 
             var inserted = ResourceProviderInternal.InsertProceduralResource(name, description, methodsArray, (object) Data);
             if (inserted != null)
@@ -103,7 +101,7 @@ namespace RESTar.Resources
             resource.SetAlias(Alias);
             ResourceProviderInternal.SetProceduralResourceDescription(procedural, Description);
             resource.Description = Description;
-            var methods = (EnabledMethods ?? RESTarConfig.Methods).ResolveMethodsCollection().ToArray();
+            var methods = EnabledMethods.ResolveMethodRestrictions().ToArray();
             ResourceProviderInternal.SetProceduralResourceMethods(procedural, methods);
             resource.AvailableMethods = methods;
         }

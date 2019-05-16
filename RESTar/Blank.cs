@@ -12,10 +12,10 @@ namespace RESTar
     /// <summary>
     /// The Blank resource is a test and debug resource that does nothing at all.
     /// </summary>
-    [RESTar]
+    [RESTar(Description = description)]
     public class Blank : ISelector<Blank>, IInserter<Blank>, IUpdater<Blank>, IDeleter<Blank>
     {
-        private const string description = "A test and debug resource that does nothing at all.";
+        private const string description = "A test and debug entity resource that is just an empty set of entities with no properties";
 
         /// <inheritdoc />
         public IEnumerable<Blank> Select(IRequest<Blank> request) => null;

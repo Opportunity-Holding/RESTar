@@ -16,9 +16,9 @@ namespace RESTar.Meta
         public readonly string Name;
 
         /// <summary>
-        /// The integer value of the enumeration
+        /// The numeric value of the enumeration
         /// </summary>
-        public readonly int Value;
+        public readonly int NumericValue;
 
         /// <summary>
         /// The attributes of the enumeration member
@@ -27,10 +27,10 @@ namespace RESTar.Meta
 
         /// <summary>
         ///  </summary>
-        internal EnumMember(string name, int value, IEnumerable<Attribute> attributes)
+        internal EnumMember(string name, int numericValue, IEnumerable<Attribute> attributes)
         {
             Name = name;
-            Value = value;
+            NumericValue = numericValue;
             Attributes = attributes;
         }
 
@@ -45,7 +45,7 @@ namespace RESTar.Meta
                     .Select(t => new EnumMember
                     (
                         name: t.Name,
-                        value: (int) (Convert.ChangeType(t.GetValue(null), TypeCode.Int32) ?? -1),
+                        numericValue: (int) (Convert.ChangeType(t.GetValue(null), TypeCode.Int32) ?? -1),
                         attributes: t.GetCustomAttributes<Attribute>()
                     ))
                     .ToArray()
@@ -68,7 +68,7 @@ namespace RESTar.Meta
     /// <summary>
     /// A generic struct to describe a member of an enumeration
     /// </summary>
-    public struct EnumMember<T>
+    public struct EnumMember<T> where T : Enum
     {
         /// <summary>
         /// The name of the enumeration members
@@ -78,7 +78,12 @@ namespace RESTar.Meta
         /// <summary>
         /// The integer value of the enumeration
         /// </summary>
-        public readonly int Value;
+        public readonly int NumericValue;
+
+        /// <summary>
+        /// The value of the enumeration
+        /// </summary>
+        public readonly T Value;
 
         /// <summary>
         /// The attributes of the enumeration member
@@ -87,9 +92,10 @@ namespace RESTar.Meta
 
         /// <summary>
         ///  </summary>
-        internal EnumMember(IEnumerable<Attribute> attributes, string name, int value)
+        internal EnumMember(IEnumerable<Attribute> attributes, T value)
         {
-            Name = name;
+            Name = value.ToString();
+            NumericValue = Convert.ToInt32(value);
             Value = value;
             Attributes = attributes;
         }
@@ -112,13 +118,12 @@ namespace RESTar.Meta
             var exceptionStrings = except?.Select(e => e.ToString()).ToList();
             return typeof(T).IsEnum
                 ? typeof(T).GetFields()
-                    .Where(t => t.FieldType.IsEnum)
-                    .Where(t => exceptionStrings?.Contains(t.Name) != true)
-                    .Select(t => new EnumMember<T>
+                    .Where(field => field.FieldType.IsEnum)
+                    .Where(field => exceptionStrings?.Contains(field.Name) != true)
+                    .Select(field => new EnumMember<T>
                     (
-                        name: t.Name,
-                        value: (int) (Convert.ChangeType(t.GetValue(null), TypeCode.Int32) ?? -1),
-                        attributes: t.GetCustomAttributes<Attribute>()
+                        value: (T) (field.GetValue(null) ?? -1),
+                        attributes: field.GetCustomAttributes<Attribute>()
                     ))
                     .ToArray()
                 : throw new ArgumentException($"Type must be enum, found '{typeof(T).RESTarTypeName()}'");
@@ -129,9 +134,8 @@ namespace RESTar.Meta
         /// </summary>
         public static T[] Values => typeof(T).IsEnum
             ? typeof(T).GetFields()
-                .Where(t => t.FieldType.IsEnum)
-                .Select(t => t.GetValue(null))
-                .Cast<T>()
+                .Where(field => field.FieldType.IsEnum)
+                .Select(field => (T) (field.GetValue(null) ?? -1))
                 .ToArray()
             : throw new ArgumentException($"Type must be enum, found '{typeof(T).RESTarTypeName()}'");
 

@@ -94,6 +94,7 @@ namespace RESTar.Meta
                             "WHERE t.\"Column\" =? AND t.\"Position\" =?", column, 0UL)
             : null;
 
+
         /// <summary>
         /// The attributes that this property has been decorated with
         /// </summary>  
@@ -177,6 +178,7 @@ namespace RESTar.Meta
             {
                 const string columnSQL = "SELECT t FROM Starcounter.Metadata.\"Column\" t WHERE t.\"Table\".FullName =? AND t.Name =?";
                 var method = p.GetGetMethod();
+
                 string columnNameGuess;
                 if (method.HasAttribute<CompilerGeneratedAttribute>())
                     columnNameGuess = p.Name;

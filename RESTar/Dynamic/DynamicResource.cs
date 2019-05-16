@@ -56,7 +56,7 @@ namespace RESTar.Dynamic
             Name = name;
             TableName = table.RESTarTypeName();
             Description = description;
-            Methods = availableMethods.ResolveMethodsCollection().ToArray();
+            Methods = availableMethods.ResolveMethodRestrictions().ToArray();
         }
     }
 }

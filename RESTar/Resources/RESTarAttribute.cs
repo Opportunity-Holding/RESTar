@@ -63,6 +63,6 @@ namespace RESTar.Resources
         /// Registers a new RESTar resource and provides permissions. If no methods are 
         /// provided in the constructor, all methods are made available for this resource.
         /// </summary>
-        public RESTarAttribute(params Method[] methodRestrictions) => AvailableMethods = methodRestrictions.ResolveMethodsCollection();
+        public RESTarAttribute(params Method[] methodRestrictions) => AvailableMethods = methodRestrictions.ResolveMethodRestrictions();
     }
 }

@@ -20,7 +20,7 @@ namespace RESTar.Admin
         /// <summary>
         /// The name of the error
         /// </summary>
-        public string Name { get; private set; }
+        public ErrorCodes Name { get; private set; }
 
         /// <summary>
         /// The numeric code of the error
@@ -33,7 +33,7 @@ namespace RESTar.Admin
             if (request == null) throw new ArgumentNullException(nameof(request));
             return EnumMember<ErrorCodes>
                 .GetMembers()
-                .Select(m => new ErrorCode {Name = m.Name, Code = m.Value})
+                .Select(m => new ErrorCode {Name = m.Value, Code = m.NumericValue})
                 .Where(request.Conditions);
         }
     }

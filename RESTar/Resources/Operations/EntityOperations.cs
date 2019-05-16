@@ -264,11 +264,13 @@ namespace RESTar.Resources.Operations
             var toUpdate = new List<(JObject json, T source)>();
             try
             {
+                var body = request.GetBody();
+                if (!body.HasContent) return (toInsert, toUpdate);
                 var conditions = request.MetaConditions.SafePost
                     .Split(',')
                     .Select(s => new Condition<T>(s, Operators.EQUALS, null))
                     .ToList();
-                foreach (var entity in request.GetBody().Deserialize<JObject>())
+                foreach (var entity in body.Deserialize<JObject>())
                 {
                     conditions.ForEach(cond => cond.Value = entity.SafeSelect(cond.Term.Evaluate));
                     innerRequest.Conditions = conditions;

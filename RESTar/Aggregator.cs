@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -51,9 +52,25 @@ namespace RESTar
             {
                 switch (node)
                 {
-                    case Aggregator obj:
-                        obj.ToList().ForEach(pair => obj[pair.Key] = populator(pair.Value));
-                        return obj;
+                    case Aggregator aggregator:
+                        foreach (var pair in aggregator.ToList())
+                        {
+                            var (key, value) = (pair.Key, populator(pair.Value));
+                            switch (key)
+                            {
+                                case "$add" when IsNumberArray(value, out var terms): return terms.Sum();
+                                case "$sub" when IsNumberArray(value, out var terms): return terms.Aggregate((x, y) => x - y);
+                                case "$mul" when IsNumberArray(value, out var terms): return terms.Aggregate((x, y) => x * y);
+                                case "$mod" when IsNumberArray(value, out var terms, 2): return terms[0] % terms[1];
+
+                                case "$add": throw GetArithmeticException(key);
+                                case "$sub": throw GetArithmeticException(key);
+                                case "$mul": throw GetArithmeticException(key);
+                                case "$mod": throw GetArithmeticException(key, "For $mod, the integer list must have a length of exacly 2");
+                            }
+                            aggregator[pair.Key] = value;
+                        }
+                        return aggregator;
                     case JArray array:
                         return array.Select(item => item.ToObject<object>()).Select(populator).ToList();
                     case JObject jobj:
@@ -75,7 +92,13 @@ namespace RESTar
                         else return stringValue;
                         if (string.IsNullOrWhiteSpace(uri))
                             throw new Exception($"Invalid URI in aggregator template. Expected relative uri after '{method.ToString()}'.");
-                        switch (request.Context.CreateRequest(uri, method, null, request.Headers).Evaluate())
+                        var internalRequest = request.Context.CreateRequest
+                        (
+                            uri: uri,
+                            method: method,
+                            headers: request.Headers
+                        );
+                        switch (internalRequest.Evaluate())
                         {
                             case Error error: throw new Exception($"Could not get source data from '{uri}'. The resource returned: {error}");
                             case NoContent _: return null;
@@ -89,11 +112,38 @@ namespace RESTar
                 }
             }
 
-            if (!request.GetBody().HasContent)
-                throw new Exception("Missing data source for Aggregator request");
-            var template = request.GetBody().Deserialize<Aggregator>().FirstOrDefault();
-            populator(template);
-            return new[] {template}.Where(request.Conditions);
+            var template = request.GetBody().Deserialize<Aggregator>().FirstOrDefault()
+                           ?? throw new Exception("Missing data source for Aggregator request");
+            var populatedTemplate = populator(template);
+            switch (populatedTemplate)
+            {
+                case Aggregator aggregator: return new[] {aggregator}.Where(request.Conditions);
+                case long integer: return new[] {new Aggregator {["Result"] = integer}}.Where(request.Conditions);
+                case var other:
+                    throw new InvalidOperationException("An error occured when reading the request template, " +
+                                                        $"the root object was resolved to {other?.GetType().FullName ?? "null"}");
+            }
+        }
+
+        private static Exception GetArithmeticException(string operation, string message = null)
+        {
+            return new InvalidOperationException($"Invalid arguments for operation '{operation}'. The value for key '{operation}' must evaluate " +
+                                                 $"to a list of integers. {message}");
+        }
+
+        private static bool IsNumberArray(object _value, out long[] array, int? ofLength = null)
+        {
+            try
+            {
+                array = ((IList) _value).Cast<long>().ToArray();
+                if (ofLength.HasValue) return array.Length == ofLength.Value;
+                return true;
+            }
+            catch (InvalidCastException)
+            {
+                array = null;
+                return false;
+            }
         }
     }
 }

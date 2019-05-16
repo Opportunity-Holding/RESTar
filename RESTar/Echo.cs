@@ -19,8 +19,8 @@ namespace RESTar
     [RESTar(GET, AllowDynamicConditions = true, Description = description)]
     public class Echo : JObject, ISelector<Echo>
     {
-        private const string description = "The Echo resource is a test and utility resource that " +
-                                           "returns the request conditions as an object.";
+        private const string description = "The Echo resource is a test and utility entity resource that " +
+                                           "returns the request conditions as an entity.";
 
         private Echo() { }
 
@@ -33,9 +33,9 @@ namespace RESTar
             var members = request.Conditions.Select(c => new JProperty(c.Key, c.Value));
             var body = request.GetBody().Deserialize<JObject>();
             if (body != null) members = members.Union<JProperty>(body.SelectMany(item => item.Properties()), EqualityComparer);
-            var echo = new[] {new Echo(members)};
+            var echo = new Echo(members);
             TypeCache.ClearTermsFor<Echo>();
-            return echo;
+            yield return echo;
         }
     }
 }
