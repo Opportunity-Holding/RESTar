@@ -116,6 +116,9 @@
     <Compile Include="Meta\Internal\EventResource.cs" />
     <Compile Include="Meta\Internal\EventResourceProvider.cs" />
     <Compile Include="Meta\IEvent.cs" />
+    <Compile Include="Palindrom\PalindromContentTypeProvider.cs" />
+    <Compile Include="Requests\Cookie.cs" />
+    <Compile Include="Requests\Cookies.cs" />
     <Compile Include="Requests\DbHeaders.cs" />
     <Compile Include="Requests\Filters\RegexSearch.cs" />
     <Compile Include="Requests\HeadersEnumerator.cs" />

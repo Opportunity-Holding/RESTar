@@ -12,9 +12,9 @@ namespace RESTar.Internal
         protected override WebSocket CreateWebSocket() => throw new NotImplementedException();
         protected override bool IsWebSocketUpgrade { get; } = false;
 
-        public override IRequest CreateRequest(string uri, Method method = Method.GET, byte[] body = null, Headers headers = null)
+        public override IRequest CreateRequest(string uri, Method method = Method.GET, byte[] body = null, Headers headers = null, Cookies cookies = null)
         {
-            return new RemoteRequest(this, method, uri, body, headers);
+            return new RemoteRequest(this, method, uri, body, headers, cookies);
         }
 
         public override IRequest<T> CreateRequest<T>(Method method = Method.GET, string protocolId = "restar", string viewName = null) =>

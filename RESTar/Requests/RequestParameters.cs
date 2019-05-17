@@ -52,6 +52,11 @@ namespace RESTar.Requests
         public Headers Headers { get; }
 
         /// <summary>
+        /// The cookies of the request
+        /// </summary>
+        public Cookies Cookies { get; }
+
+        /// <summary>
         /// Are these request parameters valid?
         /// </summary>
         public bool IsValid => Error == null;
@@ -111,12 +116,13 @@ namespace RESTar.Requests
         /// <summary>
         /// Used when creating parsed requests
         /// </summary>
-        internal RequestParameters(Context context, Method method, string uri, byte[] body, Headers headers)
+        internal RequestParameters(Context context, Method method, string uri, byte[] body, Headers headers, Cookies cookies)
         {
             TraceId = context.InitialTraceId;
             Context = context;
             Method = method;
             Headers = headers ?? new Headers();
+            Cookies = cookies ?? new Cookies();
             IsWebSocketUpgrade = Context.WebSocket?.Status == WebSocketStatus.Waiting;
             Uri = URI.ParseInternal(uri, PercentCharsEscaped(headers), context, out var cachedProtocolProvider);
             var hasMacro = Uri?.Macro != null;

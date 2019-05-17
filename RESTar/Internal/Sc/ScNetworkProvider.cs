@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -29,7 +28,7 @@ namespace RESTar.Internal.Sc
                     if (!client.TryAuthenticate(ref uri, headers, out var error))
                         return ToResponse(error);
                     var context = new ScContext(client, scRequest);
-                    using (var request = context.CreateRequest(uri, method, scRequest.BodyBytes, headers))
+                    using (var request = context.CreateRequest(uri, method, scRequest.BodyBytes, headers, new Cookies(scRequest.Cookies)))
                     {
                         switch (request.Evaluate().Serialize())
                         {
@@ -142,7 +141,7 @@ namespace RESTar.Internal.Sc
                 }
             }
             result.Headers.ForEach(header => response.Headers[header.Key] = header.Value);
-            response.Cookies = result.Cookies as List<string> ?? response.Cookies.ToList();
+            response.Cookies = result.Cookies.Select(cookie => cookie.ToString()).ToList();
             return response;
         }
 

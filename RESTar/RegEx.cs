@@ -79,5 +79,10 @@
         /// Used when matching parts of URI conditions
         /// </summary>
         internal const string UriCondition = @"^(?<key>[^\!=<>]*)(?<op>(=|\!=|<=|>=|<|>))(?<val>.*)$";
+
+        /// <summary>
+        /// Matches valid cookie names
+        /// </summary>
+        internal const string CookieName = @"^[a-zA-Z_]\w*(\.[a-zA-Z_]\w*)*$";
     }
 }

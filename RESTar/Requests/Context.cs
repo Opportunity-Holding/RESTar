@@ -95,7 +95,8 @@ namespace RESTar.Requests
         /// <param name="method">The method to perform</param>
         /// <param name="body">The body of the request</param>
         /// <param name="headers">The headers of the request</param>
-        public virtual IRequest CreateRequest(string uri, Method method = GET, byte[] body = null, Headers headers = null)
+        /// <param name="cookies">The cookies contained in the request</param>
+        public virtual IRequest CreateRequest(string uri, Method method = GET, byte[] body = null, Headers headers = null, Cookies cookies = null)
         {
             if (uri == null) throw new ArgumentNullException(nameof(uri));
             if (IsWebSocketUpgrade)
@@ -103,7 +104,7 @@ namespace RESTar.Requests
                 WebSocket = CreateWebSocket();
                 WebSocket.Context = this;
             }
-            var parameters = new RequestParameters(this, method, uri, body, headers);
+            var parameters = new RequestParameters(this, method, uri, body, headers, cookies);
             if (!parameters.IsValid) return new InvalidParametersRequest(parameters);
             return Construct((dynamic) parameters.IResource, parameters);
         }
@@ -119,7 +120,7 @@ namespace RESTar.Requests
         public bool UriIsValid(string uri, out Error error, out IResource resource, out IUriComponents uriComponents)
         {
             if (uri == null) throw new ArgumentNullException(nameof(uri));
-            var parameters = new RequestParameters(this, (Method) (-1), uri, null, null);
+            var parameters = new RequestParameters(this, (Method) (-1), uri, null, null, null);
             uriComponents = null;
             if (parameters.Error != null)
             {

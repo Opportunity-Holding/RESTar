@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RESTar;
 using RESTar.Linq;
+using RESTar.Palindrom;
 using RESTar.Requests;
 using RESTar.Resources;
 using RESTar.Resources.Operations;
@@ -28,7 +29,8 @@ namespace RESTarExample
                 uri: "/rest",
                 requireApiKey: true,
                 allowAllOrigins: false,
-                configFilePath: @"C:\Mopedo\mopedo\Mopedo.config"
+                configFilePath: @"C:\Mopedo\mopedo\Mopedo.config",
+                contentTypeProviders: new[] {new PalindromContentTypeProvider()}
             );
         }
     }
@@ -710,7 +712,6 @@ namespace RESTarExample
         public int OtherInt { get; set; }
 
         public MyResource Resource { get; }
-
     }
 
     [RESTar]

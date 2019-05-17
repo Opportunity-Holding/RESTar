@@ -27,8 +27,7 @@ namespace RESTar.Requests
         public bool HasConditions => !(_conditions?.Count > 0);
         private Headers _responseHeaders;
         public Headers ResponseHeaders => _responseHeaders ?? (_responseHeaders = new Headers());
-        private ICollection<string> _cookies;
-        public ICollection<string> Cookies => _cookies ?? (_cookies = new List<string>());
+        public Cookies Cookies { get; }
         private Exception Error { get; }
         public bool IsValid => Error == null;
         public Func<IEnumerable<T>> EntitiesProducer { get; set; }
@@ -222,7 +221,6 @@ namespace RESTar.Requests
                             if (!entity.CanUpdate) throw new SafePostNotSupported("(no updater implemented)");
                         }
                         var result = EntityOperations<T>.GetEvaluator(Method).Invoke(this);
-                        result.Cookies = Cookies;
                         ResponseHeaders.ForEach(h => result.Headers[h.Key.StartsWith("X-") ? h.Key : "X-" + h.Key] = h.Value);
                         if (RESTarConfig.AllowAllOrigins)
                             result.Headers.AccessControlAllowOrigin = "*";
@@ -280,6 +278,7 @@ namespace RESTar.Requests
             Target = resource;
             TargetType = typeof(T);
             Method = parameters.Method;
+            Cookies = parameters.Cookies;
 
             try
             {

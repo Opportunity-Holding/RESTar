@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -43,8 +42,7 @@ namespace RESTar.Requests
         public MetaConditions MetaConditions => _metaConditions ?? (_metaConditions = new MetaConditions());
         private Headers _responseHeaders;
         public Headers ResponseHeaders => _responseHeaders ?? (_responseHeaders = new Headers());
-        private ICollection<string> _cookies;
-        public ICollection<string> Cookies => _cookies ?? (_cookies = new List<string>());
+        public Cookies Cookies { get; }
         public IUriComponents UriComponents => null;
 
         public IResult Evaluate() => _GetResult().Result;
@@ -159,13 +157,14 @@ namespace RESTar.Requests
         public bool ExcludeHeaders { get; }
         public DateTime LogTime { get; }
 
-        public RemoteRequest(RemoteContext context, Method method, string uri, byte[] body, Headers headers)
+        public RemoteRequest(RemoteContext context, Method method, string uri, byte[] body, Headers headers, Cookies cookies)
         {
             TraceId = context.InitialTraceId;
             Context = context;
             Headers = headers ?? new Headers();
             if (context.HasApiKey)
                 Headers.Authorization = $"apikey {context.ApiKey}";
+            Cookies = cookies;
             Method = method;
             MessageType = MessageType.HttpInput;
             IsValid = true;

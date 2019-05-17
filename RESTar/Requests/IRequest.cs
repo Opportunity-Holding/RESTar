@@ -161,7 +161,7 @@ namespace RESTar.Requests
         /// Set cookies by adding strings to this collection. The strings in this
         /// collection will be used as values for Set-Cookie response headers.
         /// </summary>
-        ICollection<string> Cookies { get; }
+        Cookies Cookies { get; }
 
         /// <summary>
         /// The URI parameters that was used to construct this request
