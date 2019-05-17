@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RESTarTutorial</RootNamespace>
     <AssemblyName>RESTarTutorial</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StarcounterVersionCompatibility>2.4</StarcounterVersionCompatibility>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -52,22 +52,13 @@
     <Reference Include="Dynamit, Version=1.0.6.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\packages\Dynamit_2.4.1.0.6\lib\net461\Dynamit.dll</HintPath>
     </Reference>
-    <Reference Include="EPPlus, Version=4.5.2.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
-      <HintPath>..\packages\EPPlus.4.5.2.1\lib\net40\EPPlus.dll</HintPath>
+    <Reference Include="EPPlus, Version=4.5.3.1, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.3.1\lib\net40\EPPlus.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
-    <Reference Include="RESTar, Version=0.4.119.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\RESTar.0.4.119\lib\net452\RESTar.dll</HintPath>
-    </Reference>
-    <Reference Include="RESTar.OData, Version=0.4.62.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\RESTar.OData.0.4.62\lib\net452\RESTar.OData.dll</HintPath>
-    </Reference>
-    <Reference Include="RESTar.SQLite, Version=0.4.82.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\RESTar.SQLite.0.4.82\lib\net452\RESTar.SQLite.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
@@ -95,10 +86,6 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />

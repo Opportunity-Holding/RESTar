@@ -8,13 +8,15 @@ namespace RESTar.Resources
     {
         internal static IReadOnlyList<Method> ResolveMethodRestrictions(this IEnumerable<Method> methods)
         {
-            var restrictions = new HashSet<Method>(methods ?? RESTarConfig.Methods);
-            if (restrictions.Contains(Method.GET))
+            var methodsSet = methods?.ToHashSet();
+            if (methodsSet == null || methodsSet.Count == 0)
+                methodsSet = RESTarConfig.Methods.ToHashSet();
+            if (methodsSet.Contains(Method.GET))
             {
-                restrictions.Add(Method.REPORT);
-                restrictions.Add(Method.HEAD);
+                methodsSet.Add(Method.REPORT);
+                methodsSet.Add(Method.HEAD);
             }
-            return restrictions.OrderBy(i => i, MethodComparer.Instance).ToList().AsReadOnly();
+            return methodsSet.OrderBy(i => i, MethodComparer.Instance).ToList().AsReadOnly();
         }
     }
 }

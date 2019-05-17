@@ -120,18 +120,12 @@ namespace RESTarExample
     [Database, RESTar]
     public class Thing2
     {
-        private int _inte;
-
-        public int Inte
-        {
-            get => _inte;
-            set => _inte = value;
-        }
+        public int Inte { get; set; }
 
         public int Inte2
         {
-            get => _inte;
-            set => _inte = value;
+            get => Inte;
+            set => Inte = value;
         }
 
         public int Int { get; set; }
@@ -524,28 +518,6 @@ namespace RESTarExample
     #endregion
 
     [Database, RESTar]
-    public class Static
-    {
-        [RESTarMember(hideIfNull: true)] public int Swoo { get; set; }
-        private string _str;
-
-        public string Str
-        {
-            get => _str;
-            set
-            {
-                if (value == "nono")
-                    throw new Exception("Oh no no!");
-                else _str = value;
-            }
-        }
-
-        public dynamic XOXO => Str;
-
-        public int Int { get; set; }
-    }
-
-    [Database, RESTar]
     public class MyStatic3
     {
         public EE E { get; set; }
@@ -642,13 +614,11 @@ namespace RESTarExample
     {
         public string Str { get; set; }
         public int Int { get; set; }
-        public Static AStatic => Db.SQL<Static>($"SELECT t FROM {typeof(Static)} t").FirstOrDefault();
 
         protected override object GetDeclaredMemberValue(string key)
         {
             switch (key)
             {
-                case nameof(AStatic): return AStatic;
                 case nameof(Str): return Str;
                 case nameof(Int): return Int;
                 default: return null;
@@ -736,26 +706,11 @@ namespace RESTarExample
     public class MyClass
     {
         public int MyInt { get; set; }
-        private int prInt;
 
-        public int OtherInt
-        {
-            get => prInt;
-            set => prInt = value;
-        }
+        public int OtherInt { get; set; }
 
         public MyResource Resource { get; }
 
-        public int ThirdInt
-        {
-            get => prInt;
-            set
-            {
-                if (value > 10)
-                    prInt = value;
-                else prInt = 0;
-            }
-        }
     }
 
     [RESTar]
@@ -806,20 +761,6 @@ namespace RESTarExample
     public class MyOther
     {
         public string Str { get; set; }
-    }
-
-    [DList(typeof(MyElement))]
-    public class MyList : DList
-    {
-        protected override DElement NewElement(DList list, int index, object value = null)
-        {
-            return new MyElement(list, index, value);
-        }
-    }
-
-    public class MyElement : DElement
-    {
-        public MyElement(DList list, int index, object value = null) : base(list, index, value) { }
     }
 
     [RESTar(Method.GET)]

@@ -26,36 +26,42 @@ namespace RESTar.Admin
 
         internal ResourceAlias() { }
 
-        private string alias;
+        /// <summary>
+        /// The underlying storage for Alias
+        /// </summary>
+        [RESTarMember(ignore: true)] public string AliasString { get; private set; }
 
         /// <summary>
         /// The alias string
         /// </summary>
         public string Alias
         {
-            get => alias;
+            get => AliasString;
             set
             {
                 if (value[0] == '$')
                     throw new Exception($"Invalid Alias '{value}'. Aliases cannot begin with '$'");
-                alias = value;
+                AliasString = value;
             }
         }
 
-        private string _resource;
+        /// <summary>
+        /// The underlying storage for Resource
+        /// </summary>
+        [RESTarMember(ignore: true)] public string ResourceString { get; private set; }
 
         /// <summary>
         /// The name of the resource to bind the alias to
         /// </summary>
         public string Resource
         {
-            get => _resource;
+            get => ResourceString;
             set
             {
                 try
                 {
                     var r = RESTarConfig.ResourceByName[value];
-                    _resource = r.Name;
+                    ResourceString = r.Name;
                 }
                 catch (KeyNotFoundException)
                 {

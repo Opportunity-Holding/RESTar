@@ -22,7 +22,10 @@ namespace RESTar.Admin
         /// </summary>
         public string Name { get; internal set; }
 
-        private string _regularPattern;
+        /// <summary>
+        /// The underlying storage for RegularPattern
+        /// </summary>
+        public string RegularPatternString { get; private set; }
 
         private const string placeholder = "\"__RESTar__\"";
         private const string macro = "$data";
@@ -32,10 +35,10 @@ namespace RESTar.Admin
         /// </summary>
         public string RegularPattern
         {
-            get => _regularPattern;
+            get => RegularPatternString;
             internal set
             {
-                _regularPattern = value;
+                RegularPatternString = value;
                 (RegularPre, RegularPost) = value.TSplit(macro);
                 var prettyPrintPattern = Providers.Json.SerializeFormatter(
                     JToken.Parse(RegularPre + placeholder + RegularPost), out var indents);
@@ -44,22 +47,25 @@ namespace RESTar.Admin
             }
         }
 
-        private bool _isDefault;
+        /// <summary>
+        /// The underlying storage for IsDefault
+        /// </summary>
+        public bool IsDefaultStore { get; private set; }
 
         /// <summary>
         /// Is this the default pattern?
         /// </summary>
         public bool IsDefault
         {
-            get => _isDefault;
+            get => IsDefaultStore;
             set
             {
                 if (value)
                 {
-                    GetAll().ForEach(f => f._isDefault = false);
-                    _isDefault = true;
+                    GetAll().ForEach(f => f.IsDefaultStore = false);
+                    IsDefaultStore = true;
                 }
-                else _isDefault = false;
+                else IsDefaultStore = false;
             }
         }
 
@@ -134,7 +140,7 @@ namespace RESTar.Admin
             if (GetAll().All(format => !format.IsDefault))
             {
                 var raw = Db.SQL<DbOutputFormat>(ByName, "Raw").First();
-                Db.TransactAsync(() => raw._isDefault = true);
+                Db.TransactAsync(() => raw.IsDefaultStore = true);
             }
         }
     }

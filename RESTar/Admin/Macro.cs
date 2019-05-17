@@ -34,18 +34,21 @@ namespace RESTar.Admin
 
         [Transient] private bool UriChanged { get; set; }
 
-        private string uri;
+        /// <summary>
+        /// The underlying storage for URIs
+        /// </summary>
+        [RESTarMember(ignore: true)] public string UriString { get; private set; }
 
         /// <summary>
         /// The URI of the macro
         /// </summary>
         public string Uri
         {
-            get => uri;
+            get => UriString;
             set
             {
-                UriChanged = UriChanged || uri != value;
-                uri = value;
+                UriChanged = UriChanged || UriString != value;
+                UriString = value;
             }
         }
 
@@ -142,7 +145,7 @@ namespace RESTar.Admin
 
         #region IUriComponents
 
-        [Transient] private IUriComponents uriComponents;
+//        [Transient] private IUriComponents UriComponentsStore { get; set; }
 
         private IUriComponents MakeUriComponents(out Results.Error error)
         {
@@ -157,7 +160,7 @@ namespace RESTar.Admin
         /// <summary>
         /// If asked for through IUriComponents API, require IsValid for non null value
         /// </summary>
-        private IUriComponents UriComponents => uriComponents ?? (uriComponents = MakeUriComponents(out _));
+        private IUriComponents UriComponents => MakeUriComponents(out _); // UriComponentsStore ?? (UriComponentsStore = MakeUriComponents(out _));
 
         IProtocolProvider IUriComponents.ProtocolProvider => ProtocolController.DefaultProtocolProvider.ProtocolProvider;
         string IUriComponents.ResourceSpecifier => UriComponents?.ResourceSpecifier;

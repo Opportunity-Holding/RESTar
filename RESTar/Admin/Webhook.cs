@@ -57,18 +57,21 @@ namespace RESTar.Admin
         /// </summary>
         public Method Method { get; set; }
 
-        private string destination;
+        /// <summary>
+        /// The underlying storage for Destination
+        /// </summary>
+        [RESTarMember(ignore: true)] public string DestinationString { get; private set; }
 
         /// <summary>
         /// The destination URL for this webhook
         /// </summary>
         public string Destination
         {
-            get => destination;
+            get => DestinationString;
             set
             {
-                DestinationHasChanged = DestinationHasChanged || destination != value;
-                destination = value;
+                DestinationHasChanged = DestinationHasChanged || DestinationString != value;
+                DestinationString = value;
             }
         }
 
@@ -113,18 +116,21 @@ namespace RESTar.Admin
         /// </summary>
         [RESTarMember(replaceOnUpdate: true)] public CustomPayloadRequest CustomPayloadRequest
         {
-            get => customPayloadRequest;
+            get => CustomPayloadRequestStore;
             set
             {
-                if (value == null || !value.Equals(customPayloadRequest))
-                    customPayloadRequest?.Delete();
-                customPayloadRequest = value;
+                if (value == null || !value.Equals(CustomPayloadRequestStore))
+                    CustomPayloadRequestStore?.Delete();
+                CustomPayloadRequestStore = value;
             }
         }
 
         #region Internal
 
-        private CustomPayloadRequest customPayloadRequest;
+        /// <summary>
+        /// The underlying storage for CustomPayloadRequest
+        /// </summary>
+        [RESTarMember(ignore: true)] public CustomPayloadRequest CustomPayloadRequestStore { get; private set; }
 
         [Transient] private bool DestinationHasChanged { get; set; }
 
@@ -382,7 +388,7 @@ namespace RESTar.Admin
                             break;
                         case NoContent _:
                             result.Dispose();
-                            if (customPayloadRequest.BreakOnNoContent) return;
+                            if (CustomPayloadRequestStore.BreakOnNoContent) return;
                             break;
                     }
                     (body, contentType, contentLength) = (result.Body, result.Headers.ContentType.GetValueOrDefault(), result.Body.Length);

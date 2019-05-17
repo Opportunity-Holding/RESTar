@@ -22,8 +22,12 @@ namespace RESTar.Resources
     /// </summary>
     /// <typeparam name="TProvider"></typeparam>
     /// <typeparam name="TController"></typeparam>
-    public abstract class ResourceController<TController, TProvider> : Resource, ISelector<TController>, IInserter<TController>,
-        IUpdater<TController>, IDeleter<TController>
+    public abstract class ResourceController<TController, TProvider> :
+        Resource,
+        ISelector<TController>,
+        IInserter<TController>,
+        IUpdater<TController>,
+        IDeleter<TController>
         where TController : ResourceController<TController, TProvider>, new()
         where TProvider : IEntityResourceProvider, IProceduralEntityResourceProvider
     {
@@ -119,7 +123,7 @@ namespace RESTar.Resources
                 ResourceProviderInternal.RemoveProceduralResource(type);
         }
 
-        #region RESTar
+        #region RESTar resource methods
 
         /// <inheritdoc />
         public virtual IEnumerable<TController> Select(IRequest<TController> request)

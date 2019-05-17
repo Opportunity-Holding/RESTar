@@ -29,11 +29,11 @@ namespace RESTar.Admin
         /// </summary>
         public string URI
         {
-            get => uri;
+            get => UriString;
             set
             {
-                URIHasChanged = URIHasChanged || uri != value;
-                uri = value;
+                URIHasChanged = URIHasChanged || UriString != value;
+                UriString = value;
             }
         }
 
@@ -74,7 +74,10 @@ namespace RESTar.Admin
 
         [Transient] private bool URIHasChanged { get; set; }
 
-        private string uri;
+        /// <summary>
+        /// The underlying storage for URI
+        /// </summary>
+        [RESTarMember(ignore: true)] public string UriString { get; private set; }
 
         /// <summary>
         /// The API key to use in requests

@@ -80,7 +80,7 @@ namespace RESTarExample
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             //return loadedAssemblies.Where(assembly => !assembly.IsDynamic).Select(assembly => assembly.Location).Where(l => !String.IsNullOrWhiteSpace(l));
             return Assembly
-                .GetEntryAssembly()
+                .GetEntryAssembly()?
                 .GetReferencedAssemblies()
                 .Select(name => loadedAssemblies
                     .SingleOrDefault(a => a.FullName == name.FullName)?.Location)

@@ -83,11 +83,20 @@ namespace RESTar
             .Where(type => !type.IsAbstract)
             .ToList();
 
-        internal static IEnumerable<Type> GetSubclasses(this Type baseType) =>
-            from assembly in AppDomain.CurrentDomain.GetAssemblies()
-            from type in assembly.GetTypes()
-            where type.IsSubclassOf(baseType)
-            select type;
+        internal static IEnumerable<Type> GetSubclasses(this Type baseType) => AppDomain.CurrentDomain
+            .GetAssemblies()
+            .SelectMany(assembly =>
+            {
+                try
+                {
+                    return assembly.GetTypes();
+                }
+                catch
+                {
+                    return new Type[0];
+                }
+            })
+            .Where(type => type.IsSubclassOf(baseType));
 
         internal static T AsImplemented<T>(this T @delegate) where T : Delegate
         {
