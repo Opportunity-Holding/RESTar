@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using RESTar.Requests;
 using RESTar.Resources.Operations;
 
@@ -21,15 +22,24 @@ namespace RESTar.Resources.Templates
             get => _isSubmitted;
             set
             {
-                _isSubmitted = value;
-                if (value) OnSubmit();
+                if (value)
+                {
+                    PreSubmit();
+                    _isSubmitted = true;
+                    PostSubmit();
+                }
             }
         }
 
         /// <summary>
-        /// This method is called when a form has been updated
+        /// This method is called before a form is submitted
         /// </summary>
-        protected abstract void OnSubmit();
+        protected abstract void PreSubmit();
+
+        /// <summary>
+        /// This method is called after a form has been submitted
+        /// </summary>
+        protected abstract void PostSubmit();
 
         IEnumerable<T> ISelector<T>.Select(IRequest<T> request)
         {
@@ -38,13 +48,7 @@ namespace RESTar.Resources.Templates
 
         int IUpdater<T>.Update(IRequest<T> request)
         {
-            var count = 0;
-            foreach (var item in request.GetInputEntities())
-            {
-                item.OnSubmit();
-                count += 1;
-            }
-            return count;
+            return request.GetInputEntities().Count();
         }
     }
 }

@@ -11,6 +11,13 @@ using RESTar.WebSockets;
 
 namespace RESTar.Palindrom
 {
+    public enum SessionStatus
+    {
+        Waiting,
+        Open,
+        Closed
+    }
+
     [RESTar]
     public class Session : ITerminal, ITerminalInstanceResolver<Session>
     {
@@ -31,14 +38,13 @@ namespace RESTar.Palindrom
         static Session() => ActiveSessions = new ConcurrentDictionary<string, Session>();
 
         internal const string SessionCookieName = "PalindromSession";
-        internal const int TimeoutMilliseconds = 60;
+        internal const int TimeoutMilliseconds = 60 * 1000;
 
         internal static Session Create(IRequest initialRequest, object root, IRequest patchRequest)
         {
             var newSessionId = Guid.NewGuid().ToString("N");
             return ActiveSessions[newSessionId] = new Session(newSessionId)
             {
-                Resource = initialRequest.Resource,
                 Root = root,
                 PatchRequest = patchRequest
             };
@@ -54,26 +60,43 @@ namespace RESTar.Palindrom
                 dueTime: TimeoutMilliseconds,
                 period: -1
             );
+            Status = SessionStatus.Waiting;
         }
 
         public Session() { }
 
         // Instance:
 
-        private DateTime LastUsed { get; set; }
         private Timer Timer { get; set; }
         private IRequest PatchRequest { get; set; }
 
         public IWebSocket WebSocket { private get; set; }
 
         public string ID { get; private set; }
-        public Meta.IResource Resource { get; private set; }
         public object Root { get; private set; }
+        public DateTime LastUsed { get; private set; }
+        public SessionStatus Status { get; private set; }
 
-        private void ResetTimer() => Timer.Change(TimeoutMilliseconds, -1);
+        public TimeSpan TimeUntilTimeout
+        {
+            get
+            {
+                var value = TimeSpan
+                    .FromMilliseconds(TimeoutMilliseconds)
+                    .Subtract(DateTime.UtcNow - LastUsed);
+                return value > TimeSpan.Zero ? value : TimeSpan.Zero;
+            }
+        }
+
+        private void ResetTimer()
+        {
+            Timer.Change(TimeoutMilliseconds, -1);
+            LastUsed = DateTime.UtcNow;
+        }
 
         public void Open()
         {
+            Status = SessionStatus.Open;
             WebSocket.SendText($"Now open! ID: {ID}, Root:");
             WebSocket.SendJson(Root, prettyPrint: true);
             ResetTimer();
@@ -81,21 +104,28 @@ namespace RESTar.Palindrom
 
         public void HandleTextInput(string input)
         {
-            LastUsed = DateTime.Now;
-            ResetTimer();
-            var (command, arg) = input.TSplit(" ", trim: true);
-            switch (command)
+            if (Status == SessionStatus.Waiting) return;
+            if (Status == SessionStatus.Closed)
+                throw new Exception("This session is now closed!");
+
+            switch (input)
             {
                 case "GET":
                     WebSocket.SendJson(Root);
                     break;
-                case "PATCH" when !string.IsNullOrWhiteSpace(arg):
-
-
-                    WebSocket.SendJson("Patch applied!");
+                case "PING":
+                    ResetTimer();
                     break;
                 default:
-                    WebSocket.SendException(new InvalidOperationException("Invalid command syntax"));
+                    ResetTimer();
+                    var body = $"{{{input.Replace('=', ':')}}}";
+                    using (PatchRequest)
+                    {
+                        PatchRequest.SetBody(body);
+                        var result = PatchRequest.Evaluate();
+                        WebSocket.SendResult(result);
+                    }
+                    WebSocket.SendJson(Root);
                     break;
             }
         }
@@ -107,6 +137,7 @@ namespace RESTar.Palindrom
         public void Dispose()
         {
             ActiveSessions.Remove(ID);
+            Status = SessionStatus.Closed;
         }
     }
 }

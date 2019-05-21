@@ -76,24 +76,15 @@ namespace RESTar.Palindrom
             {
                 writer.WriteLine("<!DOCTYPE html>");
                 writer.WriteLine("<html lang=\"en-US\">");
-                writer.WriteLine("<head> <title> Palindrom on RESTar </title> </head>");
                 writer.WriteLine("<body>");
-                writer.WriteLine("<p>");
-                writer.WriteLine("Hi there! This is a demo of partial server-side Palindrom running from RESTar!");
+                writer.WriteLine("Bootstrapping code will be run here.");
                 writer.Write("<br>");
-                writer.WriteLine($"Request URI: {request.UriComponents}");
+                writer.WriteLine($"A new session was created with id: {session.ID}");
                 writer.Write("<br>");
-                writer.WriteLine($"Resource selected: {request.Resource}");
-                writer.Write("<br>");
-                writer.WriteLine("Here comes the root (first thing selected by the request):");
+                writer.WriteLine("Current state:");
                 writer.Write("<br>");
                 writer.WriteLine(Providers.Json.Serialize(entity));
                 writer.Write("<br>");
-                writer.WriteLine($"A palindrom session was created with ID: {session.ID}. You should find this as the value of " +
-                                 "the PalindromSession cookie as well");
-                writer.Write("<br>");
-                writer.WriteLine($"Make a WS request to /palindrom.session/id={session.ID} to get started");
-                writer.WriteLine("</p>");
                 writer.WriteLine("</body>");
                 writer.WriteLine("</html>");
             }

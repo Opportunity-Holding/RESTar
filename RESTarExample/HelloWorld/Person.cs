@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using RESTar;
 using RESTar.Meta;
-using RESTar.Requests;
 using RESTar.Resources;
-using RESTar.Resources.Operations;
 using Starcounter;
 
 #pragma warning disable 1591
@@ -81,33 +78,6 @@ namespace RESTarExample.HelloWorld
     // example:
 
 
-
-
-    [RESTar(Method.GET, Method.PATCH)]
-    public class Registration : ResourceWrapper<Whatever>, ISelector<Whatever>, IUpdater<Whatever>
-    {
-        internal string HtmlPath { get; set; } = "/registration.html";
-
-        public IEnumerable<Whatever> Select(IRequest<Whatever> request)
-        {
-            yield return new Whatever();
-        }
-
-        public int Update(IRequest<Whatever> request)
-        {
-            var c = 0;
-            foreach (var item in request.GetInputEntities())
-            {
-                // this is where we are presented with out populated form(s)
-
-
-                c += 1;
-            }
-
-            return c;
-        }
-    }
-
     public class Whatever
     {
         public string FirstName { get; set; }
@@ -115,7 +85,6 @@ namespace RESTarExample.HelloWorld
         public string EmailAddress { get; set; }
         public string Password { get; set; }
     }
-
 
     [Database, RESTar, Palindrom(html: "/person.html")]
     public class Person : IAccessHandler<Person>

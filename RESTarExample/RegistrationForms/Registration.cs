@@ -16,6 +16,7 @@ namespace RESTarExample.RegistrationForms
         public string Email { get; set; }
         public string Password { get; set; }
 
+        // The client can load the view from here
         public string Html => "/registration.html";
 
         private void Validate()
@@ -30,9 +31,11 @@ namespace RESTarExample.RegistrationForms
                 throw new Exception("Invalid password!");
         }
 
-        protected override void OnSubmit()
+        protected override void PreSubmit() => Validate();
+
+        protected override void PostSubmit()
         {
-            Validate();
+            // do something useful with the filled and validated form!
         }
     }
 }

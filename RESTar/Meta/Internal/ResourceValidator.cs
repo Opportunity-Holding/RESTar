@@ -262,6 +262,9 @@ namespace RESTar.Meta.Internal
                 {
                     ValidateCommon(terminal);
 
+                    if (terminal.ImplementsGenericInterface(typeof(ITerminalInstanceResolver<>), out var p) && p[0] != terminal)
+                        throw new InvalidTerminalDeclarationException(terminal, "that implement the ITerminalInstanceResolver interface must " +
+                                                                                "use themselves as generic type parameter in the implementation");
                     if (terminal.ImplementsGenericInterface(typeof(IEnumerable<>)))
                         throw new InvalidTerminalDeclarationException(terminal, "must not be collections");
                     if (terminal.HasResourceProviderAttribute())
