@@ -56,11 +56,6 @@ namespace RESTar.Meta
         TermBindingRule OutputBindingRule { get; }
 
         /// <summary>
-        /// Is this a singleton resource?
-        /// </summary>
-        bool IsSingleton { get; }
-
-        /// <summary>
         /// Does this resource require validation on insertion and updating?
         /// </summary>
         bool RequiresValidation { get; }

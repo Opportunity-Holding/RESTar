@@ -10,7 +10,7 @@ namespace RESTar.Admin
     /// <summary>
     /// The settings resource contains the current settings for the RESTar instance.
     /// </summary>
-    [Database, RESTar(GET, PATCH, Singleton = true, Description = description)]
+    [Database, RESTar(GET, PATCH, Description = description)]
     public class Settings
     {
         private const string description = "The Settings resource contains the current " +
@@ -20,7 +20,6 @@ namespace RESTar.Admin
                
         internal static ushort _Port => Instance.Port;
         internal static string _Uri => Instance.Uri;
-        internal static bool _ViewEnabled => Instance.ViewEnabled;
         internal static bool _PrettyPrint => Instance.PrettyPrint;
         internal static int _DaysToSaveErrors => Instance.DaysToSaveErrors;
         internal static string _ResourcesPath => Instance.ResourcesPath;
@@ -37,11 +36,6 @@ namespace RESTar.Admin
         /// The URI of the RESTar REST API
         /// </summary>
         public string Uri { get; private set; }
-               
-        /// <summary>
-        /// Is the view enabled?
-        /// </summary>
-        [RESTarMember(ignore: true)] public bool ViewEnabled { get; private set; }
                
         /// <summary>
         /// Will JSON be serialized with pretty print? (indented JSON)
@@ -91,7 +85,6 @@ namespace RESTar.Admin
             {
                 Port = port,
                 Uri = uri,
-                ViewEnabled = viewEnabled,
                 PrettyPrint = prettyPrint,
                 DaysToSaveErrors = daysToSaveErrors,
                 LineEndings = lineEndings,

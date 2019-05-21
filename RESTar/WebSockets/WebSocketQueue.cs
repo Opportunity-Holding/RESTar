@@ -28,6 +28,8 @@ namespace RESTar.WebSockets
 
         public Headers Headers => ToQueueFor.Headers;
 
+        public ReadonlyCookies Cookies => ToQueueFor.Cookies;
+
         public WebSocketQueue(IWebSocketInternal webSocket)
         {
             ActionQueue = new ConcurrentQueue<Action>();
@@ -51,7 +53,7 @@ namespace RESTar.WebSockets
 
         public void DirectToShell(IEnumerable<Condition<Shell>> a = null) => ActionQueue.Enqueue(() => ToQueueFor.DirectToShell(a));
 
-        public void DirectTo<T>(ITerminalResource<T> t, IEnumerable<Condition<T>> a = null) where T : class, ITerminal =>
+        public void DirectTo<T>(ITerminalResource<T> t, ICollection<Condition<T>> a = null) where T : class, ITerminal =>
             ActionQueue.Enqueue(() => ToQueueFor.DirectTo(t, a));
 
         public void Disconnect(string message) => ActionQueue.Enqueue(() => ToQueueFor.Disconnect(message));

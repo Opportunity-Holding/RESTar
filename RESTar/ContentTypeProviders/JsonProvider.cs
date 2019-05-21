@@ -69,6 +69,19 @@ namespace RESTar.ContentTypeProviders
             SerializerIgnoreNulls = JsonSerializer.Create(SettingsIgnoreNulls);
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="JsonProvider"/> type
+        /// </summary>
+        public JsonProvider()
+        {
+            MatchStrings = new[] {JsonMimeType, RESTarSpecific, Brief, TextPlain};
+            ContentDispositionFileExtension = ".json";
+            CanWrite = true;
+            CanRead = true;
+            ContentType = "application/json; charset=utf-8";
+            Name = "JSON";
+        }
+
         internal string SerializeFormatter(JToken formatterToken, out int indents)
         {
             using (var sw = new StringWriter())
@@ -121,19 +134,19 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public string Name => "JSON";
+        public string Name { get; }
 
         /// <inheritdoc />
-        public ContentType ContentType { get; } = "application/json; charset=utf-8";
+        public ContentType ContentType { get; }
 
         /// <inheritdoc />
-        public bool CanRead => true;
+        public bool CanRead { get; }
 
         /// <inheritdoc />
-        public bool CanWrite => true;
+        public bool CanWrite { get;  }
 
         /// <inheritdoc />
-        public string ContentDispositionFileExtension => ".json";
+        public string ContentDispositionFileExtension { get; }
 
         /// <inheritdoc />
         public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body) where T : class
@@ -147,7 +160,7 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public string[] MatchStrings { get; set; } = {JsonMimeType, RESTarSpecific, Brief, TextPlain};
+        public string[] MatchStrings { get; set; }
 
         /// <inheritdoc />
         public ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null) where T : class

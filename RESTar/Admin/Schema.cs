@@ -16,7 +16,7 @@ namespace RESTar.Admin
     /// <summary>
     /// The Schema resource provides schemas for non-dynamic RESTar resources
     /// </summary>
-    [RESTar(GET, Singleton = true, Description = description)]
+    [RESTar(GET, Description = description)]
     internal class Schema : JObject, ISelector<Schema>
     {
         private const string description = "The Schema resource provides schemas for " +

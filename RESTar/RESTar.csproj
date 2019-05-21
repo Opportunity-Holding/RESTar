@@ -107,6 +107,7 @@
     <Compile Include="ContentTypeProviders\ExcelFormatException.cs" />
     <Compile Include="ContentTypeProviders\ExcelInputException.cs" />
     <Compile Include="ContentTypeProviders\JsonAdapter.cs" />
+    <Compile Include="ContentTypeProviders\JsonPatchProvider.cs" />
     <Compile Include="ContentTypeProviders\TypeConverter.cs" />
     <Compile Include="ContentTypeProviders\XMLWriter.cs" />
     <Compile Include="Dynamic\Resource.cs" />
@@ -116,7 +117,8 @@
     <Compile Include="Meta\Internal\EventResource.cs" />
     <Compile Include="Meta\Internal\EventResourceProvider.cs" />
     <Compile Include="Meta\IEvent.cs" />
-    <Compile Include="Palindrom\PalindromContentTypeProvider.cs" />
+    <Compile Include="Palindrom\Session.cs" />
+    <Compile Include="Palindrom\PalindromBootstrapper.cs" />
     <Compile Include="Requests\Cookie.cs" />
     <Compile Include="Requests\Cookies.cs" />
     <Compile Include="Requests\DbHeaders.cs" />
@@ -132,6 +134,7 @@
     <Compile Include="Resources\InvalidEventDeclarationException.cs" />
     <Compile Include="Resources\InvalidResourceControllerException.cs" />
     <Compile Include="Resources\IProceduralEntityResourceProvider.cs" />
+    <Compile Include="Resources\ITerminalInstanceResolver.cs" />
     <Compile Include="Resources\MethodNotImplementedAttribute.cs" />
     <Compile Include="NotInitializedException.cs" />
     <Compile Include="Resources\MethodsExtensions.cs" />
@@ -147,6 +150,7 @@
     <Compile Include="Resources\IProceduralEntityResource.cs" />
     <Compile Include="Internal\WebhookController.cs" />
     <Compile Include="Resources\RESTarProceduralAttribute.cs" />
+    <Compile Include="Resources\Templates\Form.cs" />
     <Compile Include="Resources\UnknownEventTypeException.cs" />
     <Compile Include="Results\BadGateway.cs" />
     <Compile Include="Results\Change.cs" />

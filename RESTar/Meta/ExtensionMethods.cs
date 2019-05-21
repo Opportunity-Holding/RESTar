@@ -118,7 +118,6 @@ namespace RESTar.Meta
             }
         }
 
-
         internal static bool IsStarcounterCompatible(this Type type)
         {
             switch (Type.GetTypeCode(type))

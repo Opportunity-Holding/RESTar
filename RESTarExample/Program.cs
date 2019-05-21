@@ -27,10 +27,10 @@ namespace RESTarExample
             RESTarConfig.Init
             (
                 uri: "/rest",
-                requireApiKey: true,
+                // requireApiKey: true,
                 allowAllOrigins: false,
                 configFilePath: @"C:\Mopedo\mopedo\Mopedo.config",
-                contentTypeProviders: new[] {new PalindromContentTypeProvider()}
+                contentTypeProviders: new[] {new PalindromBootstrapper()}
             );
         }
     }
@@ -102,7 +102,7 @@ namespace RESTarExample
         public NotificationEvent(MyNotification payload) : base(payload) => Raise();
     }
 
-    [Database, RESTar]
+    [Database]
     public class Person
     {
         [RESTarMember(name: "PersonName")] public string Name { get; set; }
@@ -190,7 +190,7 @@ namespace RESTarExample
         public DateTime Special { get; set; }
     }
 
-    [RESTar(Method.GET, Singleton = true, Description = description)]
+    [RESTar(Method.GET, Description = description)]
     public class MonthlySpendingReport : ISelector<MonthlySpendingReport>
     {
         private const string description = "Provides an aggregated view of the spending for a given month.";
@@ -651,7 +651,7 @@ namespace RESTarExample
         public DateTime DT2 { get; set; }
     }
 
-    [RESTar(Method.GET, Singleton = true)]
+    [RESTar(Method.GET)]
     public class MyTestResource : Dictionary<string, dynamic>, ISelector<MyTestResource>
     {
         public IEnumerable<MyTestResource> Select(IRequest<MyTestResource> request)

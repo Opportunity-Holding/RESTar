@@ -56,6 +56,11 @@ namespace RESTar.Requests
         #endregion
 
         /// <summary>
+        /// Used internally to create a cookie with a given name, without validation
+        /// </summary>
+        internal Cookie(string name) : this() => Name = name;
+
+        /// <summary>
         /// Creates a new Cookie instance
         /// </summary>
         /// <param name="name">The name of the cookie to create. can be any US-ASCII characters except
@@ -175,7 +180,7 @@ namespace RESTar.Requests
         /// <inheritdoc />
         public bool Equals(Cookie other)
         {
-            return string.Equals(Name, other.Name) && string.Equals(Value, other.Value);
+            return string.Equals(Name, other.Name);
         }
 
         /// <inheritdoc />

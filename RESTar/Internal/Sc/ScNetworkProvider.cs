@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using RESTar.Linq;
 using RESTar.NetworkProviders;
@@ -141,7 +140,7 @@ namespace RESTar.Internal.Sc
                 }
             }
             result.Headers.ForEach(header => response.Headers[header.Key] = header.Value);
-            response.Cookies = result.Cookies.Select(cookie => cookie.ToString()).ToList();
+            result.Cookies.ForEach(cookie => response.Headers["Set-Cookie"] = cookie);
             return response;
         }
 

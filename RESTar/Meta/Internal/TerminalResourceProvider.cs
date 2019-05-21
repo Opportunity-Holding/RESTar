@@ -19,8 +19,14 @@ namespace RESTar.Meta.Internal
             Shell.TerminalResource = Meta.TerminalResource<Shell>.Get;
         }
 
-        internal TerminalResourceProvider() => BuildTerminalMethod =
-            typeof(TerminalResourceProvider).GetMethod(nameof(MakeTerminalResource), BindingFlags.Instance | BindingFlags.NonPublic);
+        internal TerminalResourceProvider()
+        {
+            BuildTerminalMethod = typeof(TerminalResourceProvider).GetMethod
+            (
+                name: nameof(MakeTerminalResource),
+                bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic
+            );
+        }
 
         private readonly MethodInfo BuildTerminalMethod;
         private IResource MakeTerminalResource<T>() where T : class, ITerminal => new TerminalResource<T>();

@@ -252,7 +252,7 @@ namespace RESTar.Requests
         private ISerializedResult SwitchTerminal(ITerminalResource<T> resource)
         {
             var _resource = (Meta.Internal.TerminalResource<T>) resource;
-            var newTerminal = _resource.MakeTerminal(Conditions);
+            var newTerminal = _resource.MakeTerminal(Cookies.AsReadonly(), Headers, Conditions);
             Context.WebSocket.ConnectTo(newTerminal, resource);
             newTerminal.Open();
             return new SwitchedTerminal(this);
@@ -261,7 +261,7 @@ namespace RESTar.Requests
         private ISerializedResult MakeWebSocketUpgrade(ITerminalResource<T> resource)
         {
             var _resource = (Meta.Internal.TerminalResource<T>) resource;
-            var terminal = _resource.MakeTerminal(Conditions);
+            var terminal = _resource.MakeTerminal(Cookies.AsReadonly(), Headers, Conditions);
             Context.WebSocket.SetContext(this);
             Context.WebSocket.ConnectTo(terminal, resource);
             Context.WebSocket.Open();

@@ -1,4 +1,7 @@
-﻿namespace RESTar.Meta
+﻿using System.Collections.Generic;
+using RESTar.Requests;
+
+namespace RESTar.Meta
 {
     /// <summary>
     /// Represents a getter for a property. This is an open delgate, taking a 
@@ -27,4 +30,9 @@
     /// </summary>
     /// <returns></returns>
     public delegate T Constructor<out T>();
+
+    /// <summary>
+    /// Finds or creates a new terminal instance from cookies and headers
+    /// </summary>
+    public delegate T TerminalInstanceResolver<out T>(IDictionary<string, object> assignments, Headers headers, ReadonlyCookies cookies);
 }

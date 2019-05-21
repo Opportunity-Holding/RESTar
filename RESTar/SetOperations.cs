@@ -23,7 +23,7 @@ namespace RESTar
     /// The SetOperations resource can perform advanced operations on entities in one
     /// or more RESTar resources. See the RESTar Specification for details.
     /// </summary>
-    [RESTar(GET, Singleton = true, Description = description, AllowDynamicConditions = true)]
+    [RESTar(GET, Description = description, AllowDynamicConditions = true)]
     public class SetOperations : JObject, ISelector<SetOperations>
     {
         private const string description = "The SetOperations resource can perform advanced operations " +

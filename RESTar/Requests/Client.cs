@@ -155,5 +155,11 @@ namespace RESTar.Requests
             }
             return true;
         }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return $"Origin: {Origin}, IP: {ClientIP}";
+        }
     }
 }
