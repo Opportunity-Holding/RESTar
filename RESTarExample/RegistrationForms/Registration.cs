@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using RESTar.Requests;
 using RESTar.Resources;
+using RESTar.Resources.Operations;
 using RESTar.Resources.Templates;
 using static RESTar.Method;
 
@@ -8,13 +12,27 @@ using static RESTar.Method;
 
 namespace RESTarExample.RegistrationForms
 {
+    public class LicenseAgreement
+    {
+        public string Blabla { get; set; }
+        public bool IAgree { get; set; }
+    }
+
+    public interface IMyRegistration : IEntityResourceInterface
+    {
+        string FN { get; }
+        string PW { get; }
+    }
+
     [RESTar(GET, PATCH)]
     public class Registration : Form<Registration>
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Email { get; set; }
+        public string Email { get; private set; }
         public string Password { get; set; }
+        
+        public LicenseAgreement LicenseAgreement { get; set; }
 
         // The client can load the view from here
         public string Html => "/registration.html";
@@ -34,7 +52,7 @@ namespace RESTarExample.RegistrationForms
         protected override void PreSubmit() => Validate();
 
         protected override void PostSubmit()
-        {
+        {   
             // do something useful with the filled and validated form!
         }
     }

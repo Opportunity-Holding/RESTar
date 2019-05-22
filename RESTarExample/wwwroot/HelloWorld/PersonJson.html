@@ -1,0 +1,28 @@
+<template>
+    <dom-bind>
+        <template is="dom-bind">
+            <h1>{{model.FullName}}'s expense list</h1>
+            <fieldset>
+                <label>First name:</label>
+                <input value="{{model.FirstName$::input}}">
+            </fieldset>
+            <fieldset>
+                <label>Last name:</label>
+                <input value="{{model.LastName$::input}}">
+            </fieldset>
+            <button value="{{model.SaveTrigger$::click}}" onmousedown="++this.value">Save</button>
+            <button value="{{model.CancelTrigger$::click}}" onmousedown="++this.value">Cancel</button>
+            <hr>
+            <template is="dom-repeat" items="{{model.Expenses}}">
+                <div>
+                    <template is="imported-template" model="{{item}}" href$="{{item.Html}}">
+                    </template>
+                </div>
+            </template>
+            <button value="{{model.NewExpenseTrigger$::click}}" onmousedown="++this.value">Add new expense</button>
+            <hr>
+            <h2>Current Balance: {{model.CurrentBalance}}</h2>
+            <button value="{{model.DeleteAllTrigger$::click}}" onmousedown="++this.value">Delete all expenses</button>
+        </template>
+    </dom-bind>
+</template>

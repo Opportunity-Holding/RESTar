@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using RESTar.Admin;
 using RESTar.ContentTypeProviders;
 using RESTar.Requests;
 using RESTar.Results;
+using Starcounter;
 
 namespace RESTar.Palindrom
 {
@@ -56,7 +58,7 @@ namespace RESTar.Palindrom
                 throw new Exception("Can only bootstrap palindrom onto an Entities result");
 
             // this creates a session ID, sets it as a cookie the the request, and remembers the root until later.
-            var session = Session.Create(typedEntities);
+            var session = Session.Create(typedEntities, request.Context);
 
             request.Cookies.Add
             (
@@ -70,19 +72,14 @@ namespace RESTar.Palindrom
 
             using (var writer = new StreamWriter(stream: stream, leaveOpen: true, encoding: Encoding.UTF8, bufferSize: 1024))
             {
-                writer.WriteLine("<!DOCTYPE html>");
-                writer.WriteLine("<html lang=\"en-US\">");
-                writer.WriteLine("<body>");
-                writer.WriteLine("Bootstrapping code will be run here.");
-                writer.Write("<br>");
-                writer.WriteLine($"A new session was created with id: {session.ID}");
-                writer.Write("<br>");
-                writer.WriteLine("Current state:");
-                writer.Write("<br>");
-                writer.WriteLine(session.Root);
-                writer.Write("<br>");
-                writer.WriteLine("</body>");
-                writer.WriteLine("</html>");
+                var template = Self.GET("/sys/app-shell/app-shell.html").Body;
+                var html = string.Format
+                (
+                    template,
+                    Application.Current.Name,
+                    $"{Settings._Uri}/palindrom.session/id={session.ID}"
+                );
+                writer.Write(html);
             }
 
             return 1;

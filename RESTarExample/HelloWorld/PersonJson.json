@@ -1,0 +1,13 @@
+{
+  "Html": "/HelloWorld/PersonJson.html",
+  "FirstName$": "",
+  "LastName$": "",
+  "SaveTrigger$": 0,
+  "FullName": "",
+  "Expenses": [{}],
+  "NewExpenseTrigger$": 0,
+  "CurrentBalance": 0,
+  "CancelTrigger$": 0,
+  "Foo": 12,
+  "DeleteAllTrigger$": 0
+}

@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Dynamit;
+using HelloWorld;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RESTar;
+using RESTar.ContentTypeProviders;
 using RESTar.Linq;
 using RESTar.Palindrom;
 using RESTar.Requests;
@@ -27,10 +29,15 @@ namespace RESTarExample
             RESTarConfig.Init
             (
                 uri: "/rest",
+                port: 8080,
                 // requireApiKey: true,
                 allowAllOrigins: false,
                 configFilePath: @"C:\Mopedo\mopedo\Mopedo.config",
-                contentTypeProviders: new[] {new PalindromBootstrapper()}
+                contentTypeProviders: new IContentTypeProvider[]
+                {
+                    new PalindromBootstrapper(),
+                    new JsonPatchProvider()
+                }
             );
         }
     }

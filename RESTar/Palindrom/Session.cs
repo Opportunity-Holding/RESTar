@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading;
 using RESTar.Requests;
 using RESTar.Resources;
+using RESTar.Resources.Operations;
 using RESTar.Results;
 using RESTar.WebSockets;
+using static RESTar.Method;
 
 #pragma warning disable 1591
 // ReSharper disable All
@@ -36,17 +38,17 @@ namespace RESTar.Palindrom
             return session;
         }
 
-        private static IDictionary<string, Session> ActiveSessions { get; }
+        internal static IDictionary<string, Session> ActiveSessions { get; }
         static Session() => ActiveSessions = new ConcurrentDictionary<string, Session>();
 
         internal const string SessionCookieName = "PalindromSession";
         internal const int TimeoutMilliseconds = 60 * 1000;
 
-        internal static Session Create<T>(IEntities<T> result) where T : class
+        internal static Session Create<T>(IEnumerable<T> entities, Context context) where T : class
         {
             var newSessionId = Guid.NewGuid().ToString("N");
             var session = new Session(newSessionId);
-            session.BaseOnto(result);
+            session.BaseOnto(entities, context);
             return ActiveSessions[newSessionId] = session;
         }
 
@@ -126,7 +128,7 @@ namespace RESTar.Palindrom
                             case IEntities entities:
                                 try
                                 {
-                                    BaseOnto((dynamic) entities);
+                                    BaseOnto((dynamic) entities, WebSocket.Context);
                                     WebSocket.SendText("Navigation successful. Current root:");
                                     WebSocket.SendJson(Root);
                                 }
@@ -158,7 +160,7 @@ namespace RESTar.Palindrom
             }
         }
 
-        private void BaseOnto<T>(IEntities<T> entities) where T : class
+        private void BaseOnto<T>(IEnumerable<T> entities, Context context) where T : class
         {
             var results = entities.ToList();
             switch (results.Count)
@@ -166,7 +168,7 @@ namespace RESTar.Palindrom
                 case 0:
                     throw new Exception("Found no objects to assign to root. Aborting");
                 case 1 when results.First() is T result:
-                    var patchRequest = entities.Context.CreateRequest<T>(Method.PATCH);
+                    var patchRequest = context.CreateRequest<T>(PATCH);
                     patchRequest.Selector = () => new[] {result};
                     Root = result;
                     PatchRequest = patchRequest;
