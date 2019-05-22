@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using RESTar.ContentTypeProviders;
 using RESTar.Requests;
+using RESTar.Results;
 
 namespace RESTar.Palindrom
 {
@@ -52,15 +52,11 @@ namespace RESTar.Palindrom
 
             if (request == null)
                 throw new Exception("No request!");
-
-            // for now, let's just take the first result and use that
-            var entity = entities.FirstOrDefault() ?? throw new InvalidOperationException("No root object was selected by request!");
-
-            var patchRequest = request.Context.CreateRequest<T>(Method.PATCH);
-            patchRequest.Selector = () => new[] {entity};
+            if (!(entities is IEntities<T> typedEntities))
+                throw new Exception("Can only bootstrap palindrom onto an Entities result");
 
             // this creates a session ID, sets it as a cookie the the request, and remembers the root until later.
-            var session = Session.Create(request, entity, patchRequest);
+            var session = Session.Create(typedEntities);
 
             request.Cookies.Add
             (
@@ -83,7 +79,7 @@ namespace RESTar.Palindrom
                 writer.Write("<br>");
                 writer.WriteLine("Current state:");
                 writer.Write("<br>");
-                writer.WriteLine(Providers.Json.Serialize(entity));
+                writer.WriteLine(session.Root);
                 writer.Write("<br>");
                 writer.WriteLine("</body>");
                 writer.WriteLine("</html>");

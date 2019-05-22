@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using RESTar.Requests;
 using RESTar.Resources;
+using RESTar.Results;
 using RESTar.WebSockets;
 
 #pragma warning disable 1591
@@ -40,14 +42,12 @@ namespace RESTar.Palindrom
         internal const string SessionCookieName = "PalindromSession";
         internal const int TimeoutMilliseconds = 60 * 1000;
 
-        internal static Session Create(IRequest initialRequest, object root, IRequest patchRequest)
+        internal static Session Create<T>(IEntities<T> result) where T : class
         {
             var newSessionId = Guid.NewGuid().ToString("N");
-            return ActiveSessions[newSessionId] = new Session(newSessionId)
-            {
-                Root = root,
-                PatchRequest = patchRequest
-            };
+            var session = new Session(newSessionId);
+            session.BaseOnto(result);
+            return ActiveSessions[newSessionId] = session;
         }
 
         private Session(string id)
@@ -115,6 +115,34 @@ namespace RESTar.Palindrom
                     break;
                 case "PING":
                     ResetTimer();
+                    WebSocket.SendText("ECHO");
+                    break;
+                case var go when go.StartsWith("GO "):
+                    var (_, uri) = go.TSplit(" ", trim: true);
+                    using (var request = WebSocket.Context.CreateRequest(uri))
+                    {
+                        switch (request.Evaluate())
+                        {
+                            case IEntities entities:
+                                try
+                                {
+                                    BaseOnto((dynamic) entities);
+                                    WebSocket.SendText("Navigation successful. Current root:");
+                                    WebSocket.SendJson(Root);
+                                }
+                                catch (Exception e)
+                                {
+                                    WebSocket.SendException(e);
+                                }
+                                break;
+                            case Error error:
+                                WebSocket.SendResult(error);
+                                break;
+                            default:
+                                WebSocket.SendText("Navigation failed");
+                                break;
+                        }
+                    }
                     break;
                 default:
                     ResetTimer();
@@ -127,6 +155,24 @@ namespace RESTar.Palindrom
                     }
                     WebSocket.SendJson(Root);
                     break;
+            }
+        }
+
+        private void BaseOnto<T>(IEntities<T> entities) where T : class
+        {
+            var results = entities.ToList();
+            switch (results.Count)
+            {
+                case 0:
+                    throw new Exception("Found no objects to assign to root. Aborting");
+                case 1 when results.First() is T result:
+                    var patchRequest = entities.Context.CreateRequest<T>(Method.PATCH);
+                    patchRequest.Selector = () => new[] {result};
+                    Root = result;
+                    PatchRequest = patchRequest;
+                    break;
+                case var more when more > 1:
+                    throw new Exception("Found more than one object to assign to root. Aborting");
             }
         }
 
