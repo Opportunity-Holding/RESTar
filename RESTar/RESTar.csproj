@@ -117,6 +117,7 @@
     <Compile Include="Meta\Internal\EventResource.cs" />
     <Compile Include="Meta\Internal\EventResourceProvider.cs" />
     <Compile Include="Meta\IEvent.cs" />
+    <Compile Include="Palindrom\PalindromProtocolProvider.cs" />
     <Compile Include="Palindrom\Session.cs" />
     <Compile Include="Palindrom\PalindromBootstrapper.cs" />
     <Compile Include="Requests\Cookie.cs" />

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using RESTar.Requests;
 using RESTar.Resources;
-using RESTar.Resources.Operations;
 using RESTar.Resources.Templates;
 using static RESTar.Method;
 

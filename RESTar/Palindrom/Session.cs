@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using RESTar.ContentTypeProviders;
+using RESTar.Linq;
 using RESTar.Requests;
 using RESTar.Resources;
 using RESTar.Resources.Operations;
@@ -20,6 +23,81 @@ namespace RESTar.Palindrom
         Waiting,
         Open,
         Closed
+    }
+
+    [RESTar]
+    public class SessionReconnect : ISelector<SessionReconnect>, IInserter<SessionReconnect>, IUpdater<SessionReconnect>, IDeleter<SessionReconnect>
+    {
+        public string ID { get; }
+
+        public IEnumerable<SessionReconnect> Select(IRequest<SessionReconnect> request)
+        {
+            return null;
+        }
+
+        public int Insert(IRequest<SessionReconnect> request)
+        {
+            return 0;
+        }
+
+        public int Update(IRequest<SessionReconnect> request)
+        {
+            return 0;
+        }
+
+        public int Delete(IRequest<SessionReconnect> request)
+        {
+            return 0;
+        }
+    }
+
+    [RESTar(GET)]
+    public class SessionRoot : IBinary<SessionRoot>
+    {
+        public string ID { get; }
+
+        public (Stream stream, ContentType contentType) Select(IRequest<SessionRoot> request)
+        {
+            if (!(request.Conditions.Get(nameof(ID), Operators.EQUALS).Value is string id))
+                throw new UnknownResource("No session ID!");
+            if (!Session.ActiveSessions.TryGetValue(id, out var session))
+                throw new UnknownResource(id);
+            return (
+                stream: Providers.Json.SerializeStream(session.Root.State),
+                contentType: ContentType.JSON
+            );
+        }
+    }
+
+    public interface ISessionRoot
+    {
+        object State { get; }
+        IResult ApplyPatch(string patchInput);
+    }
+
+    internal class SessionRootReference<T> : ISessionRoot where T : class
+    {
+        [RESTarMember(hide: true)] object ISessionRoot.State => State;
+        public T State { get; }
+        [RESTarMember(hide: true)] public IRequest<T> PatchRequest { get; }
+        [RESTarMember(hide: true)] public IRequest<T> GetRequest { get; }
+        [RESTarMember(hide: true)] public Session Session { get; }
+
+        public IResult ApplyPatch(string patchInput)
+        {
+            PatchRequest.SetBody(patchInput);
+            using (var request = PatchRequest)
+                return request.Evaluate();
+        }
+
+        public SessionRootReference(Session session, T state, Context context)
+        {
+            State = state;
+            PatchRequest = context.CreateRequest<T>(PATCH, protocolId: "palindrom");
+            PatchRequest.Selector = () => new[] {State};
+            PatchRequest.Headers.ContentType = JsonPatchProvider.JsonPatchMimeType;
+            Session = session;
+        }
     }
 
     [RESTar]
@@ -42,13 +120,13 @@ namespace RESTar.Palindrom
         static Session() => ActiveSessions = new ConcurrentDictionary<string, Session>();
 
         internal const string SessionCookieName = "PalindromSession";
-        internal const int TimeoutMilliseconds = 60 * 1000;
+        internal const int TimeoutMilliseconds = 120 * 1000;
 
         internal static Session Create<T>(IEnumerable<T> entities, Context context) where T : class
         {
             var newSessionId = Guid.NewGuid().ToString("N");
             var session = new Session(newSessionId);
-            session.BaseOnto(entities, context);
+            session.Root = session.CreateSessionRoot(entities, context);
             return ActiveSessions[newSessionId] = session;
         }
 
@@ -70,12 +148,12 @@ namespace RESTar.Palindrom
         // Instance:
 
         private Timer Timer { get; set; }
-        private IRequest PatchRequest { get; set; }
 
         public IWebSocket WebSocket { private get; set; }
 
         public string ID { get; private set; }
-        public object Root { get; private set; }
+        public ISessionRoot Root { get; private set; }
+
         public DateTime LastUsed { get; private set; }
         public SessionStatus Status { get; private set; }
 
@@ -99,8 +177,6 @@ namespace RESTar.Palindrom
         public void Open()
         {
             Status = SessionStatus.Open;
-            WebSocket.SendText($"Now open! ID: {ID}, Root:");
-            WebSocket.SendJson(Root, prettyPrint: true);
             ResetTimer();
         }
 
@@ -109,58 +185,22 @@ namespace RESTar.Palindrom
             if (Status == SessionStatus.Waiting) return;
             if (Status == SessionStatus.Closed)
                 throw new Exception("This session is now closed!");
-
-            switch (input)
-            {
-                case "GET":
-                    WebSocket.SendJson(Root);
-                    break;
-                case "PING":
-                    ResetTimer();
-                    WebSocket.SendText("ECHO");
-                    break;
-                case var go when go.StartsWith("GO "):
-                    var (_, uri) = go.TSplit(" ", trim: true);
-                    using (var request = WebSocket.Context.CreateRequest(uri))
-                    {
-                        switch (request.Evaluate())
-                        {
-                            case IEntities entities:
-                                try
-                                {
-                                    BaseOnto((dynamic) entities, WebSocket.Context);
-                                    WebSocket.SendText("Navigation successful. Current root:");
-                                    WebSocket.SendJson(Root);
-                                }
-                                catch (Exception e)
-                                {
-                                    WebSocket.SendException(e);
-                                }
-                                break;
-                            case Error error:
-                                WebSocket.SendResult(error);
-                                break;
-                            default:
-                                WebSocket.SendText("Navigation failed");
-                                break;
-                        }
-                    }
-                    break;
-                default:
-                    ResetTimer();
-                    var body = $"{{{input.Replace('=', ':')}}}";
-                    using (PatchRequest)
-                    {
-                        PatchRequest.SetBody(body);
-                        var result = PatchRequest.Evaluate();
-                        WebSocket.SendResult(result);
-                    }
-                    WebSocket.SendJson(Root);
-                    break;
-            }
+            ResetTimer();
+            var result = Root.ApplyPatch(input);
+            if (result is Error error)
+                throw error;
         }
 
-        private void BaseOnto<T>(IEnumerable<T> entities, Context context) where T : class
+        public void HandleBinaryInput(byte[] input) => throw new NotImplementedException();
+        public bool SupportsTextInput { get; } = true;
+        public bool SupportsBinaryInput { get; } = false;
+
+        public ISessionRoot CreateSessionRootDynamic(IEntities entities, Context context)
+        {
+            return CreateSessionRoot((dynamic) entities, context);
+        }
+
+        public ISessionRoot CreateSessionRoot<T>(IEnumerable<T> entities, Context context) where T : class
         {
             var results = entities.ToList();
             switch (results.Count)
@@ -168,19 +208,11 @@ namespace RESTar.Palindrom
                 case 0:
                     throw new Exception("Found no objects to assign to root. Aborting");
                 case 1 when results.First() is T result:
-                    var patchRequest = context.CreateRequest<T>(PATCH);
-                    patchRequest.Selector = () => new[] {result};
-                    Root = result;
-                    PatchRequest = patchRequest;
-                    break;
-                case var more when more > 1:
-                    throw new Exception("Found more than one object to assign to root. Aborting");
+                    return new SessionRootReference<T>(this, result, context);
+                default: throw new Exception("Found more than one object to assign to root. Aborting");
             }
         }
 
-        public void HandleBinaryInput(byte[] input) => throw new NotImplementedException();
-        public bool SupportsTextInput { get; } = true;
-        public bool SupportsBinaryInput { get; } = false;
 
         public void Dispose()
         {

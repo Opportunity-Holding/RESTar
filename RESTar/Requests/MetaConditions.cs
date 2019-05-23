@@ -155,7 +155,7 @@ namespace RESTar.Requests
 
         internal static MetaConditions Parse(IReadOnlyCollection<IUriCondition> uriMetaConditions, IEntityResource resource)
         {
-            if (!uriMetaConditions.Any()) return null;
+            if (uriMetaConditions?.Any() != true) return null;
             var renames = uriMetaConditions.Where(c => c.Key.EqualsNoCase("rename"));
             var regular = uriMetaConditions.Where(c => !c.Key.EqualsNoCase("rename"));
             var mc = new MetaConditions {Empty = false};

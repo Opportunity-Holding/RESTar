@@ -5,7 +5,7 @@ namespace RESTar.Results
 {
     /// <inheritdoc />
     /// <summary>
-    /// Exceptions that should be treated as bad requests
+    /// Exceptions that should be treated as a 404, Not Found
     /// </summary>
     public abstract class NotFound : Error
     {

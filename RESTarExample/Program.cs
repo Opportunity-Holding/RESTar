@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Dynamit;
-using HelloWorld;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RESTar;
@@ -35,8 +34,11 @@ namespace RESTarExample
                 configFilePath: @"C:\Mopedo\mopedo\Mopedo.config",
                 contentTypeProviders: new IContentTypeProvider[]
                 {
-                    new PalindromBootstrapper(),
-                    new JsonPatchProvider()
+                    new PalindromBootstrapper()
+                },
+                protocolProviders: new[]
+                {
+                    new PalindromProtocolProvider()
                 }
             );
         }

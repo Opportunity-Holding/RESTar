@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ namespace RESTar.Meta
     /// A term denotes a node in a static or dynamic member tree. Contains a chain of properties, 
     /// used in queries to refer to properties and properties of properties.
     /// </summary>
-    public class Term
+    public class Term : IEnumerable<Property>
     {
         private List<Property> Store;
 
@@ -96,6 +97,11 @@ namespace RESTar.Meta
             .MakeOrGetCachedTerm(propertyInfo.Name, TermBindingRule.DeclaredWithDynamicFallback);
 
         #endregion
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc />
+        public IEnumerator<Property> GetEnumerator() => Store.GetEnumerator();
 
         /// <summary>
         /// Parses a term key string and returns a term describing it. All terms are created here.
@@ -190,18 +196,30 @@ namespace RESTar.Meta
         /// Returns the value that this term denotes for a given target object as well as
         /// the actual key for this property (matching is case insensitive).
         /// </summary>
-        public dynamic Evaluate(object target, out string actualKey)
+        public dynamic Evaluate(object target, out string actualKey) => Evaluate(target, out actualKey, out _, out _);
+
+        /// <summary>
+        /// Returns the value that this term denotes for a given target object as well as
+        /// the actual key for this property (matching is case insensitive), the parent
+        /// of the denoted value, and the property representing the denoted value.
+        /// </summary>
+        public dynamic Evaluate(object target, out string actualKey, out object parent, out Property property)
         {
+            parent = null;
+            property = null;
+
             // If the target is the result of processing using some IProcessor, the type
             // will be JObject. In that case, the object may contain the entire term key
             // as member, even if the term has multiple properties (common result of add 
             // and select). This code handles those cases.
             if (target is JObject jobj)
             {
-                if (jobj.GetValue(Key, StringComparison.OrdinalIgnoreCase)?.Parent is JProperty property)
+                if (jobj.GetValue(Key, StringComparison.OrdinalIgnoreCase)?.Parent is JProperty jproperty)
                 {
-                    actualKey = property.Name;
-                    return property.Value.ToObject<dynamic>();
+                    actualKey = jproperty.Name;
+                    parent = jobj;
+                    property = DynamicProperty.Parse(Key);
+                    return jproperty.Value.ToObject<dynamic>();
                 }
                 MakeDynamic();
             }
@@ -210,7 +228,11 @@ namespace RESTar.Meta
             // keep the null. Else continue evaluating the next property as a property of the
             // previous property value.
             for (var i = 0; target != null && i < Store.Count; i++)
-                target = Store[i].GetValue(target);
+            {
+                parent = target;
+                property = Store[i];
+                target = property.GetValue(target);
+            }
 
             // If the term is dynamic, we do not know the actual key beforehand. We instead
             // set names for dynamic properties when getting their values, and concatenate the

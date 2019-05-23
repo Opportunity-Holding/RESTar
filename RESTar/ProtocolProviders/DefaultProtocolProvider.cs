@@ -138,7 +138,7 @@ namespace RESTar.ProtocolProviders
 
         public ExternalContentTypeProviderSettings ExternalContentTypeProviderSettings { get; } = ExternalContentTypeProviderSettings.AllowAll;
 
-        public IEnumerable<IContentTypeProvider> GetContentTypeProviders() => null;
+        public IEnumerable<IContentTypeProvider> GetCustomContentTypeProviders() => null;
 
         /// <inheritdoc />
         public string MakeRelativeUri(IUriComponents components) => ToUriString(components);

@@ -75,9 +75,9 @@ namespace RESTar.Palindrom
                 var template = Self.GET("/sys/app-shell/app-shell.html").Body;
                 var html = string.Format
                 (
-                    template,
-                    Application.Current.Name,
-                    $"{Settings._Uri}/palindrom.session/id={session.ID}"
+                    format: template,
+                    arg0: Application.Current.Name,
+                    arg1: $"{Settings._Uri}-palindrom/{session.ID}"
                 );
                 writer.Write(html);
             }

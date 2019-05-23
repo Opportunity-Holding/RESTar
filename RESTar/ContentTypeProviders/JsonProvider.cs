@@ -106,6 +106,23 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <summary>
+        /// A general-purpose deserializer. Deserializes the given JSON string.
+        /// </summary>
+        public T Deserialize<T>(string json)
+        {
+            return JsonConvert.DeserializeObject<T>(json, Settings);
+        }
+
+        /// <summary>
+        /// A general-purpose deserializer. Deserializes the given byte array.
+        /// </summary>
+        public T Deserialize<T>(byte[] bytes)
+        {
+            var json = Encoding.UTF8.GetString(bytes);
+            return JsonConvert.DeserializeObject<T>(json, Settings);
+        }
+
+        /// <summary>
         /// Serializes the value to the given JsonTextWriter, using the default serializer
         /// </summary>
         public void Serialize(JsonTextWriter jsonWriter, object value)
@@ -143,7 +160,7 @@ namespace RESTar.ContentTypeProviders
         public bool CanRead { get; }
 
         /// <inheritdoc />
-        public bool CanWrite { get;  }
+        public bool CanWrite { get; }
 
         /// <inheritdoc />
         public string ContentDispositionFileExtension { get; }

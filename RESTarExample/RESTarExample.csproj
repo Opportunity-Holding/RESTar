@@ -92,13 +92,7 @@
     <Compile Include="DB.cs" />
     <Compile Include="ExampleClasses.cs" />
     <Compile Include="HelloWorld\Expense.cs" />
-    <Compile Include="HelloWorld\ExpenseJson.json.cs">
-      <DependentUpon>ExpenseJson.json</DependentUpon>
-    </Compile>
     <Compile Include="HelloWorld\Person.cs" />
-    <Compile Include="HelloWorld\PersonJson.json.cs">
-      <DependentUpon>PersonJson.json</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistrationForms\Registration.cs" />
@@ -112,12 +106,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <TypedJSON Include="HelloWorld\ExpenseJson.json">
-      <Generator>MsBuild:Compile</Generator>
-    </TypedJSON>
-    <TypedJSON Include="HelloWorld\PersonJson.json">
-      <Generator>MsBuild:Compile</Generator>
-    </TypedJSON>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

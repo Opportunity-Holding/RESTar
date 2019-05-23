@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using RESTar.Admin;
-using RESTar.ContentTypeProviders;
 using RESTar.Internal;
 using RESTar.Internal.Auth;
 using static RESTar.Method;
@@ -13,7 +12,6 @@ using static RESTar.ErrorCodes;
 using RESTar.Linq;
 using RESTar.Meta;
 using RESTar.Meta.Internal;
-using RESTar.Palindrom;
 using RESTar.Resources.Operations;
 using RESTar.Results;
 using Binary = RESTar.Results.Binary;
@@ -205,22 +203,7 @@ namespace RESTar.Requests
                 {
                     case ITerminalResource<T> terminal:
                         if (!Context.HasWebSocket)
-                        {
-                            if (terminal.Type == typeof(Session))
-                            {
-                                if (!(Conditions.Get(nameof(Session.ID), Operators.EQUALS).Value is string id))
-                                    return new UnknownResource("<no session ID>");
-                                if (!Session.ActiveSessions.TryGetValue(id, out var session))
-                                    return new UnknownResource(id);
-                                return new Binary
-                                (
-                                    stream: Providers.Json.SerializeStream(session.Root),
-                                    request: this,
-                                    contentType: ContentType.JSON
-                                );
-                            }
                             throw new UpgradeRequired(terminal.Name);
-                        }
                         if (IsWebSocketUpgrade)
                             return MakeWebSocketUpgrade(terminal);
                         return SwitchTerminal(terminal);
