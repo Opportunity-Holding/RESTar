@@ -107,7 +107,6 @@
     <Compile Include="ContentTypeProviders\ExcelFormatException.cs" />
     <Compile Include="ContentTypeProviders\ExcelInputException.cs" />
     <Compile Include="ContentTypeProviders\JsonAdapter.cs" />
-    <Compile Include="ContentTypeProviders\JsonPatchProvider.cs" />
     <Compile Include="ContentTypeProviders\TypeConverter.cs" />
     <Compile Include="ContentTypeProviders\XMLWriter.cs" />
     <Compile Include="Dynamic\Resource.cs" />
@@ -117,9 +116,6 @@
     <Compile Include="Meta\Internal\EventResource.cs" />
     <Compile Include="Meta\Internal\EventResourceProvider.cs" />
     <Compile Include="Meta\IEvent.cs" />
-    <Compile Include="Palindrom\PalindromProtocolProvider.cs" />
-    <Compile Include="Palindrom\Session.cs" />
-    <Compile Include="Palindrom\PalindromBootstrapper.cs" />
     <Compile Include="Requests\Cookie.cs" />
     <Compile Include="Requests\Cookies.cs" />
     <Compile Include="Requests\DbHeaders.cs" />

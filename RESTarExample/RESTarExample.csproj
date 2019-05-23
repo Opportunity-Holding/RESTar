@@ -91,7 +91,6 @@
     <Compile Include="CShell.cs" />
     <Compile Include="DB.cs" />
     <Compile Include="ExampleClasses.cs" />
-    <Compile Include="HelloWorld\Expense.cs" />
     <Compile Include="HelloWorld\Person.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,13 +108,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="wwwroot\HelloWorld\ExpenseJson.html" />
-    <Content Include="wwwroot\HelloWorld\PersonJson.html" />
+    <Content Include="wwwroot\HelloWorld\Expense.html" />
+    <Content Include="wwwroot\HelloWorld\Person.html" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Starcounter\RESTar.JsonPatch\RESTar.JsonPatch\RESTar.JsonPatch.csproj">
+      <Project>{3d40bfd5-4c01-4213-9ffa-ce5f69ec33b1}</Project>
+      <Name>RESTar.JsonPatch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Starcounter\RESTar.Palindrom\RESTar.Palindrom\RESTar.Palindrom.csproj">
+      <Project>{99aba1a9-26c2-4b62-997d-a4a5f17bcfee}</Project>
+      <Name>RESTar.Palindrom</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RESTar\RESTar.csproj">
       <Project>{3ca9602f-fc6f-4dfe-8749-c6dbdd9a4809}</Project>
       <Name>RESTar</Name>

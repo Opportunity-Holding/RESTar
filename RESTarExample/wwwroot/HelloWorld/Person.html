@@ -11,12 +11,13 @@
                 <input value="{{model.LastName::input}}">
             </fieldset>
             <hr>
+
             <template is="dom-repeat" items="{{model.Expenses}}">
                 <div>
-                    <template is="imported-template" model="{{item}}" href$="{{item.Html}}">
-                    </template>
+                    <imported-template model="{{item}}" href$="{{item.Html}}"></imported-template>
                 </div>
             </template>
+
             <button value="{{model.NewExpenseTrigger::click}}" onmousedown="++this.value">Add new expense</button>
             <hr>
             <h2>Current Balance: {{model.CurrentBalance}}</h2>

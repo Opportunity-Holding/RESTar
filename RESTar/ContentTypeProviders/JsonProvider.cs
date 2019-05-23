@@ -130,13 +130,20 @@ namespace RESTar.ContentTypeProviders
             Serializer.Serialize(jsonWriter, value);
         }
 
-        internal void Populate(string json, object target)
+        /// <summary>
+        /// Populates JSON data onto an object
+        /// </summary>
+        public void Populate(string json, object target)
         {
             if (string.IsNullOrWhiteSpace(json)) return;
             JsonConvert.PopulateObject(json, target, Settings);
         }
 
-        internal MemoryStream SerializeStream(object entity, Formatting? formatting = null, bool ignoreNulls = false)
+        /// <summary>
+        /// Serializes an object into a stream
+        /// </summary>
+        /// <returns></returns>
+        public MemoryStream SerializeStream(object entity, Formatting? formatting = null, bool ignoreNulls = false)
         {
             var _formatting = formatting ?? (_PrettyPrint ? Indented : None);
             var serializer = ignoreNulls ? SerializerIgnoreNulls : Serializer;
