@@ -75,6 +75,7 @@ namespace RESTar.ContentTypeProviders.NativeJsonProtocol
                     p.ObjectCreationHandling = property.ReplaceOnUpdate ? ObjectCreationHandling.Replace : ObjectCreationHandling.Auto;
                     p.PropertyName = property.Name;
                     p.Order = property.Order;
+                    p.ValueProvider = new DefaultValueProvider(property);
                     return p;
                 case FieldInfo fieldInfo:
                     if (fieldInfo.RESTarIgnored()) return null;

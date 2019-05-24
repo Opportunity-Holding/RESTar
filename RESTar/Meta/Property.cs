@@ -32,12 +32,12 @@ namespace RESTar.Meta
         /// <summary>
         /// Gets the value of this property, for a given target object
         /// </summary>
-        public dynamic GetValue(object target) => Getter?.Invoke(target);
+        public virtual dynamic GetValue(object target) => Getter?.Invoke(target);
 
         /// <summary>
         /// Sets the value of this property, for a given target object and a given value
         /// </summary>
-        public void SetValue(object target, dynamic value) => Setter?.Invoke(target, value);
+        public virtual void SetValue(object target, dynamic value) => Setter?.Invoke(target, value);
 
         /// <summary>
         /// </summary>

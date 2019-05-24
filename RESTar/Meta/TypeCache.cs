@@ -140,7 +140,7 @@ namespace RESTar.Meta
                                     .Name;
                             }
                             return p;
-                        }).If(_type.HasAttribute<DatabaseAttribute>(), ps => ps.Union(SpecialProperty.GetObjectNoAndObjectID(false)));
+                        }).If(_type.HasAttribute<DatabaseAttribute>(), ps => ps.Union(SpecialProperty.GetObjectNoAndObjectID(flag: false, _type)));
                     case var _ when typeof(ITerminal).IsAssignableFrom(_type):
                         return _type.FindAndParseDeclaredProperties().Except(make(typeof(ITerminal)), DeclaredProperty.NameComparer);
                     case var _ when _type.IsNullable(out var underlying):
@@ -148,19 +148,22 @@ namespace RESTar.Meta
                     case var _ when _type.HasAttribute<RESTarViewAttribute>():
                         return _type.FindAndParseDeclaredProperties().Union(make(_type.DeclaringType));
                     case var _ when _type.IsDDictionary():
-                        return _type.FindAndParseDeclaredProperties(true).Union(SpecialProperty.GetObjectNoAndObjectID(flag: true));
+                        return _type.FindAndParseDeclaredProperties(true).Union(SpecialProperty.GetObjectNoAndObjectID(flag: true, _type));
                     case var _ when Resource.SafeGet(_type) is IEntityResource e && e.DeclaredPropertiesFlagged:
                         return _type.FindAndParseDeclaredProperties(true);
                     default:
                         return _type
                             .FindAndParseDeclaredProperties()
-                            .If(_type.HasAttribute<DatabaseAttribute>(), ps => ps.Union(SpecialProperty.GetObjectNoAndObjectID(false)));
+                            .If(_type.HasAttribute<DatabaseAttribute>(), ps => ps.Union(SpecialProperty.GetObjectNoAndObjectID(false, _type)));
                 }
             }
 
             if (type.RESTarTypeName() == null) return null;
             if (!DeclaredPropertyCache.TryGetValue(type, out var props))
+            {
                 props = DeclaredPropertyCache[type] = make(type).SafeToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
+                props.Values.ForEach(property => property.EstablishPropertyDependancies());
+            }
             return props;
         }
 

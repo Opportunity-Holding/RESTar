@@ -8,7 +8,7 @@ namespace RESTar.Meta.Internal
 {
     internal class LastInCollection : DeclaredProperty
     {
-        internal LastInCollection(Type type, bool collectionReadonly) : base
+        internal LastInCollection(Type type, bool collectionReadonly, Type declaredIn) : base
         (
             metadataToken: "-".GetHashCode(),
             name: "-",
@@ -23,6 +23,7 @@ namespace RESTar.Meta.Internal
             isEnum: type.IsEnum,
             customDateTimeFormat: null,
             allowedConditionOperators: Operators.All,
+            declaredIn: declaredIn,
             getter: target =>
             {
                 try
@@ -30,6 +31,7 @@ namespace RESTar.Meta.Internal
                     switch (target)
                     {
                         case IEnumerable<object> ie: return ie.LastOrDefault();
+                        case string str: return str.Last();
                         case IList l:
                             var count = l.Count;
                             return count == 0 ? null : l[l.Count - 1];
@@ -80,7 +82,8 @@ namespace RESTar.Meta.Internal
             int index,
             string name,
             Type type,
-            bool collectionReadonly
+            bool collectionReadonly,
+            Type declaredIn
         ) : base
         (
             metadataToken: index.GetHashCode(),
@@ -96,6 +99,7 @@ namespace RESTar.Meta.Internal
             isEnum: type.IsEnum,
             customDateTimeFormat: null,
             allowedConditionOperators: Operators.All,
+            declaredIn: declaredIn,
             getter: target =>
             {
                 try
@@ -103,6 +107,9 @@ namespace RESTar.Meta.Internal
                     switch (target)
                     {
                         case IEnumerable<object> ie: return ie.ElementAtOrDefault(index);
+                        case string str:
+                            var length = str.Length;
+                            return index >= length - 1 ? default : str[index];
                         case IList l:
                             var count = l.Count;
                             return index >= count - 1 ? null : l[index];

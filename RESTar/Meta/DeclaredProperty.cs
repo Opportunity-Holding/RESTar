@@ -18,6 +18,16 @@ using Starcounter.Metadata;
 
 namespace RESTar.Meta
 {
+    /// <summary>
+    /// Represents an operation on a property change, in context to some root object (defined by the term)
+    /// </summary>
+    public delegate void ContextualPropertyChangeHandler(Term term, object target, dynamic oldValue, dynamic newValue);
+
+    /// <summary>
+    /// Represents the operation to attach to a PropertyChanged event handler in DeclaredProperty
+    /// </summary>
+    public delegate void PropertyChangeHandler(DeclaredProperty property, object target, dynamic oldValue, dynamic newValue);
+
     /// <inheritdoc />
     /// <summary>
     /// A declared property represents a compile time known property of a type.
@@ -74,6 +84,32 @@ namespace RESTar.Meta
         public string CustomDateTimeFormat { get; }
 
         /// <summary>
+        /// The type that this property was declared in
+        /// </summary>
+        public Type DeclaredIn { get; }
+
+        private ISet<Term> definedByTerms;
+
+        /// <summary>
+        /// The properties that this property reflects upon, the changes of which should
+        /// indicate that this property needs to be reevaluated. True only for properties that are
+        /// computed variables.
+        /// </summary>
+        public ISet<Term> DefinedByTerms => definedByTerms ?? (definedByTerms = new HashSet<Term>());
+
+        private ISet<Term> definesTerms;
+
+        /// <summary>
+        /// The properties that reflects upon this property
+        /// </summary>
+        public ISet<Term> DefinesTerms => definesTerms ?? (definesTerms = new HashSet<Term>());
+
+        /// <summary>
+        /// An event that is fired when this property is changed for some target
+        /// </summary>
+        public event PropertyChangeHandler PropertyChanged;
+
+        /// <summary>
         /// The starcounter indexable column for this property (if any)
         /// </summary>
         [RESTarMember(ignore: true)] public Column ScIndexableColumn { get; }
@@ -120,12 +156,24 @@ namespace RESTar.Meta
         /// </summary>
         public bool HasAttribute<TAttribute>(out TAttribute attribute) where TAttribute : Attribute => (attribute = GetAttribute<TAttribute>()) != null;
 
+        /// <inheritdoc />
+        public override void SetValue(object target, dynamic value)
+        {
+            if (PropertyChanged != null)
+            {
+                var oldValue = GetValue(target);
+                if (!object.Equals(oldValue, value))
+                    PropertyChanged?.Invoke(this, target, oldValue, value);
+            }
+            base.SetValue(target, (object) value);
+        }
+
         /// <summary>
         /// Used in SpecialProperty
         /// </summary>
         internal DeclaredProperty(int metadataToken, string name, string actualName, Type type, int? order, bool isScQueryable,
             ICollection<Attribute> attributes, bool skipConditions, bool hidden, bool hiddenIfNull, bool isEnum, string customDateTimeFormat,
-            Operators allowedConditionOperators, Getter getter, Setter setter)
+            Operators allowedConditionOperators, Type declaredIn, Getter getter, Setter setter)
         {
             MetadataToken = metadataToken;
             Name = name;
@@ -145,6 +193,7 @@ namespace RESTar.Meta
             Getter = getter;
             Setter = setter;
             ScIndexableColumn = null;
+            DeclaredIn = declaredIn;
         }
 
         /// <summary>
@@ -176,6 +225,8 @@ namespace RESTar.Meta
             if (memberAttribute?.ReadOnly != true)
                 Setter = p.MakeDynamicSetter();
             ReplaceOnUpdate = memberAttribute?.ReplaceOnUpdate == true;
+            DeclaredIn = p.DeclaringType;
+
             if (p.DeclaringType.HasAttribute<DatabaseAttribute>() && !p.HasAttribute<TransientAttribute>())
             {
                 const string columnSQL = "SELECT t FROM Starcounter.Metadata.\"Column\" t WHERE t.\"Table\".FullName =? AND t.Name =?";
@@ -205,6 +256,20 @@ namespace RESTar.Meta
                 }
                 if (columnNameGuess != null)
                     ScIndexableColumn = Db.SQL<Column>(columnSQL, p.DeclaringType.RESTarTypeName(), columnNameGuess).FirstOrDefault();
+            }
+        }
+
+        internal void EstablishPropertyDependancies()
+        {
+            if (HasAttribute<DefinedByAttribute>(out var definedByAttribute))
+            {
+                DefinedByTerms.UnionWith(definedByAttribute.Terms.Select(name =>
+                    Term.Parse(DeclaredIn, name, ".", TermBindingRule.OnlyDeclared, null)));
+            }
+            if (HasAttribute<DefinesAttribute>(out var definesAttribute))
+            {
+                DefinesTerms.UnionWith(definesAttribute.Terms.Select(name =>
+                    Term.Parse(DeclaredIn, name, ".", TermBindingRule.OnlyDeclared, null)));
             }
         }
 
@@ -242,9 +307,9 @@ namespace RESTar.Meta
                 var collectionReadonly = typeof(IList).IsAssignableFrom(type) || type.ImplementsGenericInterface(typeof(IList<>));
                 switch (key)
                 {
-                    case "-": return new LastInCollection(elementType, collectionReadonly);
+                    case "-": return new LastInCollection(elementType, collectionReadonly, type);
                     case var _ when int.TryParse(key, out var integer):
-                        return new IndexProperty(integer, key, elementType, collectionReadonly);
+                        return new IndexProperty(integer, key, elementType, collectionReadonly, type);
                 }
             }
 

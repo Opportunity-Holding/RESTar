@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RESTar.ContentTypeProviders;
 using RESTar.Internal;
 using RESTar.Linq;
 using RESTar.Meta.Internal;
@@ -11,13 +13,16 @@ using RESTar.Results;
 
 namespace RESTar.Meta
 {
+    /// <inheritdoc />
     /// <summary>
     /// A term denotes a node in a static or dynamic member tree. Contains a chain of properties, 
     /// used in queries to refer to properties and properties of properties.
     /// </summary>
+    [JsonConverter(typeof(ToStringConverter))]
     public class Term : IEnumerable<Property>
     {
         private List<Property> Store;
+        private readonly string ComponentSeparator;
 
         /// <summary>
         /// A string representation of the path to the property, using dot notation
@@ -76,7 +81,11 @@ namespace RESTar.Meta
 
         private static readonly NoCaseComparer Comparer = new NoCaseComparer();
 
-        private Term() => Store = new List<Property>();
+        private Term(string componentSeparator)
+        {
+            Store = new List<Property>();
+            ComponentSeparator = componentSeparator;
+        }
 
         #region Public create methods, not used internally
 
@@ -119,7 +128,7 @@ namespace RESTar.Meta
         /// </summary>
         internal static Term Parse(Type resource, string key, string componentSeparator, TermBindingRule bindingRule, ICollection<string> dynDomain)
         {
-            var term = new Term();
+            var term = new Term(componentSeparator);
 
             Property propertyMaker(string str)
             {
@@ -193,7 +202,7 @@ namespace RESTar.Meta
             }).ToList();
             ScQueryable = false;
             IsDeclared = false;
-            Key = string.Join(".", Store.Select(p => p.Name));
+            Key = string.Join(ComponentSeparator, Store.Select(p => p.Name));
         }
 
         /// <summary>
@@ -247,7 +256,7 @@ namespace RESTar.Meta
             // set names for dynamic properties when getting their values, and concatenate the
             // property names here.
             if (IsDynamic)
-                Key = string.Join(".", Store.Select(p => p.Name));
+                Key = string.Join(ComponentSeparator, Store.Select(p => p.Name));
 
             actualKey = Key;
             return target;
