@@ -31,7 +31,7 @@ namespace RESTar.Meta.Internal
         };
 
         private SpecialProperty(int metadataToken, string name, string actualName, Type type, int? order, bool isScQueryable,
-            bool hidden, bool hiddenIfNull, Getter getter) : base
+            bool hidden, bool hiddenIfNull, Type declaredIn, Getter getter) : base
         (
             metadataToken: metadataToken,
             name: name,
@@ -46,12 +46,18 @@ namespace RESTar.Meta.Internal
             isEnum: false,
             allowedConditionOperators: Operators.All,
             customDateTimeFormat: null,
+            isComputedVariable: false,
             getter: getter,
+            declaredIn: declaredIn,
             setter: null
         ) { }
 
-        internal static IEnumerable<SpecialProperty> GetObjectNoAndObjectID(bool flag) =>
-            flag ? new[] {FlaggedObjectNo, FlaggedObjectID} : new[] {ObjectNo, ObjectID};
+        internal static IEnumerable<SpecialProperty> GetObjectNoAndObjectID(bool flag, Type declaredIn)
+        {
+            if (flag)
+                return new[] {FlaggedObjectNo(declaredIn), FlaggedObjectID(declaredIn)};
+            return new[] {ObjectNo(declaredIn), ObjectID(declaredIn)};
+        }
 
         // ReSharper disable PossibleNullReferenceException
 
@@ -66,7 +72,7 @@ namespace RESTar.Meta.Internal
         /// <summary>
         /// A property describing the ObjectNo of a class
         /// </summary>
-        private static readonly SpecialProperty ObjectNo = new SpecialProperty
+        private static SpecialProperty ObjectNo(Type declaredIn) => new SpecialProperty
         (
             metadataToken: ObjectNoMetadataToken,
             name: "ObjectNo",
@@ -76,13 +82,14 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: false,
             hiddenIfNull: false,
+            declaredIn: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectNo, "Could not get ObjectNo from non-Starcounter resource.")
         );
 
         /// <summary>
         /// A property describing the ObjectNo of a class
         /// </summary>
-        private static readonly SpecialProperty FlaggedObjectNo = new SpecialProperty
+        private static SpecialProperty FlaggedObjectNo(Type declaredIn) => new SpecialProperty
         (
             metadataToken: ObjectNoMetadataToken,
             name: "$ObjectNo",
@@ -92,13 +99,14 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: false,
             hiddenIfNull: false,
+            declaredIn: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectNo, "Could not get ObjectNo from non-Starcounter resource.")
         );
 
         /// <summary>
         /// A property describing the ObjectNo of a class
         /// </summary>
-        private static readonly SpecialProperty ObjectID = new SpecialProperty
+        private static SpecialProperty ObjectID(Type declaredIn) => new SpecialProperty
         (
             metadataToken: ObjectIDMetadataToken,
             name: "ObjectID",
@@ -108,13 +116,14 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: true,
             hiddenIfNull: false,
+            declaredIn: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectID, "Could not get ObjectID from non-Starcounter resource.")
         );
 
         /// <summary>
         /// A property describing the ObjectNo of a class
         /// </summary>
-        private static readonly SpecialProperty FlaggedObjectID = new SpecialProperty
+        private static SpecialProperty FlaggedObjectID(Type declaredIn) => new SpecialProperty
         (
             metadataToken: ObjectIDMetadataToken,
             name: "$ObjectID",
@@ -124,6 +133,7 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: true,
             hiddenIfNull: false,
+            declaredIn: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectID, "Could not get ObjectID from non-Starcounter resource.")
         );
     }

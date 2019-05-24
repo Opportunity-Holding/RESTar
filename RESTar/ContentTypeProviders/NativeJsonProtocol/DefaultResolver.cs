@@ -10,6 +10,7 @@ using RESTar.Internal.Sc;
 using RESTar.Linq;
 using RESTar.Meta;
 using RESTar.Meta.Internal;
+using RESTar.Resources.Operations;
 
 namespace RESTar.ContentTypeProviders.NativeJsonProtocol
 {
@@ -75,6 +76,8 @@ namespace RESTar.ContentTypeProviders.NativeJsonProtocol
                     p.ObjectCreationHandling = property.ReplaceOnUpdate ? ObjectCreationHandling.Replace : ObjectCreationHandling.Auto;
                     p.PropertyName = property.Name;
                     p.Order = property.Order;
+                    if (typeof(IObservable).IsAssignableFrom(property.DeclaredIn))
+                        p.ValueProvider = new DefaultValueProvider(property);
                     return p;
                 case FieldInfo fieldInfo:
                     if (fieldInfo.RESTarIgnored()) return null;
