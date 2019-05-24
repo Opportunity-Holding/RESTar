@@ -15,7 +15,13 @@ namespace HelloWorld
 
         [RESTarMember(hide: true)] public Person Spender { get; set; }
         public string Description { get; set; }
-        public decimal Amount { get; set; }
+        [RESTarMember(hide: true)] public decimal AmountValue { get; set; }
+
+        public string Amount
+        {
+            get => AmountValue.ToString("N");
+            set => AmountValue = decimal.Parse(value);
+        }
     }
 
     [Database, RESTar]
@@ -32,18 +38,18 @@ namespace HelloWorld
 
         public decimal CurrentBalance => Db
             .SQL<Expense>("SELECT e FROM Expense e WHERE e.Spender = ?", this)
-            .Sum(e => e.Amount);
+            .Sum(e => e.AmountValue);
 
         public string NewExpenseTrigger
         {
             get => "0";
-            set => Db.TransactAsync(() => new Expense {Spender = this});
+            set => new Expense {Spender = this};
         }
 
         public string DeleteAllTrigger
         {
             get => "0";
-            set => Db.TransactAsync(() => Db.SQL("DELETE FROM Expense WHERE Spender = ?", this));
+            set => Db.SQL("DELETE FROM Expense WHERE Spender = ?", this);
         }
     }
 }

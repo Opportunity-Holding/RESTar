@@ -33,7 +33,12 @@ namespace RESTar.Meta
         /// Condition terms are terms that refer to properties in resources, or  for
         /// use in conditions.
         /// </summary>
-        internal static Term MakeConditionTerm(this ITarget target, string key) => target.Type.MakeOrGetCachedTerm(key, target.ConditionBindingRule);
+        internal static Term MakeConditionTerm(this ITarget target, string key) => target.Type.MakeOrGetCachedTerm
+        (
+            key: key,
+            componentSeparator: ".",
+            bindingRule: target.ConditionBindingRule
+        );
 
         /// <summary>
         /// Output terms are terms that refer to properties in RESTar output. If they refer to
@@ -41,14 +46,14 @@ namespace RESTar.Meta
         /// </summary>
         internal static Term MakeOutputTerm(this IEntityResource target, string key, ICollection<string> dynamicDomain) =>
             dynamicDomain == null
-                ? MakeOrGetCachedTerm(target.Type, key, target.OutputBindingRule)
-                : Term.Parse(target.Type, key, target.OutputBindingRule, dynamicDomain);
+                ? MakeOrGetCachedTerm(target.Type, key, ".", target.OutputBindingRule)
+                : Term.Parse(target.Type, key, ".", target.OutputBindingRule, dynamicDomain);
 
-        internal static Term MakeOrGetCachedTerm(this Type resource, string key, TermBindingRule bindingRule)
+        internal static Term MakeOrGetCachedTerm(this Type resource, string key, string componentSeparator, TermBindingRule bindingRule)
         {
             var tuple = (resource.RESTarTypeName(), key.ToLower(), bindingRule);
             if (!TermCache.TryGetValue(tuple, out var term))
-                term = TermCache[tuple] = Term.Parse(resource, key, bindingRule, null);
+                term = TermCache[tuple] = Term.Parse(resource, key, componentSeparator, bindingRule, null);
             return term;
         }
 

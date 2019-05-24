@@ -88,13 +88,22 @@ namespace RESTar.Meta
         /// <summary>
         /// Create a new term for a given type, with a key describing the target property
         /// </summary>
-        public static Term Create(Type type, string key) => type.MakeOrGetCachedTerm(key, TermBindingRule.DeclaredWithDynamicFallback);
+        public static Term Create(Type type, string key, string componentSeparator = ".") => type.MakeOrGetCachedTerm
+        (
+            key: key,
+            componentSeparator: componentSeparator,
+            bindingRule: TermBindingRule.DeclaredWithDynamicFallback
+        );
 
         /// <summary>
         /// Create a new term from a given PropertyInfo
         /// </summary>
-        public static Term Create(PropertyInfo propertyInfo) => propertyInfo.DeclaringType
-            .MakeOrGetCachedTerm(propertyInfo.Name, TermBindingRule.DeclaredWithDynamicFallback);
+        public static Term Create(PropertyInfo propertyInfo) => propertyInfo.DeclaringType.MakeOrGetCachedTerm
+        (
+            key: propertyInfo.Name,
+            componentSeparator: ".",
+            bindingRule: TermBindingRule.DeclaredWithDynamicFallback
+        );
 
         #endregion
 
@@ -108,7 +117,7 @@ namespace RESTar.Meta
         /// The main caller is TypeCache.MakeTerm, but it's also called from places that use a 
         /// dynamic domain (processors).
         /// </summary>
-        internal static Term Parse(Type resource, string key, TermBindingRule bindingRule, ICollection<string> dynDomain)
+        internal static Term Parse(Type resource, string key, string componentSeparator, TermBindingRule bindingRule, ICollection<string> dynDomain)
         {
             var term = new Term();
 
@@ -157,12 +166,12 @@ namespace RESTar.Meta
                 }
             }
 
-            key.Split('.').ForEach(s => term.Store.Add(propertyMaker(s)));
+            key.Split(componentSeparator).ForEach(s => term.Store.Add(propertyMaker(s)));
             term.ScQueryable = term.Store.All(p => p.IsScQueryable);
             term.IsDeclared = term.Store.All(p => p is DeclaredProperty);
             term.ConditionSkip = term.Store.Any(p => p is DeclaredProperty s && s.SkipConditions);
-            term.Key = string.Join(".", term.Store.Select(p => p.Name));
-            term.DbKey = string.Join(".", term.Store.Select(p => p.ActualName));
+            term.Key = string.Join(componentSeparator, term.Store.Select(p => p.Name));
+            term.DbKey = string.Join(componentSeparator, term.Store.Select(p => p.ActualName));
             return term;
         }
 

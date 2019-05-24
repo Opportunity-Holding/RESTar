@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ using System.Text;
 using Newtonsoft.Json;
 using RESTar.Linq;
 using RESTar.Meta.IL;
+using RESTar.Meta.Internal;
 using RESTar.Requests;
 using RESTar.Resources;
 using RESTar.Results;
@@ -230,6 +232,22 @@ namespace RESTar.Meta
         /// <returns></returns>
         public static DeclaredProperty Find(Type type, string key)
         {
+            var isDictionary = typeof(IDictionary).IsAssignableFrom(type) ||
+                               type.ImplementsGenericInterface(typeof(IDictionary<,>));
+            if (!isDictionary && typeof(IEnumerable).IsAssignableFrom(type))
+            {
+                var elementType = type.ImplementsGenericInterface(typeof(IEnumerable<>), out var p)
+                    ? p[0]
+                    : typeof(object);
+                var collectionReadonly = typeof(IList).IsAssignableFrom(type) || type.ImplementsGenericInterface(typeof(IList<>));
+                switch (key)
+                {
+                    case "-": return new LastInCollection(elementType, collectionReadonly);
+                    case var _ when int.TryParse(key, out var integer):
+                        return new IndexProperty(integer, key, elementType, collectionReadonly);
+                }
+            }
+
             if (!type.GetDeclaredProperties().TryGetValue(key, out var prop))
             {
                 if (type.IsNullable(out var underlying))
