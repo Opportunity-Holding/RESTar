@@ -5,7 +5,7 @@ using RESTar.Requests;
 namespace RESTar.ContentTypeProviders
 {
     /// <summary>
-    /// Defines the operations ofa content type provider, that is used when 
+    /// Defines the operations of a content type provider, that is used when 
     /// serialize results to a given content type.
     /// </summary>
     public interface IContentTypeProvider
