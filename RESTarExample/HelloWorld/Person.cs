@@ -11,7 +11,9 @@ namespace HelloWorld
     [Database]
     public class Expense
     {
-        public string Html => "/HelloWorld/Expense.html";
+        private const string html = "/HelloWorld/Expense.html";
+        internal const string SelectBySpender = "SELECT t FROM Expense WHERE e.Spender = ?";
+        internal const string DeleteBySpender = "DELETE FROM Expense WHERE e.Spender = ?";
 
         [RESTarMember(hide: true)] public Person Spender { get; set; }
         public string Description { get; set; }
@@ -22,23 +24,20 @@ namespace HelloWorld
             get => AmountValue.ToString("N");
             set => AmountValue = decimal.Parse(value);
         }
+
+        public string Html => html;
     }
 
     [Database, RESTar]
     public class Person
     {
-        public string Html => "/HelloWorld/Person.html";
+        private const string html = "/HelloWorld/Person.html";
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string FullName => $"{FirstName} {LastName}";
-
-        public IEnumerable<Expense> Expenses => Db
-            .SQL<Expense>("SELECT e FROM Expense e WHERE e.Spender = ?", this);
-
-        public decimal CurrentBalance => Db
-            .SQL<Expense>("SELECT e FROM Expense e WHERE e.Spender = ?", this)
-            .Sum(e => e.AmountValue);
+        public IEnumerable<Expense> Expenses => Db.SQL<Expense>(Expense.SelectBySpender, this);
+        public decimal CurrentBalance => Db.SQL<Expense>(Expense.SelectBySpender, this).Sum(e => e.AmountValue);
 
         public string NewExpenseTrigger
         {
@@ -49,7 +48,9 @@ namespace HelloWorld
         public string DeleteAllTrigger
         {
             get => "0";
-            set => Db.SQL("DELETE FROM Expense WHERE Spender = ?", this);
+            set => Db.SQL(Expense.DeleteBySpender, this);
         }
+
+        public string Html => html;
     }
 }

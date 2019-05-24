@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.JsonPatch", "..\..\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.Palindrom", "..\..\Starcounter\RESTar.Palindrom\RESTar.Palindrom\RESTar.Palindrom.csproj", "{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.Palindrom.Example", "..\..\Starcounter\RESTar.Palindrom\RESTar.Palindrom.Example\RESTar.Palindrom.Example.csproj", "{1432A98D-C7C4-4895-956B-CCF5BF1A050A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,12 @@ Global
 		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Release|Any CPU.ActiveCfg = Release|x64
 		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Release|x64.ActiveCfg = Release|x64
 		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Release|x64.Build.0 = Release|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Debug|x64.ActiveCfg = Debug|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Debug|x64.Build.0 = Debug|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Release|Any CPU.ActiveCfg = Release|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Release|x64.ActiveCfg = Release|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
