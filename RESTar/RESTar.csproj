@@ -112,6 +112,7 @@
     <Compile Include="ContentTypeProviders\XMLWriter.cs" />
     <Compile Include="Dynamic\Resource.cs" />
     <Compile Include="Internal\WebhookContext.cs" />
+    <Compile Include="Meta\DependencyTable.cs" />
     <Compile Include="Meta\IDynamicMemberValueProvider.cs" />
     <Compile Include="Meta\IEventResource.cs" />
     <Compile Include="Meta\Internal\IndexProperty.cs" />
