@@ -31,7 +31,7 @@ namespace RESTar.Meta.Internal
         };
 
         private SpecialProperty(int metadataToken, string name, string actualName, Type type, int? order, bool isScQueryable,
-            bool hidden, bool hiddenIfNull, Type declaredIn, Getter getter) : base
+            bool hidden, bool hiddenIfNull, Type owner, Getter getter) : base
         (
             metadataToken: metadataToken,
             name: name,
@@ -46,9 +46,8 @@ namespace RESTar.Meta.Internal
             isEnum: false,
             allowedConditionOperators: Operators.All,
             customDateTimeFormat: null,
-            isComputedVariable: false,
             getter: getter,
-            declaredIn: declaredIn,
+            owner: owner,
             setter: null
         ) { }
 
@@ -82,7 +81,7 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: false,
             hiddenIfNull: false,
-            declaredIn: declaredIn,
+            owner: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectNo, "Could not get ObjectNo from non-Starcounter resource.")
         );
 
@@ -99,7 +98,7 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: false,
             hiddenIfNull: false,
-            declaredIn: declaredIn,
+            owner: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectNo, "Could not get ObjectNo from non-Starcounter resource.")
         );
 
@@ -116,7 +115,7 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: true,
             hiddenIfNull: false,
-            declaredIn: declaredIn,
+            owner: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectID, "Could not get ObjectID from non-Starcounter resource.")
         );
 
@@ -133,7 +132,7 @@ namespace RESTar.Meta.Internal
             isScQueryable: true,
             hidden: true,
             hiddenIfNull: false,
-            declaredIn: declaredIn,
+            owner: declaredIn,
             getter: t => Do.TryAndThrow(t.GetObjectID, "Could not get ObjectID from non-Starcounter resource.")
         );
     }

@@ -8,7 +8,7 @@ namespace RESTar.Meta.Internal
 {
     internal class LastInCollection : DeclaredProperty
     {
-        internal LastInCollection(Type type, bool collectionReadonly, Type declaredIn) : base
+        internal LastInCollection(Type type, bool collectionReadonly, Type owner) : base
         (
             metadataToken: "-".GetHashCode(),
             name: "-",
@@ -23,7 +23,7 @@ namespace RESTar.Meta.Internal
             isEnum: type.IsEnum,
             customDateTimeFormat: null,
             allowedConditionOperators: Operators.All,
-            declaredIn: declaredIn,
+            owner: owner,
             getter: target =>
             {
                 try
@@ -83,7 +83,7 @@ namespace RESTar.Meta.Internal
             string name,
             Type type,
             bool collectionReadonly,
-            Type declaredIn
+            Type owner
         ) : base
         (
             metadataToken: index.GetHashCode(),
@@ -99,7 +99,7 @@ namespace RESTar.Meta.Internal
             isEnum: type.IsEnum,
             customDateTimeFormat: null,
             allowedConditionOperators: Operators.All,
-            declaredIn: declaredIn,
+            owner: owner,
             getter: target =>
             {
                 try

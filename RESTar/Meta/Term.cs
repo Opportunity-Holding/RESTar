@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -122,6 +123,11 @@ namespace RESTar.Meta
         public IEnumerator<Property> GetEnumerator() => Store.GetEnumerator();
 
         /// <summary>
+        /// The empty term, used when building terms
+        /// </summary>
+        internal static Term Empty(string componentSeparator) => new Term(componentSeparator);
+
+        /// <summary>
         /// Parses a term key string and returns a term describing it. All terms are created here.
         /// The main caller is TypeCache.MakeTerm, but it's also called from places that use a 
         /// dynamic domain (processors).
@@ -176,21 +182,27 @@ namespace RESTar.Meta
             }
 
             key.Split(componentSeparator).ForEach(s => term.Store.Add(propertyMaker(s)));
-            term.ScQueryable = term.Store.All(p => p.IsScQueryable);
-            term.IsDeclared = term.Store.All(p => p is DeclaredProperty);
-            term.ConditionSkip = term.Store.Any(p => p is DeclaredProperty s && s.SkipConditions);
-            term.Key = string.Join(componentSeparator, term.Store.Select(p => p.Name));
-            term.DbKey = string.Join(componentSeparator, term.Store.Select(p => p.ActualName));
+            term.SetCommonProperties();
             return term;
+        }
+
+        private void SetCommonProperties()
+        {
+            ScQueryable = Store.All(p => p.IsScQueryable);
+            IsDeclared = Store.All(p => p is DeclaredProperty);
+            ConditionSkip = Store.Any(p => p is DeclaredProperty s && s.SkipConditions);
+            Key = GetKey();
+            DbKey = GetDbKey();
         }
 
         /// <summary>
         /// Converts all properties in this term to dynamic properties
         /// </summary>
-        private void MakeDynamic()
+        private static Term MakeDynamic(Term term)
         {
-            if (IsDynamic) return;
-            Store = Store.Select(prop =>
+            if (term.IsDynamic) return term;
+            var newTerm = new Term(term.ComponentSeparator);
+            newTerm.Store.AddRange(term.Store.Select(prop =>
             {
                 switch (prop)
                 {
@@ -199,11 +211,16 @@ namespace RESTar.Meta
                     case DeclaredProperty _: return DynamicProperty.Parse(prop.Name);
                     default: throw new ArgumentOutOfRangeException();
                 }
-            }).ToList();
-            ScQueryable = false;
-            IsDeclared = false;
-            Key = string.Join(ComponentSeparator, Store.Select(p => p.Name));
+            }));
+            newTerm.ScQueryable = false;
+            newTerm.IsDeclared = false;
+            newTerm.Key = newTerm.GetKey();
+            return newTerm;
         }
+
+        private string GetKey(string componentSeparator) => Key = string.Join(componentSeparator, Store.Select(p => p.Name));
+        private string GetKey() => Key = string.Join(ComponentSeparator, Store.Select(p => p.Name));
+        private string GetDbKey() => Key = string.Join(".", Store.Select(p => p.ActualName));
 
         /// <summary>
         /// Returns the value that this term denotes for a given target object
@@ -216,12 +233,7 @@ namespace RESTar.Meta
         /// </summary>
         public dynamic Evaluate(object target, out string actualKey) => Evaluate(target, out actualKey, out _, out _);
 
-        /// <summary>
-        /// Returns the value that this term denotes for a given target object as well as
-        /// the actual key for this property (matching is case insensitive), the parent
-        /// of the denoted value, and the property representing the denoted value.
-        /// </summary>
-        public dynamic Evaluate(object target, out string actualKey, out object parent, out Property property)
+        private static dynamic RunEvaluation(Term term, object target, out string actualKey, out object parent, out Property property)
         {
             parent = null;
             property = null;
@@ -232,34 +244,88 @@ namespace RESTar.Meta
             // and select). This code handles those cases.
             if (target is JObject jobj)
             {
-                if (jobj.GetValue(Key, StringComparison.OrdinalIgnoreCase)?.Parent is JProperty jproperty)
+                if (jobj.GetValue(term.Key, StringComparison.OrdinalIgnoreCase)?.Parent is JProperty jproperty)
                 {
                     actualKey = jproperty.Name;
                     parent = jobj;
-                    property = DynamicProperty.Parse(Key);
+                    property = DynamicProperty.Parse(term.Key);
                     return jproperty.Value.ToObject<dynamic>();
                 }
-                MakeDynamic();
+                term = MakeDynamic(term);
             }
 
             // Walk over the properties in the term, and if null is encountered, simply
             // keep the null. Else continue evaluating the next property as a property of the
             // previous property value.
-            for (var i = 0; target != null && i < Store.Count; i++)
+            for (var i = 0; target != null && i < term.Store.Count; i++)
             {
                 parent = target;
-                property = Store[i];
+                property = term.Store[i];
                 target = property.GetValue(target);
             }
 
             // If the term is dynamic, we do not know the actual key beforehand. We instead
             // set names for dynamic properties when getting their values, and concatenate the
             // property names here.
-            if (IsDynamic)
-                Key = string.Join(ComponentSeparator, Store.Select(p => p.Name));
+            if (term.IsDynamic)
+                term.Key = term.GetKey();
 
-            actualKey = Key;
+            actualKey = term.Key;
             return target;
+        }
+
+        /// <summary>
+        /// Returns the value that this term denotes for a given target object as well as
+        /// the actual key for this property (matching is case insensitive), the parent
+        /// of the denoted value, and the property representing the denoted value.
+        /// </summary>
+        public dynamic Evaluate(object target, out string actualKey, out object parent, out Property property)
+        {
+            return RunEvaluation(this, target, out actualKey, out parent, out property);
+        }
+
+        /// <summary>
+        /// Creates a new term that is this term appended with the given term, that will evaluate to the
+        /// final property in the given term.
+        /// </summary>
+        public static Term Append(Term term1, Term term2)
+        {
+            if (term1.IsDynamic)
+                return Join(term1, MakeDynamic(term2));
+            if (term2.First is DeclaredProperty next && term1.Last is DeclaredProperty last && last.Type != next.Owner)
+                throw new InvalidOperationException($"Could not append term '{term1}' with '{term2}'. The first property " +
+                                                    $"of the second term ({next}) is not a declared property of " +
+                                                    $"the last property of the first term ({last}). Expected a " +
+                                                    $"property declared in type '{last.Type}'");
+            return Join(term1, term2);
+        }
+
+        /// <summary>
+        /// Appends a property to the end of a term
+        /// </summary>
+        public static Term Append(Term term, Property property)
+        {
+            if (term.IsDynamic)
+                return Join(term, DynamicProperty.Parse(property.Name, true));
+            if (property is DeclaredProperty next && term.Last is DeclaredProperty last && last.Type != next.Owner)
+                throw new InvalidOperationException($"Could not append property '{term}' with property '{property}'. " +
+                                                    $"The new property is not a declared property of the last property " +
+                                                    $"of the first term ({last}). Expected a property declared in type '{last.Type}'");
+            return Join(term, property);
+        }
+
+        private static Term Join(Term term1, Property singleProperty)
+        {
+            return Join(term1, new[] {singleProperty});
+        }
+
+        private static Term Join(Term term1, IEnumerable<Property> properties)
+        {
+            var joinedTerm = new Term(term1.ComponentSeparator);
+            joinedTerm.Store.AddRange(term1);
+            joinedTerm.Store.AddRange(properties);
+            joinedTerm.SetCommonProperties();
+            return joinedTerm;
         }
 
         /// <summary>

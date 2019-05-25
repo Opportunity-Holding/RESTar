@@ -86,7 +86,7 @@ namespace RESTar.Meta
         /// <summary>
         /// The type that this property was declared in
         /// </summary>
-        public Type DeclaredIn { get; }
+        public Type Owner { get; }
 
         private ISet<Term> definedByTerms;
 
@@ -162,10 +162,17 @@ namespace RESTar.Meta
             if (PropertyChanged != null)
             {
                 var oldValue = GetValue(target);
+                base.SetValue(target, (object) value);
                 if (!object.Equals(oldValue, value))
-                    PropertyChanged?.Invoke(this, target, oldValue, value);
+                    NotifyChange(target, oldValue, value);
+                return;
             }
             base.SetValue(target, (object) value);
+        }
+
+        internal void NotifyChange(object target, object oldValue, object newValue)
+        {
+            PropertyChanged?.Invoke(this, target, oldValue, newValue);
         }
 
         /// <summary>
@@ -173,7 +180,7 @@ namespace RESTar.Meta
         /// </summary>
         internal DeclaredProperty(int metadataToken, string name, string actualName, Type type, int? order, bool isScQueryable,
             ICollection<Attribute> attributes, bool skipConditions, bool hidden, bool hiddenIfNull, bool isEnum, string customDateTimeFormat,
-            Operators allowedConditionOperators, Type declaredIn, Getter getter, Setter setter)
+            Operators allowedConditionOperators, Type owner, Getter getter, Setter setter)
         {
             MetadataToken = metadataToken;
             Name = name;
@@ -193,7 +200,7 @@ namespace RESTar.Meta
             Getter = getter;
             Setter = setter;
             ScIndexableColumn = null;
-            DeclaredIn = declaredIn;
+            Owner = owner;
         }
 
         /// <summary>
@@ -225,7 +232,7 @@ namespace RESTar.Meta
             if (memberAttribute?.ReadOnly != true)
                 Setter = p.MakeDynamicSetter();
             ReplaceOnUpdate = memberAttribute?.ReplaceOnUpdate == true;
-            DeclaredIn = p.DeclaringType;
+            Owner = p.DeclaringType;
 
             if (p.DeclaringType.HasAttribute<DatabaseAttribute>() && !p.HasAttribute<TransientAttribute>())
             {
@@ -264,12 +271,12 @@ namespace RESTar.Meta
             if (HasAttribute<DefinedByAttribute>(out var definedByAttribute))
             {
                 DefinedByTerms.UnionWith(definedByAttribute.Terms.Select(name =>
-                    Term.Parse(DeclaredIn, name, ".", TermBindingRule.OnlyDeclared, null)));
+                    Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)));
             }
             if (HasAttribute<DefinesAttribute>(out var definesAttribute))
             {
                 DefinesTerms.UnionWith(definesAttribute.Terms.Select(name =>
-                    Term.Parse(DeclaredIn, name, ".", TermBindingRule.OnlyDeclared, null)));
+                    Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)));
             }
         }
 

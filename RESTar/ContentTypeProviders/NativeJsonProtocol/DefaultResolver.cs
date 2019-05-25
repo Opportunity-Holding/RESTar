@@ -10,7 +10,6 @@ using RESTar.Internal.Sc;
 using RESTar.Linq;
 using RESTar.Meta;
 using RESTar.Meta.Internal;
-using RESTar.Resources.Operations;
 
 namespace RESTar.ContentTypeProviders.NativeJsonProtocol
 {

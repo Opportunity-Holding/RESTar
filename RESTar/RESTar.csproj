@@ -130,6 +130,7 @@
     <Compile Include="Resources\Event.cs" />
     <Compile Include="Meta\Internal\IEventInternal.cs" />
     <Compile Include="Resources\Events.cs" />
+    <Compile Include="Resources\Operations\ExtensionMethods.cs" />
     <Compile Include="Resources\IEntityResourceInterface.cs" />
     <Compile Include="Resources\InvalidEventDeclarationException.cs" />
     <Compile Include="Resources\InvalidResourceControllerException.cs" />

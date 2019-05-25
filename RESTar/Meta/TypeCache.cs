@@ -22,6 +22,7 @@ namespace RESTar.Meta
         static TypeCache()
         {
             DeclaredPropertyCache = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, DeclaredProperty>>();
+            DeclaredPropertyCacheByActualName = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, DeclaredProperty>>();
             TermCache = new ConcurrentDictionary<(string, string, TermBindingRule), Term>();
         }
 
@@ -30,7 +31,7 @@ namespace RESTar.Meta
         internal static readonly ConcurrentDictionary<(string Type, string Key, TermBindingRule BindingRule), Term> TermCache;
 
         /// <summary>
-        /// Condition terms are terms that refer to properties in resources, or  for
+        /// Condition terms are terms that refer to properties in resources, or for
         /// use in conditions.
         /// </summary>
         internal static Term MakeConditionTerm(this ITarget target, string key) => target.Type.MakeOrGetCachedTerm
@@ -68,6 +69,7 @@ namespace RESTar.Meta
         #region Declared properties
 
         internal static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<string, DeclaredProperty>> DeclaredPropertyCache;
+        internal static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<string, DeclaredProperty>> DeclaredPropertyCacheByActualName;
 
         internal static IEnumerable<DeclaredProperty> FindAndParseDeclaredProperties(this Type type, bool flag = false) => type
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -82,7 +84,7 @@ namespace RESTar.Meta
         /// <summary>
         /// Gets the declared properties for a given type
         /// </summary>
-        public static IReadOnlyDictionary<string, DeclaredProperty> GetDeclaredProperties(this Type type)
+        public static IReadOnlyDictionary<string, DeclaredProperty> GetDeclaredProperties(this Type type, bool groupByActualName = false)
         {
             IEnumerable<DeclaredProperty> make(Type _type)
             {
@@ -158,13 +160,25 @@ namespace RESTar.Meta
                 }
             }
 
-            if (type.RESTarTypeName() == null) return null;
-            if (!DeclaredPropertyCache.TryGetValue(type, out var props))
+            if (type?.RESTarTypeName() == null) return null;
+
+            if (!groupByActualName)
             {
-                props = DeclaredPropertyCache[type] = make(type).SafeToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
-                props.Values.ForEach(property => property.EstablishPropertyDependancies());
+                if (!DeclaredPropertyCache.TryGetValue(type, out var propsByName))
+                {
+                    propsByName = DeclaredPropertyCache[type] = make(type).SafeToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
+                    propsByName.Values.ForEach(property => property.EstablishPropertyDependancies());
+                }
+                return propsByName;
             }
-            return props;
+
+            if (!DeclaredPropertyCacheByActualName.TryGetValue(type, out var propsByActualName))
+            {
+                propsByActualName = DeclaredPropertyCacheByActualName[type] = GetDeclaredProperties(type)
+                    .Values
+                    .SafeToDictionary(p => p.ActualName, StringComparer.OrdinalIgnoreCase);
+            }
+            return propsByActualName;
         }
 
         /// <summary>
