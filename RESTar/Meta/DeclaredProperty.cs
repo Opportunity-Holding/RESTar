@@ -19,14 +19,15 @@ using Starcounter.Metadata;
 namespace RESTar.Meta
 {
     /// <summary>
-    /// Represents an operation on a property change, in context to some root object (defined by the term)
-    /// </summary>
-    public delegate void ContextualPropertyChangeHandler(Term term, object target, dynamic oldValue, dynamic newValue);
-
-    /// <summary>
     /// Represents the operation to attach to a PropertyChanged event handler in DeclaredProperty
     /// </summary>
-    public delegate void PropertyChangeHandler(DeclaredProperty property, object target, dynamic oldValue, dynamic newValue);
+    public delegate void PropertyChangeHandler
+    (
+        DeclaredProperty property,
+        object target,
+        dynamic oldValue,
+        dynamic newValue
+    );
 
     /// <inheritdoc />
     /// <summary>
@@ -84,25 +85,26 @@ namespace RESTar.Meta
         public string CustomDateTimeFormat { get; }
 
         /// <summary>
+        /// Should this member, and all its members, be merged onto the owner type when (de)serializing?
+        /// </summary>
+        public bool MergeOntoOwner { get; }
+
+        /// <summary>
         /// The type that this property was declared in
         /// </summary>
         public Type Owner { get; }
 
-        private ISet<Term> definedByTerms;
-
         /// <summary>
-        /// The properties that this property reflects upon, the changes of which should
-        /// indicate that this property needs to be reevaluated. True only for properties that are
-        /// computed variables.
+        /// Does the value of this property define the values of other properties?
         /// </summary>
-        public ISet<Term> DefinedByTerms => definedByTerms ?? (definedByTerms = new HashSet<Term>());
+        public bool DefinesOtherProperties { get; private set; }
 
-        private ISet<Term> definesTerms;
+        private ISet<Term> definesPropertyTerms;
 
         /// <summary>
         /// The properties that reflects upon this property
         /// </summary>
-        public ISet<Term> DefinesTerms => definesTerms ?? (definesTerms = new HashSet<Term>());
+        public ISet<Term> DefinesPropertyTerms => definesPropertyTerms ?? (definesPropertyTerms = new HashSet<Term>());
 
         /// <summary>
         /// An event that is fired when this property is changed for some target
@@ -201,6 +203,7 @@ namespace RESTar.Meta
             Setter = setter;
             ScIndexableColumn = null;
             Owner = owner;
+            MergeOntoOwner = false;
         }
 
         /// <summary>
@@ -217,6 +220,7 @@ namespace RESTar.Meta
             var memberAttribute = GetAttribute<RESTarMemberAttribute>();
             var jsonAttribute = GetAttribute<JsonPropertyAttribute>();
             CustomDateTimeFormat = memberAttribute?.DateTimeFormat;
+            MergeOntoOwner = memberAttribute?.MergeOntoOwner ?? false;
             Order = memberAttribute?.Order ?? jsonAttribute?.Order;
             IsScQueryable = p.DeclaringType?.HasAttribute<DatabaseAttribute>() == true && p.PropertyType.IsStarcounterCompatible();
             SkipConditions = memberAttribute?.SkipConditions == true || p.DeclaringType.HasAttribute<RESTarViewAttribute>();
@@ -268,15 +272,20 @@ namespace RESTar.Meta
 
         internal void EstablishPropertyDependancies()
         {
-            if (HasAttribute<DefinedByAttribute>(out var definedByAttribute))
+            if (HasAttribute<DefinedByAttribute>(out var dbAttribute) && dbAttribute.Terms is string[] dbArgs && dbArgs.Any())
             {
-                DefinedByTerms.UnionWith(definedByAttribute.Terms.Select(name =>
-                    Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)));
+                foreach (var term in dbArgs.Select(name => Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)))
+                {
+                    var definer = term.LastAs<DeclaredProperty>();
+                    definer.DefinesOtherProperties = true;
+                    definer.DefinesPropertyTerms.Add(term);
+                }
             }
-            if (HasAttribute<DefinesAttribute>(out var definesAttribute))
+            if (HasAttribute<DefinesAttribute>(out var dAttribute) && dAttribute.Terms is string[] dArgs && dArgs.Any())
             {
-                DefinesTerms.UnionWith(definesAttribute.Terms.Select(name =>
-                    Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)));
+                foreach (var term in dArgs.Select(name => Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)))
+                    DefinesPropertyTerms.Add(term);
+                DefinesOtherProperties = true;
             }
         }
 
@@ -314,7 +323,7 @@ namespace RESTar.Meta
                 var collectionReadonly = typeof(IList).IsAssignableFrom(type) || type.ImplementsGenericInterface(typeof(IList<>));
                 switch (key)
                 {
-                    case "-": return new LastInCollection(elementType, collectionReadonly, type);
+                    case "-": return new LastIndexProperty(elementType, collectionReadonly, type);
                     case var _ when int.TryParse(key, out var integer):
                         return new IndexProperty(integer, key, elementType, collectionReadonly, type);
                 }

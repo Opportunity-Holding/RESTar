@@ -14,7 +14,7 @@ namespace RESTarExample.RegistrationForms
         public bool IAgree { get; set; }
     }
 
-    public interface IMyRegistration : IEntityResourceInterface
+    public interface IMyRegistration : IEntityDefinition
     {
         string FN { get; }
         string PW { get; }

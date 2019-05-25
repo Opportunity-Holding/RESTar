@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -125,7 +124,12 @@ namespace RESTar.Meta
         /// <summary>
         /// The empty term, used when building terms
         /// </summary>
-        internal static Term Empty(string componentSeparator) => new Term(componentSeparator);
+        internal static Term Empty(string componentSeparator)
+        {
+            var empty = new Term(componentSeparator);
+            empty.SetCommonProperties();
+            return empty;
+        }
 
         /// <summary>
         /// Parses a term key string and returns a term describing it. All terms are created here.
@@ -284,6 +288,14 @@ namespace RESTar.Meta
             return RunEvaluation(this, target, out actualKey, out parent, out property);
         }
 
+        internal static Term Create(IEnumerable<DeclaredProperty> properties, string componentSeparator)
+        {
+            var newTerm = new Term(componentSeparator);
+            newTerm.Store.AddRange(properties);
+            newTerm.SetCommonProperties();
+            return newTerm;
+        }
+
         /// <summary>
         /// Creates a new term that is this term appended with the given term, that will evaluate to the
         /// final property in the given term.
@@ -333,5 +345,25 @@ namespace RESTar.Meta
         /// </summary>
         /// <returns></returns>
         public override string ToString() => Key;
+
+        private bool Equals(Term other) => string.Equals(Key, other.Key) && IsDeclared == other.IsDeclared;
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((Term) obj);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((Key != null ? Key.GetHashCode() : 0) * 397) ^ IsDeclared.GetHashCode();
+            }
+        }
     }
 }

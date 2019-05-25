@@ -6,20 +6,13 @@ using RESTar.Requests;
 
 namespace RESTar.Meta.Internal
 {
-    internal class IndexProperty : DeclaredProperty
+    internal class LastIndexProperty : DeclaredProperty
     {
-        internal IndexProperty
+        internal LastIndexProperty(Type type, bool collectionReadonly, Type owner) : base
         (
-            int index,
-            string name,
-            Type type,
-            bool collectionReadonly,
-            Type owner
-        ) : base
-        (
-            metadataToken: index.GetHashCode(),
-            name: name,
-            actualName: name,
+            metadataToken: "-".GetHashCode(),
+            name: "-",
+            actualName: "-",
             type: type,
             order: null,
             isScQueryable: false,
@@ -37,14 +30,12 @@ namespace RESTar.Meta.Internal
                 {
                     switch (target)
                     {
-                        case IEnumerable<object> ie: return ie.ElementAtOrDefault(index);
-                        case string str:
-                            var length = str.Length;
-                            return index >= length - 1 ? default : str[index];
+                        case IEnumerable<object> ie: return ie.LastOrDefault();
+                        case string str: return str.Last();
                         case IList l:
                             var count = l.Count;
-                            return index >= count - 1 ? null : l[index];
-                        case IEnumerable e: return e.Cast<object>().ElementAtOrDefault(index);
+                            return count == 0 ? null : l[l.Count - 1];
+                        case IEnumerable e: return e.Cast<object>().LastOrDefault();
                     }
                 }
                 catch { }
@@ -59,7 +50,10 @@ namespace RESTar.Meta.Internal
                         case IList l:
                             try
                             {
-                                l[index] = value;
+                                var count = l.Count;
+                                if (count == 0)
+                                    l.Add(value);
+                                else l[l.Count - 1] = value;
                             }
                             catch { }
                             break;
@@ -67,9 +61,12 @@ namespace RESTar.Meta.Internal
                             try
                             {
                                 // we know that it is IList<T> of something (which does not make it IList!)
-                                // so it should have an indexer
-                                dynamic dynTarget = target;
-                                dynTarget[index] = value;
+                                // so it should have an indexer and a Count property.
+                                dynamic l = target;
+                                int count = l.Count;
+                                if (count == 0)
+                                    l.Add(value);
+                                else l[l.Count - 1] = value;
                             }
                             catch { }
                             break;

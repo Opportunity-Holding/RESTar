@@ -49,6 +49,24 @@ namespace RESTarExample
         Method Method { get; }
     }
 
+    public class X
+    {
+        public string S; // defines = ST
+        public string T; // defines = ST
+
+        public string ST => S + T; // definedby = (S, T)
+
+        public int SLength => S.Length; // definedby = S
+
+        public char SFirst => S[0]; // definedby = S
+        
+        // as soon as we have mutable collections, however, things get weird
+
+        public IEnumerable<string> GetStrings => null; // get strings
+
+        public string Third => GetStrings.ElementAtOrDefault(2);  // defined by GetStrings.3
+    }
+
     [RESTar, Database]
     public class EnumTest : I
     {
@@ -462,7 +480,7 @@ namespace RESTarExample
 
         #region Version1 interface
 
-        public interface IVersion1 : IEntityResourceInterface
+        public interface IVersion1 : IEntityDefinition
         {
             string _ICanCallThisWhateverString { get; }
             int __ThisIsMyINt { get; set; }
@@ -491,7 +509,7 @@ namespace RESTarExample
             set => MyDateTime = value;
         }
 
-        public interface IVersion2 : IEntityResourceInterface
+        public interface IVersion2 : IEntityDefinition
         {
             string _ICanCadsallThisWhateverString { get; }
             int __ThiasdasdsIsMyINt { get; set; }

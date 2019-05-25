@@ -67,6 +67,11 @@ namespace RESTar.Resources
         /// </summary>
         public string DateTimeFormat { get; }
 
+        /// <summary>
+        /// Should this member, and all its members, be merged onto the owner type when serializing?
+        /// </summary>
+        public bool MergeOntoOwner { get; }
+
         /// <inheritdoc />
         /// <summary>
         /// Creates a new RESTar property configuration for a property
@@ -82,9 +87,10 @@ namespace RESTar.Resources
         /// <param name="excelReducer">The name of an optional public ToString-like method, declared in the same scope as the property, that reduces the property to an excel-compatible string.</param>
         /// <param name="replaceOnUpdate">Should this object be replaced with a new instance on update, or reused? Applicable for types such as Dictionaries and Lists.</param>
         /// <param name="dateTimeFormat">A custom datetime format string to use when writing and reading this property</param>
+        /// <param name="mergeOntoOwner">Should this member, and all its members, be merged onto the owner type when serializing?</param>
         public RESTarMemberAttribute(bool ignore = false, string name = null, int order = int.MinValue, bool hide = false,
             bool hideIfNull = false, bool readOnly = false, bool skipConditions = false, Operators allowedOperators = Operators.All,
-            string excelReducer = null, bool replaceOnUpdate = false, string dateTimeFormat = null)
+            string excelReducer = null, bool replaceOnUpdate = false, string dateTimeFormat = null, bool mergeOntoOwner = false)
         {
             Ignored = ignore;
             Name = name;
@@ -98,6 +104,7 @@ namespace RESTar.Resources
             ExcelReducerName = excelReducer;
             ReplaceOnUpdate = replaceOnUpdate;
             DateTimeFormat = dateTimeFormat;
+            MergeOntoOwner = mergeOntoOwner;
         }
     }
 }

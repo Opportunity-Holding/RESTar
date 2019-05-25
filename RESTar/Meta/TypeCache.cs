@@ -96,7 +96,7 @@ namespace RESTar.Meta
                             .Concat(_type.GetInterfaces())
                             .SelectMany(i => i.GetProperties(BindingFlags.Instance | BindingFlags.Public))
                             .ParseDeclaredProperties(false);
-                    case var _ when _type.HasAttribute<RESTarAttribute>(out _) && _type.GetRESTarInterfaceType() is Type t:
+                    case var _ when _type.GetRESTarInterfaceType() is Type t:
                         var interfaceName = t.RESTarTypeName();
                         var targetsByProp = _type
                             .GetInterfaceMap(t)
@@ -111,8 +111,9 @@ namespace RESTar.Meta
                                     return m.Name.Split("get_")[1];
                                 if (m.Name.StartsWith("set_"))
                                     return m.Name.Split("set_")[1];
-                                throw new Exception("Invalid interface");
+                                return null;
                             })
+                            .Where(group => group.Key != null)
                             .ToDictionary(m => m.Key, m => (
                                 getter: m.FirstOrDefault(p => p.GetParameters().Length == 0),
                                 setter: m.FirstOrDefault(p => p.GetParameters().Length == 1)

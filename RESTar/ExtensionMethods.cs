@@ -394,7 +394,7 @@ namespace RESTar
 
         internal static Type GetRESTarInterfaceType(this Type resourceType) => resourceType
             .GetInterfaces()
-            .FirstOrDefault(i => typeof(IEntityResourceInterface).IsAssignableFrom(i));
+            .FirstOrDefault(i => typeof(IEntityDefinition).IsAssignableFrom(i));
 
         internal static IEnumerable<Operator> ToOperators(this Operators operators)
         {
