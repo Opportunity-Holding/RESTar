@@ -109,6 +109,19 @@ namespace RESTar.Requests
             }
         }
 
+        internal Body GetCopy(string newProtocol = null)
+        {
+            if (!HasContent) return default;
+            var streamCopy = new RESTarStream(ContentType);
+            Stream.CopyTo(streamCopy);
+            streamCopy.Rewind();
+            Stream.Rewind();
+            var protocolProvider = newProtocol != null
+                ? ProtocolController.ResolveProtocolProvider(newProtocol)
+                : ProtocolProvider;
+            return new Body(streamCopy, protocolProvider);
+        }
+
         /// <inheritdoc />
         public void Dispose()
         {

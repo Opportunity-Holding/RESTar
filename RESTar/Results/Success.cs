@@ -26,7 +26,7 @@ namespace RESTar.Results
         public virtual Headers Headers { get; }
 
         /// <inheritdoc />
-        public Cookies Cookies { get; protected set; }
+        public Cookies Cookies => Context.Client.Cookies;
 
         /// <inheritdoc />
         public bool IsSerialized { get; protected set; }

@@ -245,5 +245,7 @@ namespace RESTar.Requests
 
         /// <inheritdoc />
         public ICollection<string> Values => this._Keys();
+
+        internal Headers GetCopy() => new Headers(this);
     }
 }

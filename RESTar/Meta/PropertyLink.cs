@@ -57,7 +57,7 @@ namespace RESTar.Meta
         public void Activate() => Property.PropertyChanged += OnPropertyChanged;
 
         /// <inheritdoc />
-        public void Dispose() { } // => Property.PropertyChanged -= OnPropertyChanged;
+        public void Dispose() => Property.PropertyChanged -= OnPropertyChanged;
 
         private Term GetTermFromRoot(string componentSeparator)
         {

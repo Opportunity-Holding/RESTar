@@ -71,7 +71,6 @@ namespace RESTar.Results
             Request = request;
             TimeElapsed = request.TimeElapsed;
             RequestInternal = (IRequestInternal) request;
-            Cookies = request.Cookies;
         }
     }
 }

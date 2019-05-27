@@ -95,9 +95,10 @@ namespace RESTar.Requests
         /// <param name="resource">The resource to create a request for</param>
         /// <param name="method">The method to perform, for example GET</param>
         /// <param name="protocolId">An optional protocol ID, defining the protocol to use for the request. If the 
-        /// protocol ID is null, the default protocol will be used.</param>
+        /// protocol ID is null, the default protocol will be used.</param>0
         /// <param name="viewName">An optional view name to use when selecting entities from the resource</param>
-        public virtual IRequest<T> CreateRequest<T>(IResource<T> resource, Method method = GET, string protocolId = "restar", string viewName = null) where T : class
+        public virtual IRequest<T> CreateRequest<T>(IResource<T> resource, Method method = GET, string protocolId = "restar", string viewName = null)
+            where T : class
         {
             var parameters = new RequestParameters(this, method, resource, protocolId, viewName);
             return new Request<T>(resource, parameters);
@@ -110,8 +111,7 @@ namespace RESTar.Requests
         /// <param name="method">The method to perform</param>
         /// <param name="body">The body of the request</param>
         /// <param name="headers">The headers of the request</param>
-        /// <param name="cookies">The cookies contained in the request</param>
-        public virtual IRequest CreateRequest(string uri, Method method = GET, byte[] body = null, Headers headers = null, Cookies cookies = null)
+        public virtual IRequest CreateRequest(string uri, Method method = GET, byte[] body = null, Headers headers = null)
         {
             if (uri == null) throw new ArgumentNullException(nameof(uri));
             if (IsWebSocketUpgrade)
@@ -119,7 +119,7 @@ namespace RESTar.Requests
                 WebSocket = CreateWebSocket();
                 WebSocket.Context = this;
             }
-            var parameters = new RequestParameters(this, method, uri, body, headers, cookies);
+            var parameters = new RequestParameters(this, method, uri, body, headers);
             if (!parameters.IsValid) return new InvalidParametersRequest(parameters);
             return Construct((dynamic) parameters.IResource, parameters);
         }
@@ -135,7 +135,7 @@ namespace RESTar.Requests
         public bool UriIsValid(string uri, out Error error, out IResource resource, out IUriComponents uriComponents)
         {
             if (uri == null) throw new ArgumentNullException(nameof(uri));
-            var parameters = new RequestParameters(this, (Method) (-1), uri, null, null, null);
+            var parameters = new RequestParameters(this, (Method) (-1), uri, null, null);
             uriComponents = null;
             if (parameters.Error != null)
             {

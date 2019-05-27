@@ -51,7 +51,11 @@ namespace RESTar.Meta
                 ? MakeOrGetCachedTerm(target.Type, key, ".", target.OutputBindingRule)
                 : Term.Parse(target.Type, key, ".", target.OutputBindingRule, dynamicDomain);
 
-        internal static Term MakeOrGetCachedTerm(this Type resource, string key, string componentSeparator, TermBindingRule bindingRule)
+        /// <summary>
+        /// Creates a new term for the given type, with the given key, component separator and binding rule. If a term with
+        /// the given key already existed, simply returns that one.
+        /// </summary>
+        public static Term MakeOrGetCachedTerm(this Type resource, string key, string componentSeparator, TermBindingRule bindingRule)
         {
             var tuple = (resource.RESTarTypeName(), key.ToLower(), bindingRule);
             if (!TermCache.TryGetValue(tuple, out var term))
@@ -122,7 +126,7 @@ namespace RESTar.Meta
                         return make(t).Select(p =>
                         {
                             p.IsScQueryable = _type.HasAttribute<DatabaseAttribute>() && p.Type.IsStarcounterCompatible();
-                            var (getter, setter) = targetsByProp.SafeGet(p.Name);
+                            var (getter, setter) = targetsByProp.SafeGet(p.ActualName);
                             if (p.IsReadable)
                             {
                                 p.ActualName = getter.GetInstructions()
@@ -191,7 +195,8 @@ namespace RESTar.Meta
             var declaringType = member.DeclaringType;
             if (declaringType.RESTarTypeName() == null)
                 throw new Exception($"Cannot get declared property for member '{member}' of unknown type");
-            return declaringType.GetDeclaredProperties().FirstOrDefault(p => p.Value.ActualName == member.Name).Value;
+            declaringType.GetDeclaredProperties(true).TryGetValue(member.Name, out var property);
+            return property;
         }
 
         /// <summary>
@@ -202,7 +207,8 @@ namespace RESTar.Meta
             var declaringType = member.DeclaringType;
             if (declaringType.RESTarTypeName() == null)
                 throw new Exception($"Cannot get declared property for member '{member}' of unknown type");
-            return declaringType.GetDeclaredProperties().FirstOrDefault(p => p.Value.Name == member.PropertyName).Value;
+            declaringType.GetDeclaredProperties().TryGetValue(member.PropertyName, out var property);
+            return property;
         }
 
         #endregion
@@ -211,6 +217,9 @@ namespace RESTar.Meta
 
         internal static readonly IDictionary<Type, PropertyMonitoringTree> PropertyMonitoringTreeCache;
 
+        /// <summary>
+        /// Gets a property monitoring tree for a given type
+        /// </summary>
         public static PropertyMonitoringTree GetPropertyMonitoringTree(this Type rootType, string outputTermComponentSeparator,
             ObservedChangeHandler handleObservedChange)
         {

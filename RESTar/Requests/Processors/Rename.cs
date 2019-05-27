@@ -25,6 +25,9 @@ namespace RESTar.Requests.Processors
             dynamicDomain = Values;
         }
 
+        private Rename(Rename other) : base(other) { }
+        internal Rename GetCopy() => new Rename(this);
+
         private JObject Renamed(JObject entity)
         {
             this.ForEach(pair =>

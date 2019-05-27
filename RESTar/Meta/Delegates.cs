@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using RESTar.Requests;
-
-namespace RESTar.Meta
+﻿namespace RESTar.Meta
 {
     /// <summary>
     /// Represents a getter for a property. This is an open delgate, taking a 

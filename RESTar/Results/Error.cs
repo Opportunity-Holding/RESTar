@@ -27,7 +27,7 @@ namespace RESTar.Results
         public Headers Headers { get; } = new Headers();
 
         /// <inheritdoc />
-        public Cookies Cookies { get; } = new Cookies();
+        public Cookies Cookies => Context.Client.Cookies;
 
         /// <inheritdoc />
         public bool IsSuccess { get; }

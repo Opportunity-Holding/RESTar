@@ -48,9 +48,13 @@ namespace RESTar.Requests
         /// </summary>
         public bool Secure { get; }
 
+        /// <summary>
+        /// The path that this cookie is placed at
+        /// </summary>
+        public string Path { get; }
+
         #region In future versions
 
-        // public string Path { get; }
         // public SameSitePolicy SameSite { get; }
 
         #endregion
@@ -76,6 +80,7 @@ namespace RESTar.Requests
         /// the current document location (but not including subdomains)</param>
         /// <param name="httpOnly">HTTP-only cookies aren't accessible via JavaScript through the Document.cookie property or the XMLHttpRequest API</param>
         /// <param name="secure">A secure cookie will only be sent to the server when a request is made using SSL</param>
+        /// <param name="path">The path that this cookie will be placed at</param>
         public Cookie
         (
             string name,
@@ -84,7 +89,8 @@ namespace RESTar.Requests
             int? maxAge = null,
             string domain = null,
             bool httpOnly = false,
-            bool secure = false
+            bool secure = false,
+            string path = null
         )
         {
             if (!Regex.IsMatch(name, RegEx.CookieName))
@@ -96,6 +102,7 @@ namespace RESTar.Requests
             Domain = domain;
             HttpOnly = httpOnly;
             Secure = secure;
+            Path = path;
         }
 
         /// <summary>
@@ -112,6 +119,7 @@ namespace RESTar.Requests
                 string domain = null;
                 var httpOnly = false;
                 var secure = false;
+                string path = null;
 
                 var parts = cookieString
                     .Split(';')
@@ -146,12 +154,15 @@ namespace RESTar.Requests
                             case var _ when keyPart.EqualsNoCase("Secure"):
                                 secure = true;
                                 break;
+                            case var _ when keyPart.EqualsNoCase("Path") && !string.IsNullOrWhiteSpace(valuePart):
+                                path = valuePart;
+                                break;
                         }
                     }
                 }
 
                 if (!nameAndValueParsed) throw new ArgumentException();
-                return new Cookie(name, value, expires, maxAge, domain, httpOnly, secure);
+                return new Cookie(name, value, expires, maxAge, domain, httpOnly, secure, path);
             }
             catch (Exception e)
             {
@@ -225,17 +236,12 @@ namespace RESTar.Requests
             {
                 writer.Append("; Secure");
             }
+            if (Path != null)
+            {
+                writer.Append("; Path=");
+                writer.Append(Path);
+            }
             return writer.ToString();
         }
-
-        /// <summary>
-        /// Converts a cookie from its corresponding cookie string
-        /// </summary>
-        public static implicit operator Cookie(string cookieString) => Parse(cookieString);
-
-        /// <summary>
-        /// Converts a cookie to its corresponding cookie string
-        /// </summary>
-        public static implicit operator string(Cookie cookie) => cookie.ToString();
     }
 }

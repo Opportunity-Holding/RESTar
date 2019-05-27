@@ -45,6 +45,11 @@ namespace RESTar.Requests
         /// </summary>
         public bool HTTPS { get; }
 
+        /// <summary>
+        /// The cookies associated with this client
+        /// </summary>
+        public Cookies Cookies { get; }
+
         internal AccessRights AccessRights { get; set; }
         internal IDictionary<IResource, byte> ResourceAuthMappings { get; }
         internal IDictionary<IResource, IDictionary<string, object>> ResourceClientDataMappings { get; }
@@ -54,7 +59,7 @@ namespace RESTar.Requests
         /// <summary>
         /// Creates a new client with the given origin type
         /// </summary>
-        private Client(OriginType origin, string host, IPAddress clientIP, IPAddress proxyIP, string userAgent, bool https)
+        private Client(OriginType origin, string host, IPAddress clientIP, IPAddress proxyIP, string userAgent, bool https, Cookies cookies)
         {
             Origin = origin;
             Host = host;
@@ -64,6 +69,7 @@ namespace RESTar.Requests
             HTTPS = https;
             ResourceAuthMappings = new ConcurrentDictionary<IResource, byte>();
             ResourceClientDataMappings = new ConcurrentDictionary<IResource, IDictionary<string, object>>();
+            Cookies = cookies;
         }
 
         /// <summary>
@@ -74,15 +80,17 @@ namespace RESTar.Requests
         /// <param name="userAgent">THe user agent of the client</param>
         /// <param name="host">The content of the host header in the HTTP request</param>
         /// <param name="https">Is the client connected with HTTPS?</param>
+        /// <param name="cookies">The cookies registered for this client</param>
         /// <returns></returns>
-        public static Client External(IPAddress clientIP, IPAddress proxyIP, string userAgent, string host, bool https) => new Client
+        public static Client External(IPAddress clientIP, IPAddress proxyIP, string userAgent, string host, bool https, Cookies cookies) => new Client
         (
             origin: OriginType.External,
             host: host,
             clientIP: clientIP,
             proxyIP: proxyIP,
             userAgent: userAgent,
-            https: https
+            https: https,
+            cookies: cookies
         );
 
         /// <summary>
@@ -95,7 +103,8 @@ namespace RESTar.Requests
             clientIP: new IPAddress(new byte[] {127, 0, 0, 1}),
             proxyIP: null,
             userAgent: null,
-            https: false
+            https: false,
+            cookies: new Cookies()
         ) {AccessRights = AccessRights.Root};
 
         internal static Client Remote => new Client
@@ -105,7 +114,8 @@ namespace RESTar.Requests
             clientIP: new IPAddress(new byte[] {127, 0, 0, 1}),
             proxyIP: null,
             userAgent: null,
-            https: false
+            https: false,
+            cookies: new Cookies()
         );
 
         internal static Client Webhook => new Client
@@ -115,7 +125,8 @@ namespace RESTar.Requests
             clientIP: new IPAddress(new byte[] {127, 0, 0, 1}),
             proxyIP: null,
             userAgent: null,
-            https: false
+            https: false,
+            cookies: new Cookies()
         );
 
         /// <summary>

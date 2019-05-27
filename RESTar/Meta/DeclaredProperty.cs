@@ -212,6 +212,7 @@ namespace RESTar.Meta
         internal DeclaredProperty(PropertyInfo p, bool flagName = false)
         {
             if (p == null) return;
+
             MetadataToken = p.MetadataToken;
             Name = p.RESTarMemberName(flagName);
             Type = p.PropertyType;

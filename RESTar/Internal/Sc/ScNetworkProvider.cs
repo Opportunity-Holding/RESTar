@@ -27,7 +27,7 @@ namespace RESTar.Internal.Sc
                     if (!client.TryAuthenticate(ref uri, headers, out var error))
                         return ToResponse(error);
                     var context = new ScContext(client, scRequest);
-                    using (var request = context.CreateRequest(uri, method, scRequest.BodyBytes, headers, new Cookies(scRequest.Cookies)))
+                    using (var request = context.CreateRequest(uri, method, scRequest.BodyBytes, headers))
                     {
                         switch (request.Evaluate().Serialize())
                         {
@@ -140,7 +140,7 @@ namespace RESTar.Internal.Sc
                 }
             }
             result.Headers.ForEach(header => response.Headers[header.Key] = header.Value);
-            result.Cookies.ForEach(cookie => response.Headers["Set-Cookie"] = cookie);
+            result.Cookies.ForEach(cookie => response.Headers["Set-Cookie"] = cookie.ToString());
             return response;
         }
 
@@ -160,7 +160,15 @@ namespace RESTar.Internal.Sc
                     proxyIP = request.ClientIpAddress;
                 }
             }
-            return Client.External(clientIP, proxyIP, userAgent, host, https);
+            return Client.External
+            (
+                clientIP: clientIP,
+                proxyIP: proxyIP,
+                userAgent: userAgent,
+                host: host,
+                https: https,
+                cookies: new Cookies(request.Cookies)
+            );
         }
     }
 }

@@ -58,10 +58,11 @@ namespace RESTar.WebSockets
         /// </summary>
         public Headers Headers { get; internal set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// The cookies contained in the WebSocket upgrade request
         /// </summary>
-        public ReadonlyCookies Cookies { get; internal set; }
+        public ReadonlyCookies Cookies => Client.Cookies.AsReadonly();
 
         /// <inheritdoc />
         public string TraceId => Id;
@@ -98,7 +99,6 @@ namespace RESTar.WebSockets
         {
             Context = new WebSocketContext(this, Client);
             Headers = upgradeRequest.Headers;
-            Cookies = upgradeRequest.Cookies.AsReadonly();
         }
 
         internal void Open()

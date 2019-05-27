@@ -57,6 +57,15 @@ namespace RESTar.Requests.Filters
             }
         }
 
+        private Search(string pattern, string selector, bool ignoreCase)
+        {
+            Pattern = pattern;
+            Selector = selector;
+            IgnoreCase = ignoreCase;
+        }
+
+        internal Search GetCopy() => new Search(Pattern, Selector, IgnoreCase);
+
         /// <summary>
         /// Searches the entities for a given case insensitive string pattern, and returns only 
         /// those that contain the pattern.

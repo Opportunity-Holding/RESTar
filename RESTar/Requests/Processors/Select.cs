@@ -20,6 +20,9 @@ namespace RESTar.Requests.Processors
             .Select(key => resource.MakeOutputTerm(key, dynDomain))
             .ForEach(Add);
 
+        private Select(Select other) : base(other) { }
+        internal Select GetCopy() => new Select(this);
+
         internal JObject Apply<T>(T entity)
         {
             var jobj = new JObject();

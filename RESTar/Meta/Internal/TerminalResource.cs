@@ -5,7 +5,6 @@ using System.Reflection;
 using RESTar.Linq;
 using RESTar.Requests;
 using RESTar.Resources;
-using RESTar.Resources.Operations;
 using RESTar.Results;
 
 namespace RESTar.Meta.Internal
