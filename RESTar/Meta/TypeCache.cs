@@ -24,6 +24,7 @@ namespace RESTar.Meta
             DeclaredPropertyCache = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, DeclaredProperty>>();
             DeclaredPropertyCacheByActualName = new ConcurrentDictionary<Type, IReadOnlyDictionary<string, DeclaredProperty>>();
             TermCache = new ConcurrentDictionary<(string, string, TermBindingRule), Term>();
+            PropertyMonitoringTreeCache = new ConcurrentDictionary<Type, PropertyMonitoringTree>();
         }
 
         #region Terms
@@ -202,6 +203,18 @@ namespace RESTar.Meta
             if (declaringType.RESTarTypeName() == null)
                 throw new Exception($"Cannot get declared property for member '{member}' of unknown type");
             return declaringType.GetDeclaredProperties().FirstOrDefault(p => p.Value.Name == member.PropertyName).Value;
+        }
+
+        #endregion
+
+        #region Property monitoring trees
+
+        internal static readonly IDictionary<Type, PropertyMonitoringTree> PropertyMonitoringTreeCache;
+
+        public static PropertyMonitoringTree GetPropertyMonitoringTree(this Type rootType, string outputTermComponentSeparator,
+            ObservedChangeHandler handleObservedChange)
+        {
+            return new PropertyMonitoringTree(rootType, outputTermComponentSeparator, handleObservedChange);
         }
 
         #endregion

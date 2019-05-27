@@ -26,9 +26,6 @@ namespace RESTar.Resources.Operations
                 case var d when d == typeof(BinarySelector<>).MakeGenericType(t): return typeof(IBinary<>).MakeGenericType(t);
                 case var d when d == typeof(ViewSelector<>).MakeGenericType(t): return typeof(ISelector<>).MakeGenericType(t);
                 case var d when d == typeof(Validator<>).MakeGenericType(t): return typeof(IValidator<>).MakeGenericType(t);
-                case var d when d == typeof(TerminalInstanceResolver<>).MakeGenericType(t):
-                    return typeof(ITerminalInstanceResolver<>).MakeGenericType(t);
-
                 default: throw new ArgumentOutOfRangeException();
             }
         }

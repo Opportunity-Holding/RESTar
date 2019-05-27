@@ -70,6 +70,8 @@ namespace RESTar.Meta
             }
 
             recurseTree(rootType, null);
+
+            Activate();
         }
 
         /// <summary>

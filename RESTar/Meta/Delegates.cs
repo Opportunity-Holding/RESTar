@@ -30,9 +30,4 @@ namespace RESTar.Meta
     /// </summary>
     /// <returns></returns>
     public delegate T Constructor<out T>();
-
-    /// <summary>
-    /// Finds or creates a new terminal instance from cookies and headers
-    /// </summary>
-    public delegate T TerminalInstanceResolver<out T>(IDictionary<string, object> assignments, Headers headers, ReadonlyCookies cookies);
 }

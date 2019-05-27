@@ -35,37 +35,15 @@ namespace RESTar.Meta.Internal
         public Type InterfaceType { get; }
         public ResourceKind ResourceKind { get; }
         private bool IsDynamicTerminal { get; }
-        private bool HasInstanceResolver { get; }
-
+        
         private Constructor<ITerminal> Constructor { get; }
         private Func<T, IRequest<T>, IEnumerable<T>> Selector { get; }
-        private TerminalInstanceResolver<ITerminal> TerminalInstanceResolver { get; }
-
+        
         public IEnumerable<T> Select(IRequest<T> request) => Selector(null, request);
 
-        internal ITerminal MakeTerminal(ReadonlyCookies cookies, Headers headers, ICollection<Condition<T>> assignments = null)
+        internal ITerminal MakeTerminal(IEnumerable<Condition<T>> assignments = null)
         {
-            ITerminal resolvedTerminal = null;
-            
-            if (HasInstanceResolver)
-            {
-                var assignmentDict = new Dictionary<string, object>();
-                assignments?.ForEach(assignment =>
-                {
-                    if (assignment.Operator != Operators.EQUALS)
-                        throw new BadConditionOperator(this, assignment.Operator);
-                    if (!Members.TryGetValue(assignment.Key, out var property))
-                    {
-                        if (IsDynamicTerminal)
-                            assignmentDict[assignment.Key] = assignment.Value;
-                        throw new UnknownProperty(Type, assignment.Key);
-                    }
-                    assignmentDict[property.Name] = assignment.Value;
-                });
-                resolvedTerminal = TerminalInstanceResolver(assignmentDict, headers, cookies);
-            }
-
-            var newTerminal = resolvedTerminal ?? Constructor();
+            var newTerminal = Constructor();
             assignments?.ForEach(assignment =>
             {
                 if (assignment.Operator != Operators.EQUALS)
@@ -100,9 +78,7 @@ namespace RESTar.Meta.Internal
             Constructor = typeof(T).MakeStaticConstructor<ITerminal>();
             GETAvailableToAll = attribute?.GETAvailableToAll == true;
             IsDynamicTerminal = typeof(IDynamicTerminal).IsAssignableFrom(typeof(T));
-            HasInstanceResolver = typeof(ITerminalInstanceResolver<T>).IsAssignableFrom(typeof(T));
-            TerminalInstanceResolver = DelegateMaker.GetDelegate<TerminalInstanceResolver<ITerminal>>(typeof(T));
-
+            
             var typeName = typeof(T).FullName;
             if (typeName?.Contains('+') == true)
             {

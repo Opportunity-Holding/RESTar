@@ -188,7 +188,7 @@ namespace RESTar.WebSockets
             if (resource == null)
                 throw new ArgumentNullException(nameof(resource));
             var _resource = (Meta.Internal.TerminalResource<T>) resource;
-            var newTerminal = _resource.MakeTerminal(Cookies, Headers, assignments);
+            var newTerminal = _resource.MakeTerminal(assignments);
             Context.WebSocket.ConnectTo(newTerminal, _resource);
             newTerminal.Open();
         }

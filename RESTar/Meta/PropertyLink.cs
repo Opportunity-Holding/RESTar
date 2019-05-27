@@ -25,6 +25,7 @@ namespace RESTar.Meta
 
         private void OnPropertyChanged(DeclaredProperty declaredProperty, object target, dynamic value, dynamic newValue)
         {
+            if (target == null) return;
             MonitoringTree.HandleObservedChange
             (
                 termRelativeRoot: TermFromRoot,
@@ -56,7 +57,7 @@ namespace RESTar.Meta
         public void Activate() => Property.PropertyChanged += OnPropertyChanged;
 
         /// <inheritdoc />
-        public void Dispose() => Property.PropertyChanged -= OnPropertyChanged;
+        public void Dispose() { } // => Property.PropertyChanged -= OnPropertyChanged;
 
         private Term GetTermFromRoot(string componentSeparator)
         {
@@ -66,7 +67,7 @@ namespace RESTar.Meta
             {
                 stack.Push(currentLink.Property);
                 currentLink = currentLink.Rootward;
-            } while (currentLink.Rootward != null);
+            } while (currentLink != null);
             return Term.Create(stack, componentSeparator);
         }
     }

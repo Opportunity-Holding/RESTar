@@ -122,7 +122,6 @@
     <Compile Include="Meta\IEvent.cs" />
     <Compile Include="Meta\Internal\LastIndexProperty.cs" />
     <Compile Include="Meta\PropertyLink.cs" />
-    <Compile Include="Meta\PropertyMonitoring.cs" />
     <Compile Include="Meta\PropertyMonitoringTree.cs" />
     <Compile Include="Requests\Cookie.cs" />
     <Compile Include="Requests\Cookies.cs" />
@@ -140,7 +139,6 @@
     <Compile Include="Resources\InvalidEventDeclarationException.cs" />
     <Compile Include="Resources\InvalidResourceControllerException.cs" />
     <Compile Include="Resources\IProceduralEntityResourceProvider.cs" />
-    <Compile Include="Resources\ITerminalInstanceResolver.cs" />
     <Compile Include="Resources\MethodNotImplementedAttribute.cs" />
     <Compile Include="NotInitializedException.cs" />
     <Compile Include="Resources\MethodsExtensions.cs" />

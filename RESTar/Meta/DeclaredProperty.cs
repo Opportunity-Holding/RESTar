@@ -272,15 +272,15 @@ namespace RESTar.Meta
 
         internal void EstablishPropertyDependancies()
         {
-            if (HasAttribute<DefinedByAttribute>(out var dbAttribute) && dbAttribute.Terms is string[] dbArgs && dbArgs.Any())
-            {
-                foreach (var term in dbArgs.Select(name => Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)))
-                {
-                    var definer = term.LastAs<DeclaredProperty>();
-                    definer.DefinesOtherProperties = true;
-                    definer.DefinesPropertyTerms.Add(term);
-                }
-            }
+            // if (HasAttribute<DefinedByAttribute>(out var dbAttribute) && dbAttribute.Terms is string[] dbArgs && dbArgs.Any())
+            // {
+            //     foreach (var definingTerm in dbArgs.Select(name => Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)))
+            //     {
+            //         var definer = definingTerm.LastAs<DeclaredProperty>();
+            //         definer.DefinesOtherProperties = true;
+            //         definer.DefinesPropertyTerms.Add(definingTerm);
+            //     }
+            // }
             if (HasAttribute<DefinesAttribute>(out var dAttribute) && dAttribute.Terms is string[] dArgs && dArgs.Any())
             {
                 foreach (var term in dArgs.Select(name => Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)))
