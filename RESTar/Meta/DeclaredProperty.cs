@@ -164,9 +164,11 @@ namespace RESTar.Meta
             if (PropertyChanged != null)
             {
                 var oldValue = GetValue(target);
-                if (!object.Equals(oldValue, value))
-                    NotifyChange(target, oldValue, value);
                 base.SetValue(target, (object) value);
+                var changedValue = GetValue(target);
+                if (object.Equals(changedValue, oldValue))
+                    return;
+                NotifyChange(target, oldValue, value);
                 return;
             }
             base.SetValue(target, (object) value);
