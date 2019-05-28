@@ -48,18 +48,18 @@ namespace RESTar.ContentTypeProviders
         /// <summary>
         /// Serializes the entity collection to the given Stream and returns the number of entities serialized.
         /// </summary>
-        ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null) where T : class;
+        ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null);
 
         /// <summary>
         /// Deserializes the data from the stream to the given content entity collection type. Deserialize calls can only be made with 
         /// content types included in CanRead.
         /// </summary>
-        IEnumerable<T> DeserializeCollection<T>(Stream stream) where T : class;
+        IEnumerable<T> DeserializeCollection<T>(Stream stream);
 
         /// <summary>
         /// Populates the data from the byte array to all entities in the given collection. Populate calls can only be made with 
         /// content types included in CanRead.
         /// </summary>
-        IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body) where T : class;
+        IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body);
     }
 }

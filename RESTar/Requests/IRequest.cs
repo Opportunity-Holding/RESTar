@@ -48,10 +48,11 @@ namespace RESTar.Requests
         ITarget<T> Target { get; }
 
         /// <summary>
-        /// Returns the input entities for this request. Use this in Inserters and Deleters to receive
-        /// the entities to insert or delete, and in Updaters to receive and update the entities selected 
-        /// by the request. This will run the entire select query for all entities selected by the request, so
-        /// it should only be called once.
+        /// Selects, processes and returns the input entities for this request. Use this in Inserters and
+        /// Deleters to receive the entities to insert or delete, and in Updaters to receive and update the
+        /// entities selected by the request. The entities may be generated in various different ways, depending
+        /// on the request, for example by deserializing input JSON data to this request type. This will run the
+        /// entire select query for all entities selected by the request, so it should only be called once.
         /// </summary>
         IEnumerable<T> GetInputEntities();
 

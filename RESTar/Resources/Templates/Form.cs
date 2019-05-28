@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using RESTar.Requests;
 using RESTar.Resources.Operations;
@@ -10,40 +12,25 @@ namespace RESTar.Resources.Templates
     /// <summary>
     /// Represents a form resource that can be fetched, populated and returned
     /// </summary>
-    public abstract class Form<T> : ISelector<T>, IUpdater<T> where T : Form<T>, new()
+    public abstract class Form<T> : ISelector<T>, IUpdater<T>, IPropertyChangeNotifier where T : Form<T>, new()
     {
-        private bool _isSubmitted;
-
         /// <summary>
-        /// Has this form been submitted?
+        /// Saved forms
         /// </summary>
-        public bool IsSubmitted
-        {
-            get => _isSubmitted;
-            set
-            {
-                if (value)
-                {
-                    PreSubmit();
-                    _isSubmitted = true;
-                    PostSubmit();
-                }
-            }
-        }
-
-        /// <summary>
-        /// This method is called before a form is submitted
-        /// </summary>
-        protected abstract void PreSubmit();
-
-        /// <summary>
-        /// This method is called after a form has been submitted
-        /// </summary>
-        protected abstract void PostSubmit();
+        protected IDictionary<string, T> Forms { get; } = new ConcurrentDictionary<string, T>();
 
         IEnumerable<T> ISelector<T>.Select(IRequest<T> request)
         {
-            yield return new T();
+            if (!request.Cookies.TryGetValue("FormId", out var cookie))
+            {
+                cookie = new Cookie(name: "FormId", value: Guid.NewGuid().ToString("N"));
+                request.Cookies.Add(cookie);
+            }
+
+            if (!Forms.TryGetValue(cookie.Value, out var form))
+                form = Forms[cookie.Value] = new T();
+
+            yield return form;
         }
 
         int IUpdater<T>.Update(IRequest<T> request)

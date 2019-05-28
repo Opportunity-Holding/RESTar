@@ -27,11 +27,13 @@ namespace RESTar.Requests
         /// <summary>
         /// Deserializes the body to an IEnumerable of entities of the given type
         /// </summary>
-        public IEnumerable<T> Deserialize<T>() where T : class
+        public IEnumerable<T> Deserialize<T>(ContentType? contentType = null)
         {
             if (!HasContent) return null;
-            var contentTypeProvider = ProtocolProvider.InputMimeBindings.SafeGet(ContentType.MediaType) ??
-                                      throw new UnsupportedContent(ContentType.MediaType);
+
+            var resolvedContentType = contentType ?? ContentType;
+            var contentTypeProvider = ProtocolProvider.InputMimeBindings.SafeGet(resolvedContentType.MediaType) ??
+                                      throw new UnsupportedContent(resolvedContentType.MediaType);
             try
             {
                 return contentTypeProvider.DeserializeCollection<T>(Stream.Rewind());

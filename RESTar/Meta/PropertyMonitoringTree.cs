@@ -30,6 +30,11 @@ namespace RESTar.Meta
         public string OutputTermComponentSeparator { get; }
 
         /// <summary>
+        /// The term stub to append all output terms to
+        /// </summary>
+        public Term Stub { get; }
+
+        /// <summary>
         /// The property links of this monitoring tree
         /// </summary>
         public HashSet<PropertyLink> AllLinks { get; }
@@ -39,16 +44,19 @@ namespace RESTar.Meta
         /// </summary>
         /// <param name="rootType">The root type to monitor</param>
         /// <param name="outputTermComponentSeparator">The component separator to use in output terms</param>
+        /// <param name="stub">The term stub to append all output terms to</param>
         /// <param name="handleObservedChange">The handler of output terms and new and old values</param>
         internal PropertyMonitoringTree
         (
             Type rootType,
             string outputTermComponentSeparator,
+            Term stub,
             ObservedChangeHandler handleObservedChange
         )
         {
             OutputTermComponentSeparator = outputTermComponentSeparator;
             HandleObservedChange = handleObservedChange;
+            Stub = stub;
             AllLinks = new HashSet<PropertyLink>();
 
             var discoveredTypes = new HashSet<Type>();

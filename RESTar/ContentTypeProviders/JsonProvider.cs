@@ -173,7 +173,7 @@ namespace RESTar.ContentTypeProviders
         public string ContentDispositionFileExtension { get; }
 
         /// <inheritdoc />
-        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body) where T : class
+        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body)
         {
             var json = Encoding.UTF8.GetString(body);
             foreach (var entity in entities)
@@ -187,7 +187,7 @@ namespace RESTar.ContentTypeProviders
         public string[] MatchStrings { get; set; }
 
         /// <inheritdoc />
-        public ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null) where T : class
+        public ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null)
         {
             if (entities == null) return 0;
             var formatter = request?.MetaConditions.Formatter ?? DbOutputFormat.Default;
@@ -203,7 +203,7 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public IEnumerable<T> DeserializeCollection<T>(Stream body) where T : class
+        public IEnumerable<T> DeserializeCollection<T>(Stream body)
         {
             using (var jsonReader = new JsonTextReader(new StreamReader(body, UTF8, false, 1024, true)))
             {

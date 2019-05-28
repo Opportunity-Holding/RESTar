@@ -21,7 +21,7 @@ namespace RESTar.Meta
     [JsonConverter(typeof(ToStringConverter))]
     public class Term : IEnumerable<Property>
     {
-        private List<Property> Store;
+        private readonly List<Property> Store;
         private readonly string ComponentSeparator;
 
         /// <summary>
@@ -222,9 +222,9 @@ namespace RESTar.Meta
             return newTerm;
         }
 
-        private string GetKey(string componentSeparator) => Key = string.Join(componentSeparator, Store.Select(p => p.Name));
-        private string GetKey() => Key = string.Join(ComponentSeparator, Store.Select(p => p.Name));
-        private string GetDbKey() => Key = string.Join(".", Store.Select(p => p.ActualName));
+        private string GetKey(string componentSeparator) => string.Join(componentSeparator, Store.Select(p => p.Name));
+        private string GetKey() => string.Join(ComponentSeparator, Store.Select(p => p.Name));
+        private string GetDbKey() => string.Join(".", Store.Select(p => p.ActualName));
 
         /// <summary>
         /// Returns the value that this term denotes for a given target object
@@ -300,11 +300,11 @@ namespace RESTar.Meta
         /// Creates a new term that is this term appended with the given term, that will evaluate to the
         /// final property in the given term.
         /// </summary>
-        public static Term Append(Term term1, Term term2)
+        public static Term Append(Term term1, Term term2, bool checkTypes = true)
         {
             if (term1.IsDynamic)
                 return Join(term1, MakeDynamic(term2));
-            if (term2.First is DeclaredProperty next && term1.Last is DeclaredProperty last && last.Type != next.Owner)
+            if (checkTypes && term2.First is DeclaredProperty next && term1.Last is DeclaredProperty last && last.Type != next.Owner)
                 throw new InvalidOperationException($"Could not append term '{term1}' with '{term2}'. The first property " +
                                                     $"of the second term ({next}) is not a declared property of " +
                                                     $"the last property of the first term ({last}). Expected a " +
@@ -315,11 +315,11 @@ namespace RESTar.Meta
         /// <summary>
         /// Appends a property to the end of a term
         /// </summary>
-        public static Term Append(Term term, Property property)
+        public static Term Append(Term term, Property property, bool checkTypes = true)
         {
             if (term.IsDynamic)
                 return Join(term, DynamicProperty.Parse(property.Name, true));
-            if (property is DeclaredProperty next && term.Last is DeclaredProperty last && last.Type != next.Owner)
+            if (checkTypes && property is DeclaredProperty next && term.Last is DeclaredProperty last && last.Type != next.Owner)
                 throw new InvalidOperationException($"Could not append property '{term}' with property '{property}'. " +
                                                     $"The new property is not a declared property of the last property " +
                                                     $"of the first term ({last}). Expected a property declared in type '{last.Type}'");

@@ -33,16 +33,19 @@ namespace RESTar.Requests
         public CachedProtocolProvider CachedProtocolProvider { get; }
         private Exception Error { get; }
         public bool IsValid => Error == null;
-        public Func<IEnumerable<T>> EntitiesProducer { get; set; }
-        public Func<IEnumerable<T>> Selector { private get; set; }
-        public Func<IEnumerable<T>, IEnumerable<T>> Updater { private get; set; }
-        public Func<IEnumerable<T>, IEnumerable<T>> GetUpdater() => Updater;
-        public Func<IEnumerable<T>> GetSelector() => Selector;
         public IResource<T> Resource { get; }
-        public IEntityResource<T> EntityResource => Resource as IEntityResource<T>;
         public TimeSpan TimeElapsed => Stopwatch.Elapsed;
         private Stopwatch Stopwatch { get; }
 
+        public Func<IEnumerable<T>> Selector { private get; set; }
+        public Func<IEnumerable<T>, IEnumerable<T>> Updater { private get; set; }
+
+        public Func<IEnumerable<T>> EntitiesProducer { get; set; }
+
+        IEntityResource<T> IEntityRequest<T>.EntityResource => Resource as IEntityResource<T>;
+        Func<IEnumerable<T>, IEnumerable<T>> IEntityRequest<T>.GetUpdater() => Updater;
+        IEnumerable<T> IRequest<T>.GetInputEntities() => EntitiesProducer?.Invoke() ?? new T[0];
+        Func<IEnumerable<T>> IEntityRequest<T>.GetSelector() => Selector;
         IResource IRequest.Resource => Resource;
         private Method method;
 
@@ -259,8 +262,6 @@ namespace RESTar.Requests
             terminal.Open();
             return new WebSocketUpgradeSuccessful(this);
         }
-
-        public IEnumerable<T> GetInputEntities() => EntitiesProducer?.Invoke() ?? new T[0];
 
         internal Request(IResource<T> resource, RequestParameters parameters)
         {

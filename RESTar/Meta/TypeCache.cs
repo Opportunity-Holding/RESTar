@@ -220,10 +220,10 @@ namespace RESTar.Meta
         /// <summary>
         /// Gets a property monitoring tree for a given type
         /// </summary>
-        public static PropertyMonitoringTree GetPropertyMonitoringTree(this Type rootType, string outputTermComponentSeparator,
+        public static PropertyMonitoringTree GetPropertyMonitoringTree(this Type rootType, Term stub, string outputTermComponentSeparator,
             ObservedChangeHandler handleObservedChange)
         {
-            return new PropertyMonitoringTree(rootType, outputTermComponentSeparator, handleObservedChange);
+            return new PropertyMonitoringTree(rootType, outputTermComponentSeparator, stub, handleObservedChange);
         }
 
         #endregion

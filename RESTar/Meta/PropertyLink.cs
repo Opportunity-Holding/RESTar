@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using RESTar.Meta.Internal;
 
 namespace RESTar.Meta
 {
@@ -13,6 +15,7 @@ namespace RESTar.Meta
         internal PropertyLink Rootward { get; }
         internal DeclaredProperty Property { get; }
         private Term TermFromRoot { get; }
+        private bool HasUnresolvedIndexes { get; }
 
         internal PropertyLink(PropertyMonitoringTree monitoringTree, PropertyLink rootward, DeclaredProperty property)
         {
@@ -20,7 +23,8 @@ namespace RESTar.Meta
             monitoringTree.AllLinks.Add(this);
             Rootward = rootward;
             Property = property;
-            TermFromRoot = GetTermFromRoot(monitoringTree.OutputTermComponentSeparator);
+            TermFromRoot = Term.Append(monitoringTree.Stub, GetTermFromRoot(monitoringTree.OutputTermComponentSeparator), false);
+            HasUnresolvedIndexes = TermFromRoot.OfType<AnyIndexProperty>().Any();
         }
 
         private void OnPropertyChanged(DeclaredProperty declaredProperty, object target, dynamic value, dynamic newValue)
