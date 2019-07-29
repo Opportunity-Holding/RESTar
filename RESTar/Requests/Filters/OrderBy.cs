@@ -20,10 +20,18 @@ namespace RESTar.Requests.Filters
             Term = resource.MakeOutputTerm(key, dynamicMembers);
         }
 
+        internal OrderBy(IEntityResource resource, Term term)
+        {
+            Resource = resource;
+            Term = term;
+        }
+
         /// <summary>
         /// Applies the order by operation on an IEnumerable of entities
         /// </summary>
         public abstract IEnumerable<T> Apply<T>(IEnumerable<T> entities) where T : class;
+
+        internal abstract OrderBy GetCopy();
     }
 
     /// <inheritdoc />
@@ -34,6 +42,8 @@ namespace RESTar.Requests.Filters
     {
         /// <inheritdoc />
         public OrderByAscending(IEntityResource resource, string key, ICollection<string> dynamicMembers) : base(resource, key, dynamicMembers) { }
+
+        private OrderByAscending(IEntityResource resource, Term term) : base(resource, term) { }
 
         /// <inheritdoc />
         public override IEnumerable<T> Apply<T>(IEnumerable<T> entities)
@@ -54,6 +64,8 @@ namespace RESTar.Requests.Filters
 
             return entities.OrderBy(selector);
         }
+
+        internal override OrderBy GetCopy() => new OrderByAscending(Resource, Term);
     }
 
     /// <inheritdoc />
@@ -64,6 +76,8 @@ namespace RESTar.Requests.Filters
     {
         /// <inheritdoc />
         public OrderByDescending(IEntityResource resource, string key, ICollection<string> dynamicMembers) : base(resource, key, dynamicMembers) { }
+
+        private OrderByDescending(IEntityResource resource, Term term) : base(resource, term) { }
 
         /// <inheritdoc />
         public override IEnumerable<T> Apply<T>(IEnumerable<T> entities)
@@ -84,5 +98,7 @@ namespace RESTar.Requests.Filters
 
             return entities.OrderByDescending(selector);
         }
+
+        internal override OrderBy GetCopy() => new OrderByDescending(Resource, Term);
     }
 }

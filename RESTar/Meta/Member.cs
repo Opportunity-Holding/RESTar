@@ -52,5 +52,8 @@ namespace RESTar.Meta
         /// Is this member write-only?
         /// </summary>
         public bool IsWriteOnly => IsWritable && !IsReadable;
+
+        /// <inheritdoc />
+        public override string ToString() => Name;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using RESTar.Internal;
 using RESTar.Meta;
 using RESTar.Results;
@@ -47,10 +48,11 @@ namespace RESTar.Requests
         ITarget<T> Target { get; }
 
         /// <summary>
-        /// Returns the input entities for this request. Use this in Inserters and Deleters to receive
-        /// the entities to insert or delete, and in Updaters to receive and update the entities selected 
-        /// by the request. This will run the entire select query for all entities selected by the request, so
-        /// it should only be called once.
+        /// Selects, processes and returns the input entities for this request. Use this in Inserters and
+        /// Deleters to receive the entities to insert or delete, and in Updaters to receive and update the
+        /// entities selected by the request. The entities may be generated in various different ways, depending
+        /// on the request, for example by deserializing input JSON data to this request type. This will run the
+        /// entire select query for all entities selected by the request, so it should only be called once.
         /// </summary>
         IEnumerable<T> GetInputEntities();
 
@@ -88,16 +90,6 @@ namespace RESTar.Requests
         /// separate client data set, that is not available from other resuorces.
         /// </summary>
         void SetClientData<TData>(string key, TData value);
-
-        /// <summary>
-        /// Sets the conditions of the request to the given collection of conditions, and returns the request
-        /// </summary>
-        IRequest<T> WithConditions(IEnumerable<Condition<T>> conditions);
-
-        /// <summary>
-        /// Sets the conditions of the request to the given collection of conditions, and returns the request
-        /// </summary>
-        IRequest<T> WithConditions(params Condition<T>[] conditions);
     }
 
     /// <inheritdoc cref="ITraceable" />
@@ -161,7 +153,7 @@ namespace RESTar.Requests
         /// Set cookies by adding strings to this collection. The strings in this
         /// collection will be used as values for Set-Cookie response headers.
         /// </summary>
-        ICollection<string> Cookies { get; }
+        Cookies Cookies { get; }
 
         /// <summary>
         /// The URI parameters that was used to construct this request
@@ -182,5 +174,97 @@ namespace RESTar.Requests
         /// The time elapsed since request evaluation began
         /// </summary>
         TimeSpan TimeElapsed { get; }
+
+        /// <summary>
+        /// Gets an exacy copy of this request
+        /// </summary>
+        /// <returns></returns>
+        IRequest GetCopy(string newProtocol = null);
+    }
+
+    /// <summary>
+    /// Extension methods for IRequest
+    /// </summary>
+    public static class ExtensionMethods
+    {
+        /// <summary>
+        /// Sets the given method to the request, and returns the request
+        /// </summary>
+        public static IRequest WithMethod(this IRequest request, Method method)
+        {
+            if (request == null) return null;
+            request.Method = method;
+            return request;
+        }
+
+        /// <summary>
+        /// Sets the given body to the request, and returns the request
+        /// </summary>
+        public static IRequest WithBody(this IRequest request, object content, ContentType? contentType = null)
+        {
+            if (request == null) return null;
+            request.SetBody(content, contentType);
+            return request;
+        }
+
+
+        /// <summary>
+        /// Sets the given method to the request, and returns the request
+        /// </summary>
+        public static IRequest<T> WithMethod<T>(this IRequest<T> request, Method method) where T : class
+        {
+            if (request == null) return null;
+            request.Method = method;
+            return request;
+        }
+
+        /// <summary>
+        /// Sets the given body to the request, and returns the request
+        /// </summary>
+        public static IRequest<T> WithBody<T>(this IRequest<T> request, object content, ContentType? contentType = null) where T : class
+        {
+            if (request == null) return null;
+            request.SetBody(content, contentType);
+            return request;
+        }
+
+        /// <summary>
+        /// Sets the given conditions to the request, and returns the request
+        /// </summary>
+        public static IRequest<T> WithConditions<T>(this IRequest<T> request, IEnumerable<Condition<T>> conditions) where T : class
+        {
+            if (request == null) return null;
+            request.Conditions = conditions?.ToList();
+            return request;
+        }
+
+        /// <summary>
+        /// Sets the given conditions to the request, and returns the request
+        /// </summary>
+        public static IRequest<T> WithConditions<T>(this IRequest<T> request, params Condition<T>[] conditionsArray) where T : class
+        {
+            if (request == null) return null;
+            return WithConditions(request, conditions: conditionsArray);
+        }
+
+        /// <summary>
+        /// Sets the given selector to the request, and returns the request
+        /// </summary>
+        public static IRequest<T> WithSelector<T>(this IRequest<T> request, Func<IEnumerable<T>> selector) where T : class
+        {
+            if (request == null) return null;
+            request.Selector = selector;
+            return request;
+        }
+
+        /// <summary>
+        /// Sets the given selector to the request, and returns the request
+        /// </summary>
+        public static IRequest<T> WithUpdater<T>(this IRequest<T> request, Func<IEnumerable<T>, IEnumerable<T>> updater) where T : class
+        {
+            if (request == null) return null;
+            request.Updater = updater;
+            return request;
+        }
     }
 }

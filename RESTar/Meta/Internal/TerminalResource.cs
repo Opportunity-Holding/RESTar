@@ -33,10 +33,11 @@ namespace RESTar.Meta.Internal
         public void SetAlias(string alias) => Alias = alias;
         public Type InterfaceType { get; }
         public ResourceKind ResourceKind { get; }
-
+        private bool IsDynamicTerminal { get; }
+        
         private Constructor<ITerminal> Constructor { get; }
         private Func<T, IRequest<T>, IEnumerable<T>> Selector { get; }
-
+        
         public IEnumerable<T> Select(IRequest<T> request) => Selector(null, request);
 
         internal ITerminal MakeTerminal(IEnumerable<Condition<T>> assignments = null)
@@ -75,6 +76,8 @@ namespace RESTar.Meta.Internal
             Members = typeof(T).GetDeclaredProperties();
             Constructor = typeof(T).MakeStaticConstructor<ITerminal>();
             GETAvailableToAll = attribute?.GETAvailableToAll == true;
+            IsDynamicTerminal = typeof(IDynamicTerminal).IsAssignableFrom(typeof(T));
+            
             var typeName = typeof(T).FullName;
             if (typeName?.Contains('+') == true)
             {

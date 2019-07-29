@@ -100,11 +100,7 @@ namespace RESTar.Requests
             Headers = new Headers();
             iresource = resource;
             IsWebSocketUpgrade = Context.WebSocket?.Status == WebSocketStatus.Waiting;
-            Uri = new URI
-            {
-                ResourceSpecifier = resource.Name,
-                ViewName = viewName
-            };
+            Uri = new URI(resourceSpecifier: resource.Name, viewName: viewName);
             CachedProtocolProvider = ProtocolController.ResolveProtocolProvider(protocolIdentifier);
         }
 

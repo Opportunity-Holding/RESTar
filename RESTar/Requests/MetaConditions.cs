@@ -155,7 +155,7 @@ namespace RESTar.Requests
 
         internal static MetaConditions Parse(IReadOnlyCollection<IUriCondition> uriMetaConditions, IEntityResource resource)
         {
-            if (!uriMetaConditions.Any()) return null;
+            if (uriMetaConditions?.Any() != true) return null;
             var renames = uriMetaConditions.Where(c => c.Key.EqualsNoCase("rename"));
             var regular = uriMetaConditions.Where(c => !c.Key.EqualsNoCase("rename"));
             var mc = new MetaConditions {Empty = false};
@@ -332,6 +332,29 @@ namespace RESTar.Requests
             if (Formatter.HasValue)
                 list.Add(new UriCondition(RESTarMetaCondition.Format, Formatter.Value.Name));
             return list;
+        }
+
+        internal MetaConditions GetCopy()
+        {
+            var copy = new MetaConditions
+            {
+                Unsafe = Unsafe,
+                Limit = Limit,
+                Offset = Offset,
+                OrderBy = OrderBy?.GetCopy(),
+                Select = Select?.GetCopy(),
+                Add = Add?.GetCopy(),
+                Rename = Rename?.GetCopy(),
+                Distinct = Distinct,
+                Search = Search?.GetCopy(),
+                SafePost = SafePost,
+                Formatter = Formatter,
+                Empty = Empty
+            };
+            copy.Processors = new IProcessor[] {copy.Add, copy.Rename, copy.Select}.Where(p => p != null).ToArray();
+            copy.HasProcessors = copy.Processors.Any();
+            copy.CanUseExternalCounter = copy.Search == null && copy.Distinct == null && copy.Limit.Number == -1 && copy.Offset.Number == 0;
+            return copy;
         }
     }
 }

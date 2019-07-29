@@ -59,6 +59,12 @@ namespace RESTar.WebSockets
         public Headers Headers { get; internal set; }
 
         /// <inheritdoc />
+        /// <summary>
+        /// The cookies contained in the WebSocket upgrade request
+        /// </summary>
+        public ReadonlyCookies Cookies => Client.Cookies.AsReadonly();
+
+        /// <inheritdoc />
         public string TraceId => Id;
 
         /// <inheritdoc />
@@ -175,7 +181,7 @@ namespace RESTar.WebSockets
         public void DirectToShell(IEnumerable<Condition<Shell>> assignments = null) => DirectTo(Shell.TerminalResource);
 
         /// <inheritdoc />
-        public void DirectTo<T>(ITerminalResource<T> resource, IEnumerable<Condition<T>> assignments = null) where T : class, ITerminal
+        public void DirectTo<T>(ITerminalResource<T> resource, ICollection<Condition<T>> assignments = null) where T : class, ITerminal
         {
             if (Status != WebSocketStatus.Open)
                 throw new InvalidOperationException($"Unable to send WebSocket with status '{Status}' to terminal '{resource.Name}'");

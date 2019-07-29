@@ -199,7 +199,7 @@ namespace RESTar.Meta
         public static IResource<T> SafeGet => RESTarConfig.ResourceByType.SafeGet(typeof(T)) as IResource<T>;
 
         /// <summary>
-        /// Gets the resource specifier for a given terminal resource
+        /// Gets the resource specifier for a given resource
         /// </summary>
         public static string ResourceSpecifier => Get.Name;
     }

@@ -120,7 +120,7 @@ namespace RESTar.ContentTypeProviders
                         }
                     }
 
-                    writeEntities(_entities);
+                    writeEntities(_entities.Cast<object>());
                     if (currentRow == 1) return 0;
                     worksheet.Cells.AutoFitColumns(0);
                     package.Save();

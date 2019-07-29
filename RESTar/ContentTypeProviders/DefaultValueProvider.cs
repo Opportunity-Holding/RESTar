@@ -9,10 +9,9 @@ namespace RESTar.ContentTypeProviders
     /// </summary>
     internal class DefaultValueProvider : IValueProvider
     {
-        private Getter Get { get; }
-        private Setter Set { get; }
-        public DefaultValueProvider(Property property) => (Get, Set) = (property.Getter, property.Setter);
-        public void SetValue(object target, object value) => Set(target, value);
-        public object GetValue(object target) => Get(target);
+        private readonly Property Property;
+        public DefaultValueProvider(Property property) => Property = property;
+        public object GetValue(object target) => Property.GetValue(target);
+        public void SetValue(object target, object value) => Property.SetValue(target, value);
     }
 }

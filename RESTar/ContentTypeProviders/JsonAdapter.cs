@@ -51,10 +51,10 @@ namespace RESTar.ContentTypeProviders
         protected abstract void ProduceJsonArray(Stream inputStream, Stream outputStream);
 
         /// <inheritdoc />
-        public abstract ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null) where T : class;
+        public abstract ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null);
 
         /// <inheritdoc />
-        public IEnumerable<T> DeserializeCollection<T>(Stream stream) where T : class
+        public IEnumerable<T> DeserializeCollection<T>(Stream stream)
         {
             var jsonStream = new RESTarStream(ContentType.JSON);
             try
@@ -71,7 +71,7 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body) where T : class
+        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body)
         {
             var jsonStream = new RESTarStream(ContentType.JSON);
             try

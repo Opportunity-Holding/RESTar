@@ -75,10 +75,10 @@ namespace RESTar.Requests
     internal class URI : IUriComponents
     {
         /// <inheritdoc />
-        public string ResourceSpecifier { get; set; }
+        public string ResourceSpecifier { get; private set; }
 
         /// <inheritdoc />
-        public string ViewName { get; set; }
+        public string ViewName { get; private set; }
 
         /// <inheritdoc />
         public IReadOnlyCollection<IUriCondition> Conditions { get; private set; }
@@ -130,11 +130,17 @@ namespace RESTar.Requests
             Macro = components.Macro;
         }
 
-        internal URI()
+        private URI()
         {
             Conditions = new List<IUriCondition>();
             MetaConditions = new List<IUriCondition>();
             ProtocolProvider = ProtocolController.DefaultProtocolProvider.ProtocolProvider;
+        }
+
+        internal URI(string resourceSpecifier, string viewName) : this()
+        {
+            ResourceSpecifier = resourceSpecifier;
+            ViewName = viewName;
         }
 
         /// <inheritdoc />

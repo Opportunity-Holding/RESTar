@@ -93,10 +93,13 @@ namespace RESTar.WebSockets
         public Headers Headers => WebSocket.Headers;
 
         /// <inheritdoc />
+        public ReadonlyCookies Cookies => WebSocket.Cookies;
+
+        /// <inheritdoc />
         public void DirectToShell(IEnumerable<Condition<Shell>> assignments = null) => WebSocket.DirectToShell(assignments);
 
         /// <inheritdoc />
-        public void DirectTo<T>(ITerminalResource<T> terminalResource, IEnumerable<Condition<T>> assignments = null) where T : class, ITerminal =>
+        public void DirectTo<T>(ITerminalResource<T> terminalResource, ICollection<Condition<T>> assignments = null) where T : class, ITerminal =>
             WebSocket.DirectTo(terminalResource, assignments);
 
         /// <inheritdoc />

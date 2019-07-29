@@ -69,6 +69,19 @@ namespace RESTar.ContentTypeProviders
             SerializerIgnoreNulls = JsonSerializer.Create(SettingsIgnoreNulls);
         }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="JsonProvider"/> type
+        /// </summary>
+        public JsonProvider()
+        {
+            MatchStrings = new[] {JsonMimeType, RESTarSpecific, Brief, TextPlain};
+            ContentDispositionFileExtension = ".json";
+            CanWrite = true;
+            CanRead = true;
+            ContentType = "application/json; charset=utf-8";
+            Name = "JSON";
+        }
+
         internal string SerializeFormatter(JToken formatterToken, out int indents)
         {
             using (var sw = new StringWriter())
@@ -93,6 +106,23 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <summary>
+        /// A general-purpose deserializer. Deserializes the given JSON string.
+        /// </summary>
+        public T Deserialize<T>(string json)
+        {
+            return JsonConvert.DeserializeObject<T>(json, Settings);
+        }
+
+        /// <summary>
+        /// A general-purpose deserializer. Deserializes the given byte array.
+        /// </summary>
+        public T Deserialize<T>(byte[] bytes)
+        {
+            var json = Encoding.UTF8.GetString(bytes);
+            return JsonConvert.DeserializeObject<T>(json, Settings);
+        }
+
+        /// <summary>
         /// Serializes the value to the given JsonTextWriter, using the default serializer
         /// </summary>
         public void Serialize(JsonTextWriter jsonWriter, object value)
@@ -100,13 +130,20 @@ namespace RESTar.ContentTypeProviders
             Serializer.Serialize(jsonWriter, value);
         }
 
-        internal void Populate(string json, object target)
+        /// <summary>
+        /// Populates JSON data onto an object
+        /// </summary>
+        public void Populate(string json, object target)
         {
             if (string.IsNullOrWhiteSpace(json)) return;
             JsonConvert.PopulateObject(json, target, Settings);
         }
 
-        internal MemoryStream SerializeStream(object entity, Formatting? formatting = null, bool ignoreNulls = false)
+        /// <summary>
+        /// Serializes an object into a stream
+        /// </summary>
+        /// <returns></returns>
+        public MemoryStream SerializeStream(object entity, Formatting? formatting = null, bool ignoreNulls = false)
         {
             var _formatting = formatting ?? (_PrettyPrint ? Indented : None);
             var serializer = ignoreNulls ? SerializerIgnoreNulls : Serializer;
@@ -121,22 +158,22 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public string Name => "JSON";
+        public string Name { get; }
 
         /// <inheritdoc />
-        public ContentType ContentType { get; } = "application/json; charset=utf-8";
+        public ContentType ContentType { get; }
 
         /// <inheritdoc />
-        public bool CanRead => true;
+        public bool CanRead { get; }
 
         /// <inheritdoc />
-        public bool CanWrite => true;
+        public bool CanWrite { get; }
 
         /// <inheritdoc />
-        public string ContentDispositionFileExtension => ".json";
+        public string ContentDispositionFileExtension { get; }
 
         /// <inheritdoc />
-        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body) where T : class
+        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body)
         {
             var json = Encoding.UTF8.GetString(body);
             foreach (var entity in entities)
@@ -147,10 +184,10 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public string[] MatchStrings { get; set; } = {JsonMimeType, RESTarSpecific, Brief, TextPlain};
+        public string[] MatchStrings { get; set; }
 
         /// <inheritdoc />
-        public ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null) where T : class
+        public ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null)
         {
             if (entities == null) return 0;
             var formatter = request?.MetaConditions.Formatter ?? DbOutputFormat.Default;
@@ -166,7 +203,7 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public IEnumerable<T> DeserializeCollection<T>(Stream body) where T : class
+        public IEnumerable<T> DeserializeCollection<T>(Stream body)
         {
             using (var jsonReader = new JsonTextReader(new StreamReader(body, UTF8, false, 1024, true)))
             {

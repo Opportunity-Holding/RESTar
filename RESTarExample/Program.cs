@@ -7,7 +7,9 @@ using Dynamit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RESTar;
+using RESTar.ContentTypeProviders;
 using RESTar.Linq;
+using RESTar.Palindrom;
 using RESTar.Requests;
 using RESTar.Resources;
 using RESTar.Resources.Operations;
@@ -26,9 +28,18 @@ namespace RESTarExample
             RESTarConfig.Init
             (
                 uri: "/rest",
-                requireApiKey: true,
+                port: 8080,
+                // requireApiKey: true,
                 allowAllOrigins: false,
-                configFilePath: @"C:\Mopedo\mopedo\Mopedo.config"
+                configFilePath: @"C:\Mopedo\mopedo\Mopedo.config",
+                contentTypeProviders: new IContentTypeProvider[]
+                {
+                    new PalindromBootstrapper()
+                },
+                protocolProviders: new[]
+                {
+                    new PalindromProtocolProvider()
+                }
             );
         }
     }
@@ -36,6 +47,24 @@ namespace RESTarExample
     internal interface I
     {
         Method Method { get; }
+    }
+
+    public class X
+    {
+        public string S; // defines = ST
+        public string T; // defines = ST
+
+        public string ST => S + T; // definedby = (S, T)
+
+        public int SLength => S.Length; // definedby = S
+
+        public char SFirst => S[0]; // definedby = S
+        
+        // as soon as we have mutable collections, however, things get weird
+
+        public IEnumerable<string> GetStrings => null; // get strings
+
+        public string Third => GetStrings.ElementAtOrDefault(2);  // defined by GetStrings.3
     }
 
     [RESTar, Database]
@@ -100,7 +129,7 @@ namespace RESTarExample
         public NotificationEvent(MyNotification payload) : base(payload) => Raise();
     }
 
-    [Database, RESTar]
+    [Database]
     public class Person
     {
         [RESTarMember(name: "PersonName")] public string Name { get; set; }
@@ -188,7 +217,7 @@ namespace RESTarExample
         public DateTime Special { get; set; }
     }
 
-    [RESTar(Method.GET, Singleton = true, Description = description)]
+    [RESTar(Method.GET, Description = description)]
     public class MonthlySpendingReport : ISelector<MonthlySpendingReport>
     {
         private const string description = "Provides an aggregated view of the spending for a given month.";
@@ -451,7 +480,7 @@ namespace RESTarExample
 
         #region Version1 interface
 
-        public interface IVersion1 : IEntityResourceInterface
+        public interface IVersion1 : IEntityDefinition
         {
             string _ICanCallThisWhateverString { get; }
             int __ThisIsMyINt { get; set; }
@@ -480,7 +509,7 @@ namespace RESTarExample
             set => MyDateTime = value;
         }
 
-        public interface IVersion2 : IEntityResourceInterface
+        public interface IVersion2 : IEntityDefinition
         {
             string _ICanCadsallThisWhateverString { get; }
             int __ThiasdasdsIsMyINt { get; set; }
@@ -649,7 +678,7 @@ namespace RESTarExample
         public DateTime DT2 { get; set; }
     }
 
-    [RESTar(Method.GET, Singleton = true)]
+    [RESTar(Method.GET)]
     public class MyTestResource : Dictionary<string, dynamic>, ISelector<MyTestResource>
     {
         public IEnumerable<MyTestResource> Select(IRequest<MyTestResource> request)
@@ -710,7 +739,6 @@ namespace RESTarExample
         public int OtherInt { get; set; }
 
         public MyResource Resource { get; }
-
     }
 
     [RESTar]

@@ -7,7 +7,7 @@ using Starcounter;
 #pragma warning disable 1591
 
 namespace RESTarExample
-{
+{ 
     // Below is a common Starcounter-style database class describing an employee in 
     // an organization.
 

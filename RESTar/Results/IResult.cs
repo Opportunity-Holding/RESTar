@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using RESTar.Requests;
 
@@ -47,7 +46,7 @@ namespace RESTar.Results
         /// <summary>
         /// The cookies to set in the response
         /// </summary>
-        ICollection<string> Cookies { get; }
+        Cookies Cookies { get; }
 
         /// <summary>
         /// Is this a successful result?

@@ -29,7 +29,6 @@ namespace RESTar.Meta.Internal
         public bool IsGlobal => !IsInternal;
         public bool IsInnerResource { get; }
         public string ParentResourceName { get; }
-        public bool IsSingleton { get; }
         public bool DynamicConditionsAllowed { get; }
         public IReadOnlyDictionary<string, ITarget<T>> ViewDictionary => ViewDictionaryInternal;
         public IEnumerable<ITarget> Views => ViewDictionaryInternal?.Values;
@@ -143,7 +142,6 @@ namespace RESTar.Meta.Internal
             IsDeclared = attribute.IsDeclared;
             Description = attribute.Description;
             AvailableMethods = attribute.AvailableMethods;
-            IsSingleton = attribute.Singleton;
             IsInternal = attribute is RESTarInternalAttribute;
             InterfaceType = typeof(T).GetRESTarInterfaceType();
             (DynamicConditionsAllowed, ConditionBindingRule) = typeof(T).GetDynamicConditionHandling(attribute);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using RESTar.Requests;
 
@@ -55,7 +54,7 @@ namespace RESTar.Results
         public string StatusDescription => Result.StatusDescription;
 
         /// <inheritdoc />
-        public ICollection<string> Cookies => Result.Cookies;
+        public Cookies Cookies => Result.Cookies;
 
         /// <inheritdoc />
         public bool IsSerialized => Result.IsSerialized;

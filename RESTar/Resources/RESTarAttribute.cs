@@ -33,13 +33,6 @@ namespace RESTar.Resources
         public bool FlagStaticMembers { get; set; }
 
         /// <summary>
-        /// Singleton resources get special treatment in the view. They have no list 
-        /// view, but only entity view. Good for settings, reports etc. Not applicable for 
-        /// terminal resources.
-        /// </summary>
-        public bool Singleton { get; set; }
-
-        /// <summary>
         /// Resource descriptions are visible in the AvailableResource resource
         /// </summary>
         public string Description { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -21,7 +20,8 @@ namespace RESTar.Requests
 
         private Uri URI { get; }
         public string TraceId { get; }
-        public Context Context { get; }
+        Context ITraceable.Context => RemoteContext;
+        private RemoteContext RemoteContext { get; }
         public Headers Headers { get; }
         public Method Method { get; set; }
         private Body body;
@@ -43,8 +43,7 @@ namespace RESTar.Requests
         public MetaConditions MetaConditions => _metaConditions ?? (_metaConditions = new MetaConditions());
         private Headers _responseHeaders;
         public Headers ResponseHeaders => _responseHeaders ?? (_responseHeaders = new Headers());
-        private ICollection<string> _cookies;
-        public ICollection<string> Cookies => _cookies ?? (_cookies = new List<string>());
+        public Cookies Cookies => RemoteContext.Client.Cookies;
         public IUriComponents UriComponents => null;
 
         public IResult Evaluate() => _GetResult().Result;
@@ -162,7 +161,7 @@ namespace RESTar.Requests
         public RemoteRequest(RemoteContext context, Method method, string uri, byte[] body, Headers headers)
         {
             TraceId = context.InitialTraceId;
-            Context = context;
+            RemoteContext = context;
             Headers = headers ?? new Headers();
             if (context.HasApiKey)
                 Headers.Authorization = $"apikey {context.ApiKey}";
@@ -177,6 +176,36 @@ namespace RESTar.Requests
             if (body?.Length > 0)
                 SetBody(body, Headers.ContentType);
         }
+
+        private RemoteRequest(RemoteContext context, Method method, Body body, Uri uri, Headers headers, string protocol)
+        {
+            TraceId = context.InitialTraceId;
+            RemoteContext = context;
+            Headers = headers ?? new Headers();
+            if (context.HasApiKey)
+                Headers.Authorization = $"apikey {context.ApiKey}";
+            Method = method;
+            MessageType = MessageType.HttpInput;
+            IsValid = true;
+            IsWebSocketUpgrade = false;
+            URI = uri;
+            LogTime = DateTime.Now;
+            CachedProtocolProvider = protocol != null
+                ? ProtocolController.ResolveProtocolProvider(protocol)
+                : ProtocolController.DefaultProtocolProvider;
+            ExcludeHeaders = false;
+            this.body = body;
+        }
+
+        public IRequest GetCopy(string newProtocol = null) => new RemoteRequest
+        (
+            context: RemoteContext,
+            method: Method,
+            body: body.GetCopy(newProtocol),
+            uri: URI,
+            headers: Headers,
+            protocol: newProtocol
+        );
 
         public void Dispose() => GetBody().Dispose();
     }

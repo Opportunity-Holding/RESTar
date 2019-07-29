@@ -66,14 +66,6 @@ namespace RESTar.Results
             }
         }
 
-//        /// <summary>
-//        /// Generates a URI string from URI components, according to the protocol of this Content
-//        /// </summary>
-//        protected string GetUriString(IUriComponents components) => RequestInternal
-//            .CachedProtocolProvider
-//            .ProtocolProvider
-//            .MakeRelativeUri(components);
-
         internal RequestSuccess(IRequest request) : base(request)
         {
             Request = request;

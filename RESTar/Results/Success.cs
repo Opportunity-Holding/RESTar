@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using RESTar.Internal;
@@ -27,7 +26,7 @@ namespace RESTar.Results
         public virtual Headers Headers { get; }
 
         /// <inheritdoc />
-        public ICollection<string> Cookies { get; internal set; }
+        public Cookies Cookies => Context.Client.Cookies;
 
         /// <inheritdoc />
         public bool IsSerialized { get; protected set; }

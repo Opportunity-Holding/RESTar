@@ -21,6 +21,9 @@ namespace RESTar.Requests.Processors
             .Select(key => resource.MakeOutputTerm(key, dynDomain))
             .ForEach(Add);
 
+        private Add(Add other) : base(other) { }
+        internal Add GetCopy() => new Add(this);
+
         /// <summary>
         /// Adds properties to entities in an IEnumerable
         /// </summary>

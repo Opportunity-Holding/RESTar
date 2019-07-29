@@ -89,6 +89,22 @@ namespace RESTar.Requests
         }
 
         /// <summary>
+        /// Creates a request in this context for a given resource, using the given method and optional protocol id and 
+        /// view name. If the protocol ID is null, the default protocol will be used. T must be a registered resource type.
+        /// </summary>
+        /// <param name="resource">The resource to create a request for</param>
+        /// <param name="method">The method to perform, for example GET</param>
+        /// <param name="protocolId">An optional protocol ID, defining the protocol to use for the request. If the 
+        /// protocol ID is null, the default protocol will be used.</param>0
+        /// <param name="viewName">An optional view name to use when selecting entities from the resource</param>
+        public virtual IRequest<T> CreateRequest<T>(IResource<T> resource, Method method = GET, string protocolId = "restar", string viewName = null)
+            where T : class
+        {
+            var parameters = new RequestParameters(this, method, resource, protocolId, viewName);
+            return new Request<T>(resource, parameters);
+        }
+
+        /// <summary>
         /// Creates a request in this context using the given parameters.
         /// </summary>
         /// <param name="uri">The URI of the request</param>

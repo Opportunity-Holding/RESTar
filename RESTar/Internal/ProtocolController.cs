@@ -21,7 +21,7 @@ namespace RESTar.Internal
         private static CachedProtocolProvider GetCachedProtocolProvider(IProtocolProvider provider)
         {
             var cProvider = new CachedProtocolProvider(provider);
-            var contentTypeProviders = provider.GetContentTypeProviders()?.ToList();
+            var contentTypeProviders = provider.GetCustomContentTypeProviders()?.ToList();
             contentTypeProviders?.ForEach(contentTypeProvider =>
             {
                 if (contentTypeProvider.CanRead)
@@ -61,7 +61,7 @@ namespace RESTar.Internal
                                                            "ProtocolIdentifier can only contain letters a-z and A-Z");
             if (provider.ExternalContentTypeProviderSettings == ExternalContentTypeProviderSettings.DontAllow)
             {
-                var contentProviders = provider.GetContentTypeProviders()?.ToList();
+                var contentProviders = provider.GetCustomContentTypeProviders()?.ToList();
                 if (contentProviders?.Any() != true)
                     throw new InvalidProtocolProviderException($"Invalid protocol provider '{provider.GetType().RESTarTypeName()}'. " +
                                                                "The protocol provider allows no external content type providers " +

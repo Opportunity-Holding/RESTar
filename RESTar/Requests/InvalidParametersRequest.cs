@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using RESTar.Internal;
 using RESTar.Meta;
@@ -54,7 +53,7 @@ namespace RESTar.Requests
         private readonly Body body;
         public Body GetBody() => body;
         public Headers ResponseHeaders { get; }
-        public ICollection<string> Cookies { get; }
+        public Cookies Cookies => Context.Client.Cookies;
 
         public void SetBody(object content, ContentType? contentType = null) =>
             throw new InvalidOperationException("Cannot set body of an invalid request");
@@ -81,7 +80,12 @@ namespace RESTar.Requests
                     protocolProvider: parameters.CachedProtocolProvider
                 );
             ResponseHeaders = null;
-            Cookies = null;
+        }
+
+        public IRequest GetCopy(string newProtocol = null)
+        {
+            // We do not care about changing the protocol of an invalid parameters request.
+            return new InvalidParametersRequest(Parameters);
         }
 
         public void Dispose()

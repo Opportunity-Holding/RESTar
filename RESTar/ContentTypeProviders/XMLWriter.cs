@@ -46,7 +46,7 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null) where T : class
+        public ulong SerializeCollection<T>(IEnumerable<T> entities, Stream stream, IRequest request = null)
         {
             var count = JsonProvider.SerializeCollection(entities, stream, request);
             stream.Seek(0, SeekOrigin.Begin);
@@ -67,10 +67,10 @@ namespace RESTar.ContentTypeProviders
         }
 
         /// <inheritdoc />
-        public IEnumerable<T> DeserializeCollection<T>(Stream body) where T : class => throw new NotImplementedException();
+        public IEnumerable<T> DeserializeCollection<T>(Stream body) => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body) where T : class =>
+        public IEnumerable<T> Populate<T>(IEnumerable<T> entities, byte[] body) =>
             throw new NotImplementedException();
     }
 }

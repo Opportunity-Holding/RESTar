@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -27,17 +28,24 @@ namespace RESTar.Requests
         public bool HasConditions => !(_conditions?.Count > 0);
         private Headers _responseHeaders;
         public Headers ResponseHeaders => _responseHeaders ?? (_responseHeaders = new Headers());
-        private ICollection<string> _cookies;
-        public ICollection<string> Cookies => _cookies ?? (_cookies = new List<string>());
+        public Cookies Cookies => Context.Client.Cookies;
+        public Headers Headers { get; }
+        public CachedProtocolProvider CachedProtocolProvider { get; }
         private Exception Error { get; }
         public bool IsValid => Error == null;
-        public Func<IEnumerable<T>> EntitiesProducer { get; set; }
+        public IResource<T> Resource { get; }
+        public TimeSpan TimeElapsed => Stopwatch.Elapsed;
+        private Stopwatch Stopwatch { get; }
+
         public Func<IEnumerable<T>> Selector { private get; set; }
         public Func<IEnumerable<T>, IEnumerable<T>> Updater { private get; set; }
-        public Func<IEnumerable<T>, IEnumerable<T>> GetUpdater() => Updater;
-        public Func<IEnumerable<T>> GetSelector() => Selector;
-        public IResource<T> Resource { get; }
-        public IEntityResource<T> EntityResource => Resource as IEntityResource<T>;
+
+        public Func<IEnumerable<T>> EntitiesProducer { get; set; }
+
+        IEntityResource<T> IEntityRequest<T>.EntityResource => Resource as IEntityResource<T>;
+        Func<IEnumerable<T>, IEnumerable<T>> IEntityRequest<T>.GetUpdater() => Updater;
+        IEnumerable<T> IRequest<T>.GetInputEntities() => EntitiesProducer?.Invoke() ?? new T[0];
+        Func<IEnumerable<T>> IEntityRequest<T>.GetSelector() => Selector;
         IResource IRequest.Resource => Resource;
         private Method method;
 
@@ -79,18 +87,6 @@ namespace RESTar.Requests
         {
             get => _metaConditions ?? (_metaConditions = new MetaConditions());
             set => _metaConditions = value;
-        }
-
-        public IRequest<T> WithConditions(IEnumerable<Condition<T>> conditions)
-        {
-            Conditions = conditions?.ToList();
-            return this;
-        }
-
-        public IRequest<T> WithConditions(params Condition<T>[] conditions)
-        {
-            Conditions = conditions?.ToList();
-            return this;
         }
 
         private Func<Body> BodyFunc { get; set; }
@@ -136,10 +132,7 @@ namespace RESTar.Requests
 
         public string TraceId => Parameters.TraceId;
         public Context Context => Parameters.Context;
-        public CachedProtocolProvider CachedProtocolProvider => Parameters.CachedProtocolProvider;
-        public Headers Headers => Parameters.Headers;
         public bool IsWebSocketUpgrade => Parameters.IsWebSocketUpgrade;
-        public TimeSpan TimeElapsed => Parameters.Stopwatch.Elapsed;
         public IMacro Macro => Parameters.UriComponents.Macro;
 
         #endregion
@@ -222,7 +215,6 @@ namespace RESTar.Requests
                             if (!entity.CanUpdate) throw new SafePostNotSupported("(no updater implemented)");
                         }
                         var result = EntityOperations<T>.GetEvaluator(Method).Invoke(this);
-                        result.Cookies = Cookies;
                         ResponseHeaders.ForEach(h => result.Headers[h.Key.StartsWith("X-") ? h.Key : "X-" + h.Key] = h.Value);
                         if (RESTarConfig.AllowAllOrigins)
                             result.Headers.AccessControlAllowOrigin = "*";
@@ -271,8 +263,6 @@ namespace RESTar.Requests
             return new WebSocketUpgradeSuccessful(this);
         }
 
-        public IEnumerable<T> GetInputEntities() => EntitiesProducer?.Invoke() ?? new T[0];
-
         internal Request(IResource<T> resource, RequestParameters parameters)
         {
             Parameters = parameters;
@@ -280,6 +270,9 @@ namespace RESTar.Requests
             Target = resource;
             TargetType = typeof(T);
             Method = parameters.Method;
+            Headers = parameters.Headers;
+            Stopwatch = parameters.Stopwatch;
+            CachedProtocolProvider = parameters.CachedProtocolProvider;
 
             try
             {
@@ -384,6 +377,54 @@ namespace RESTar.Requests
                 Error = e;
             }
         }
+
+        private Request
+        (
+            Method method,
+            IResource<T> resource,
+            ITarget<T> target,
+            Type targetType,
+            CachedProtocolProvider cachedProtocolProvider,
+            RequestParameters parameters,
+            Body body,
+            Headers headers,
+            MetaConditions metaConditions,
+            List<Condition<T>> conditions,
+            Exception error,
+            string protocol
+        )
+        {
+            Method = method;
+            Resource = resource;
+            Target = target;
+            TargetType = targetType;
+            Parameters = parameters;
+            _body = body;
+            Headers = headers;
+            MetaConditions = metaConditions;
+            Conditions = conditions;
+            Error = error;
+            Stopwatch = Stopwatch.StartNew();
+            CachedProtocolProvider = protocol != null
+                ? ProtocolController.ResolveProtocolProvider(protocol)
+                : cachedProtocolProvider;
+        }
+
+        public IRequest GetCopy(string newProtocol = null) => new Request<T>
+        (
+            method: Method,
+            resource: Resource,
+            target: Target,
+            targetType: TargetType,
+            cachedProtocolProvider: CachedProtocolProvider,
+            parameters: Parameters,
+            body: GetBody().GetCopy(newProtocol),
+            headers: Headers.GetCopy(),
+            metaConditions: MetaConditions.GetCopy(),
+            conditions: Conditions.ToList(),
+            error: Error,
+            protocol: newProtocol
+        );
 
         public void Dispose()
         {

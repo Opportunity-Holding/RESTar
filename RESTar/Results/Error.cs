@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -28,7 +27,7 @@ namespace RESTar.Results
         public Headers Headers { get; } = new Headers();
 
         /// <inheritdoc />
-        public ICollection<string> Cookies { get; } = new List<string>();
+        public Cookies Cookies => Context.Client.Cookies;
 
         /// <inheritdoc />
         public bool IsSuccess { get; }

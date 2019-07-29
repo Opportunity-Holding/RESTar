@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar", "RESTar\RESTar.csproj", "{3CA9602F-FC6F-4DFE-8749-C6DBDD9A4809}"
 EndProject
@@ -12,6 +12,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{83B376F6-73DF-484B-9CEA-6F1722681838}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTarTutorial", "RESTarTutorial\RESTarTutorial.csproj", "{7E58A3E7-0D1A-46A8-8708-B652198BC8A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.JsonPatch", "..\..\Starcounter\RESTar.JsonPatch\RESTar.JsonPatch\RESTar.JsonPatch.csproj", "{3D40BFD5-4C01-4213-9FFA-CE5F69EC33B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.Palindrom", "..\..\Starcounter\RESTar.Palindrom\RESTar.Palindrom\RESTar.Palindrom.csproj", "{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.Palindrom.Example", "..\..\Starcounter\RESTar.Palindrom\RESTar.Palindrom.Example\RESTar.Palindrom.Example.csproj", "{1432A98D-C7C4-4895-956B-CCF5BF1A050A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +57,24 @@ Global
 		{7E58A3E7-0D1A-46A8-8708-B652198BC8A9}.Release|Any CPU.ActiveCfg = Release|x64
 		{7E58A3E7-0D1A-46A8-8708-B652198BC8A9}.Release|x64.ActiveCfg = Release|x64
 		{7E58A3E7-0D1A-46A8-8708-B652198BC8A9}.Release|x64.Build.0 = Release|x64
+		{3D40BFD5-4C01-4213-9FFA-CE5F69EC33B1}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{3D40BFD5-4C01-4213-9FFA-CE5F69EC33B1}.Debug|x64.ActiveCfg = Debug|x64
+		{3D40BFD5-4C01-4213-9FFA-CE5F69EC33B1}.Debug|x64.Build.0 = Debug|x64
+		{3D40BFD5-4C01-4213-9FFA-CE5F69EC33B1}.Release|Any CPU.ActiveCfg = Release|x64
+		{3D40BFD5-4C01-4213-9FFA-CE5F69EC33B1}.Release|x64.ActiveCfg = Release|x64
+		{3D40BFD5-4C01-4213-9FFA-CE5F69EC33B1}.Release|x64.Build.0 = Release|x64
+		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Debug|x64.ActiveCfg = Debug|x64
+		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Debug|x64.Build.0 = Debug|x64
+		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Release|Any CPU.ActiveCfg = Release|x64
+		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Release|x64.ActiveCfg = Release|x64
+		{99ABA1A9-26C2-4B62-997D-A4A5F17BCFEE}.Release|x64.Build.0 = Release|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Debug|x64.ActiveCfg = Debug|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Debug|x64.Build.0 = Debug|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Release|Any CPU.ActiveCfg = Release|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Release|x64.ActiveCfg = Release|x64
+		{1432A98D-C7C4-4895-956B-CCF5BF1A050A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

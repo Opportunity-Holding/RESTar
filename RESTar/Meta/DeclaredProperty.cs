@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ using System.Text;
 using Newtonsoft.Json;
 using RESTar.Linq;
 using RESTar.Meta.IL;
+using RESTar.Meta.Internal;
 using RESTar.Requests;
 using RESTar.Resources;
 using RESTar.Results;
@@ -16,6 +18,17 @@ using Starcounter.Metadata;
 
 namespace RESTar.Meta
 {
+    /// <summary>
+    /// Represents the operation to attach to a PropertyChanged event handler in DeclaredProperty
+    /// </summary>
+    public delegate void PropertyChangeHandler
+    (
+        DeclaredProperty property,
+        object target,
+        dynamic oldValue,
+        dynamic newValue
+    );
+
     /// <inheritdoc />
     /// <summary>
     /// A declared property represents a compile time known property of a type.
@@ -72,6 +85,33 @@ namespace RESTar.Meta
         public string CustomDateTimeFormat { get; }
 
         /// <summary>
+        /// Should this member, and all its members, be merged onto the owner type when (de)serializing?
+        /// </summary>
+        public bool MergeOntoOwner { get; }
+
+        /// <summary>
+        /// The type that this property was declared in
+        /// </summary>
+        public Type Owner { get; }
+
+        /// <summary>
+        /// Does the value of this property define the values of other properties?
+        /// </summary>
+        public bool DefinesOtherProperties { get; private set; }
+
+        private ISet<Term> definesPropertyTerms;
+
+        /// <summary>
+        /// The properties that reflects upon this property
+        /// </summary>
+        public ISet<Term> DefinesPropertyTerms => definesPropertyTerms ?? (definesPropertyTerms = new HashSet<Term>());
+
+        /// <summary>
+        /// An event that is fired when this property is changed for some target
+        /// </summary>
+        public event PropertyChangeHandler PropertyChanged;
+
+        /// <summary>
         /// The starcounter indexable column for this property (if any)
         /// </summary>
         [RESTarMember(ignore: true)] public Column ScIndexableColumn { get; }
@@ -118,12 +158,33 @@ namespace RESTar.Meta
         /// </summary>
         public bool HasAttribute<TAttribute>(out TAttribute attribute) where TAttribute : Attribute => (attribute = GetAttribute<TAttribute>()) != null;
 
+        /// <inheritdoc />
+        public override void SetValue(object target, dynamic value)
+        {
+            if (PropertyChanged != null)
+            {
+                var oldValue = GetValue(target);
+                base.SetValue(target, (object) value);
+                var changedValue = GetValue(target);
+                if (object.Equals(changedValue, oldValue))
+                    return;
+                NotifyChange(target, oldValue, value);
+                return;
+            }
+            base.SetValue(target, (object) value);
+        }
+
+        internal void NotifyChange(object target, object oldValue, object newValue)
+        {
+            PropertyChanged?.Invoke(this, target, oldValue, newValue);
+        }
+
         /// <summary>
         /// Used in SpecialProperty
         /// </summary>
         internal DeclaredProperty(int metadataToken, string name, string actualName, Type type, int? order, bool isScQueryable,
             ICollection<Attribute> attributes, bool skipConditions, bool hidden, bool hiddenIfNull, bool isEnum, string customDateTimeFormat,
-            Operators allowedConditionOperators, Getter getter, Setter setter)
+            Operators allowedConditionOperators, Type owner, Getter getter, Setter setter)
         {
             MetadataToken = metadataToken;
             Name = name;
@@ -143,6 +204,8 @@ namespace RESTar.Meta
             Getter = getter;
             Setter = setter;
             ScIndexableColumn = null;
+            Owner = owner;
+            MergeOntoOwner = false;
         }
 
         /// <summary>
@@ -151,6 +214,7 @@ namespace RESTar.Meta
         internal DeclaredProperty(PropertyInfo p, bool flagName = false)
         {
             if (p == null) return;
+
             MetadataToken = p.MetadataToken;
             Name = p.RESTarMemberName(flagName);
             Type = p.PropertyType;
@@ -159,6 +223,7 @@ namespace RESTar.Meta
             var memberAttribute = GetAttribute<RESTarMemberAttribute>();
             var jsonAttribute = GetAttribute<JsonPropertyAttribute>();
             CustomDateTimeFormat = memberAttribute?.DateTimeFormat;
+            MergeOntoOwner = memberAttribute?.MergeOntoOwner ?? false;
             Order = memberAttribute?.Order ?? jsonAttribute?.Order;
             IsScQueryable = p.DeclaringType?.HasAttribute<DatabaseAttribute>() == true && p.PropertyType.IsStarcounterCompatible();
             SkipConditions = memberAttribute?.SkipConditions == true || p.DeclaringType.HasAttribute<RESTarViewAttribute>();
@@ -174,6 +239,8 @@ namespace RESTar.Meta
             if (memberAttribute?.ReadOnly != true)
                 Setter = p.MakeDynamicSetter();
             ReplaceOnUpdate = memberAttribute?.ReplaceOnUpdate == true;
+            Owner = p.DeclaringType;
+
             if (p.DeclaringType.HasAttribute<DatabaseAttribute>() && !p.HasAttribute<TransientAttribute>())
             {
                 const string columnSQL = "SELECT t FROM Starcounter.Metadata.\"Column\" t WHERE t.\"Table\".FullName =? AND t.Name =?";
@@ -206,6 +273,25 @@ namespace RESTar.Meta
             }
         }
 
+        internal void EstablishPropertyDependancies()
+        {
+            // if (HasAttribute<DefinedByAttribute>(out var dbAttribute) && dbAttribute.Terms is string[] dbArgs && dbArgs.Any())
+            // {
+            //     foreach (var definingTerm in dbArgs.Select(name => Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)))
+            //     {
+            //         var definer = definingTerm.LastAs<DeclaredProperty>();
+            //         definer.DefinesOtherProperties = true;
+            //         definer.DefinesPropertyTerms.Add(definingTerm);
+            //     }
+            // }
+            if (HasAttribute<DefinesAttribute>(out var dAttribute) && dAttribute.Terms is string[] dArgs && dArgs.Any())
+            {
+                foreach (var term in dArgs.Select(name => Owner.MakeOrGetCachedTerm(name, ".", TermBindingRule.OnlyDeclared)))
+                    DefinesPropertyTerms.Add(term);
+                DefinesOtherProperties = true;
+            }
+        }
+
         private static dynamic MakeExcelReducer(string methodName, PropertyInfo p)
         {
             if (p.DeclaringType == null) throw new Exception("Type error, cannot cache property " + p);
@@ -230,6 +316,22 @@ namespace RESTar.Meta
         /// <returns></returns>
         public static DeclaredProperty Find(Type type, string key)
         {
+            var isDictionary = typeof(IDictionary).IsAssignableFrom(type) ||
+                               type.ImplementsGenericInterface(typeof(IDictionary<,>));
+            if (!isDictionary && typeof(IEnumerable).IsAssignableFrom(type))
+            {
+                var elementType = type.ImplementsGenericInterface(typeof(IEnumerable<>), out var p)
+                    ? p[0]
+                    : typeof(object);
+                var collectionReadonly = typeof(IList).IsAssignableFrom(type) || type.ImplementsGenericInterface(typeof(IList<>));
+                switch (key)
+                {
+                    case "-": return new LastIndexProperty(elementType, collectionReadonly, type);
+                    case var _ when int.TryParse(key, out var integer):
+                        return new IndexProperty(integer, key, elementType, collectionReadonly, type);
+                }
+            }
+
             if (!type.GetDeclaredProperties().TryGetValue(key, out var prop))
             {
                 if (type.IsNullable(out var underlying))
