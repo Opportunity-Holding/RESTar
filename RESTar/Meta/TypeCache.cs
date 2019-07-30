@@ -7,7 +7,9 @@ using System.Reflection.Emit;
 using Newtonsoft.Json.Serialization;
 using RESTar.Linq;
 using RESTar.Meta.IL;
+using RESTar.Meta.Internal;
 using RESTar.Resources;
+using Starcounter.Nova;
 
 namespace RESTar.Meta
 {
@@ -146,7 +148,7 @@ namespace RESTar.Meta
                                     .Name;
                             }
                             return p;
-                        });
+                        }).If(_type.IsStarcounterDatabaseType, ps => ps.Union(SpecialProperty.GetObjectNo(flag: false, _type)));
                     case var _ when typeof(ITerminal).IsAssignableFrom(_type):
                         return _type.FindAndParseDeclaredProperties().Except(make(typeof(ITerminal)), DeclaredProperty.NameComparer);
                     case var _ when _type.IsNullable(out var underlying):
@@ -154,8 +156,9 @@ namespace RESTar.Meta
                     case var _ when _type.HasAttribute<RESTarViewAttribute>():
                         return _type.FindAndParseDeclaredProperties().Union(make(_type.DeclaringType));
                     case var _ when Resource.SafeGet(_type) is IEntityResource e && e.DeclaredPropertiesFlagged:
-                        return _type.FindAndParseDeclaredProperties(true);
-                    default: return _type.FindAndParseDeclaredProperties();
+                    default:
+                        return _type.FindAndParseDeclaredProperties()
+                            .If(_type.HasAttribute<DatabaseAttribute>(), ps => ps.Union(SpecialProperty.GetObjectNo(false, _type)));
                 }
             }
 

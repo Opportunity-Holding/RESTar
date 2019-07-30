@@ -8,6 +8,7 @@ using Newtonsoft.Json.Serialization;
 using RESTar.Linq;
 using RESTar.Meta;
 using RESTar.Meta.Internal;
+using Starcounter.Nova;
 
 namespace RESTar.ContentTypeProviders.NativeJsonProtocol
 {
@@ -41,6 +42,13 @@ namespace RESTar.ContentTypeProviders.NativeJsonProtocol
                     break;
                 case var _ when objectType.IsEnum:
                     contract.Converter = StringEnumConverter;
+                    break;
+                case var _ when objectType.IsStarcounterDatabaseType():
+                    dynamic inserter = typeof(Db)
+                        .GetMethod("Insert")?
+                        .MakeGenericMethod(objectType)
+                        .CreateDelegate(typeof(Func<>).MakeGenericType(objectType));
+                    contract.DefaultCreator = () => inserter();
                     break;
             }
             return contract;

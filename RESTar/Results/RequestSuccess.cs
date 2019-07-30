@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using RESTar.Internal;
 using RESTar.Requests;
+using Starcounter.Nova;
 
 namespace RESTar.Results
 {
@@ -38,6 +39,8 @@ namespace RESTar.Results
             }
         }
 
+        private static readonly TransactOptions ReadonlyOptions = new TransactOptions(TransactionFlags.ReadOnly);
+
         /// <inheritdoc />
         public override ISerializedResult Serialize(ContentType? contentType = null)
         {
@@ -49,7 +52,7 @@ namespace RESTar.Results
             {
                 var protocolProvider = RequestInternal.CachedProtocolProvider.ProtocolProvider;
                 var acceptProvider = ContentTypeController.ResolveOutputContentTypeProvider(RequestInternal, contentType);
-                return protocolProvider.Serialize(this, acceptProvider).Finalize(acceptProvider);
+                return Db.Transact(() => protocolProvider.Serialize(this, acceptProvider).Finalize(acceptProvider), ReadonlyOptions);
             }
             catch (Exception exception)
             {
@@ -61,7 +64,7 @@ namespace RESTar.Results
                 IsSerializing = false;
                 IsSerialized = true;
                 stopwatch.Stop();
-                TimeElapsed = TimeElapsed + stopwatch.Elapsed;
+                TimeElapsed += stopwatch.Elapsed;
                 Headers.Elapsed = TimeElapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
             }
         }

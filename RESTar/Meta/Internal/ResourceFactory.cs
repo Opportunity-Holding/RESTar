@@ -14,11 +14,10 @@ namespace RESTar.Meta.Internal
         private static IEntityResourceProviderInternal VrProvider { get; }
         private static TerminalResourceProvider TerminalProvider { get; }
         private static BinaryResourceProvider BinaryProvider { get; }
-        
+
         static ResourceFactory()
         {
             VrProvider = new VirtualResourceProvider();
-            EntityResourceProviders.Add(VrProvider.Id, VrProvider);
             TerminalProvider = new TerminalResourceProvider();
             BinaryProvider = new BinaryResourceProvider();
         }
@@ -45,7 +44,7 @@ namespace RESTar.Meta.Internal
                 throw new InvalidEntityResourceProviderException(idDupe.GetType(),
                     "Two or more external ResourceProviders had simliar type names, which could lead to confusion. Only one provider " +
                     $"should be associated with '{idDupe}'");
-            foreach (var provider in entityResourceProviders.Where(provider => provider is IProceduralEntityResourceProvider))
+            foreach (var provider in entityResourceProviders.OfType<IProceduralEntityResourceProvider>())
             {
                 var methods = provider.GetType().GetMethods(DeclaredOnly | Instance | NonPublic);
                 if (methods.All(method => method.Name != "SelectProceduralResources"
@@ -61,6 +60,7 @@ namespace RESTar.Meta.Internal
             }
             foreach (var provider in entityResourceProviders)
                 EntityResourceProviders.Add(provider.Id, provider);
+            EntityResourceProviders.Add(VrProvider.Id, VrProvider);
         }
 
         /// <summary>

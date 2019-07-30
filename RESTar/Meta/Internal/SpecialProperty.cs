@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using RESTar.ContentTypeProviders;
 using RESTar.Requests;
 using RESTar.Resources;
+using RESTar.Resources.Operations;
+using Starcounter.Nova;
 
 namespace RESTar.Meta.Internal
 {
@@ -36,7 +39,7 @@ namespace RESTar.Meta.Internal
             type: type,
             order: order,
             isScQueryable: isScQueryable,
-            attributes: new[] {new KeyAttribute()},
+            attributes: new[] { new KeyAttribute() },
             skipConditions: false,
             hidden: hidden,
             hiddenIfNull: hiddenIfNull,
@@ -46,6 +49,55 @@ namespace RESTar.Meta.Internal
             getter: getter,
             owner: owner,
             setter: null
-        ) { }
+        )
+        { }
+
+        internal static IEnumerable<SpecialProperty> GetObjectNo(bool flag, Type declaredIn)
+        {
+            if (flag) yield return FlaggedObjectNo(declaredIn);
+            else yield return ObjectNo(declaredIn);
+        }
+
+        // ReSharper disable PossibleNullReferenceException
+
+        private static readonly int ObjectNoMetadataToken =
+            typeof(Db).GetMethod(nameof(Db.GetOid), new[] { typeof(object) }).MetadataToken;
+
+
+        // ReSharper restore PossibleNullReferenceException
+
+        /// <summary>
+        /// A property describing the ObjectNo of a class
+        /// </summary>
+        private static SpecialProperty ObjectNo(Type declaredIn) => new SpecialProperty
+        (
+            metadataToken: ObjectNoMetadataToken,
+            name: "ObjectNo",
+            actualName: "ObjectNo",
+            type: typeof(ulong),
+            order: int.MaxValue - 1,
+            isScQueryable: true,
+            hidden: false,
+            hiddenIfNull: false,
+            owner: declaredIn,
+            getter: t => Do.TryAndThrow(() => Db.GetOid(t), "Could not get ObjectNo from non-Starcounter resource.")
+        );
+
+        /// <summary>
+        /// A property describing the ObjectNo of a class
+        /// </summary>
+        private static SpecialProperty FlaggedObjectNo(Type declaredIn) => new SpecialProperty
+        (
+            metadataToken: ObjectNoMetadataToken,
+            name: "$ObjectNo",
+            actualName: "ObjectNo",
+            type: typeof(ulong),
+            order: int.MaxValue - 1,
+            isScQueryable: true,
+            hidden: false,
+            hiddenIfNull: false,
+            owner: declaredIn,
+            getter: t => Do.TryAndThrow(() => Db.GetOid(t), "Could not get ObjectNo from non-Starcounter resource.")
+        );
     }
 }

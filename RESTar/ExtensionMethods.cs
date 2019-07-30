@@ -24,6 +24,7 @@ using RESTar.Requests.Processors;
 using RESTar.Resources;
 using RESTar.Results;
 using RESTar.WebSockets;
+using Starcounter.Nova;
 using static System.Globalization.DateTimeStyles;
 using static System.Reflection.BindingFlags;
 using static System.StringComparison;
@@ -108,7 +109,7 @@ namespace RESTar
 
         internal static bool IsStarcounterDatabaseType(this MemberInfo type)
         {
-            return type.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "DatabaseAttribute");
+            return type.HasAttribute<DatabaseAttribute>();
         }
 
         public static bool HasAttribute<TAttribute>(this MemberInfo type) where TAttribute : Attribute

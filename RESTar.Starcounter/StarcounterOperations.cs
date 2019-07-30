@@ -19,6 +19,12 @@ namespace RESTar.Starcounter
         private static readonly string select = $"SELECT t FROM {TableName.Fnuttify()} t ";
         private const string ObjectNo = nameof(ObjectNo);
 
+        private static readonly TransactOptions ReadonlyOptions = new TransactOptions
+        (
+            flags: TransactionFlags.ReadOnly,
+            onCommit: () => { }
+        );
+
         /// <summary>
         /// Selects entities from a Starcounter table
         /// </summary>
@@ -28,7 +34,7 @@ namespace RESTar.Starcounter
             {
                 case 0:
                     var sql = $"{select}{GetOrderbyString(request, out _)}";
-                    var result = Db.SQL<T>(sql);
+                    var result = Db.Transact(() => Db.SQL<T>(sql), ReadonlyOptions);
                     QueryConsole.Publish(sql, null, () => result.GetEnumerator());
                     return result;
                 case 1 when request.Conditions[0] is var only && only.Operator == Operators.EQUALS:
@@ -39,7 +45,7 @@ namespace RESTar.Starcounter
                     var orderBy = GetOrderbyString(request, out var orderByIndexName);
                     var (where, values) = request.Conditions.GetSQL().MakeWhereClause(orderByIndexName, out var useOrderBy);
                     sql = useOrderBy ? $"{select}{where}{orderBy}" : $"{select}{where}";
-                    result = Db.SQL<T>(sql, values);
+                    result = Db.Transact(() => Db.SQL<T>(sql, values), ReadonlyOptions);
                     QueryConsole.Publish(sql, values, () => result.GetEnumerator());
                     return !request.Conditions.HasPost(out var post) ? result : result.Where(post);
             }
@@ -49,7 +55,7 @@ namespace RESTar.Starcounter
         {
             QueryConsole.Publish<T>($"FROMID {objectNo}", null, null);
             if (objectNo == 0) return null;
-            return Db.Get(objectNo) is T t ? new[] {t} : null;
+            return Db.Transact(() => Db.Get(objectNo), ReadonlyOptions) is T t ? new[] {t} : null;
         }
 
         private static string GetOrderbyString(IRequest request, out string indexedName)
@@ -91,7 +97,7 @@ namespace RESTar.Starcounter
             }));
             return count;
         }
-        
+
         internal static bool IsValid(IEntityResource resource, out string reason)
         {
             if (resource.InterfaceType != null)
