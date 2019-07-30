@@ -36,10 +36,11 @@ namespace RESTar.AspNetCore
 
         protected override bool IsConnected => !WebSocket.CloseStatus.HasValue;
 
-        protected override void SendUpgrade()
+        protected override async Task SendUpgrade()
         {
-            WebSocket = HttpContext.WebSockets.AcceptWebSocketAsync().Result;
-            Task.Run(ManageReceieveLoopAsync);
+            WebSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            await ManageReceieveLoopAsync();
+            WebSocketController.HandleDisconnect(Id);
         }
 
         public async Task ManageReceieveLoopAsync()

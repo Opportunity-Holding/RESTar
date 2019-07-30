@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using RESTar.Internal;
 using RESTar.Internal.Auth;
 using static RESTar.Method;
@@ -224,7 +225,7 @@ namespace RESTar.Requests
                         Context.WebSocket.Open();
                         Context.WebSocket.SendResult(serialized);
                         Context.WebSocket.Disconnect();
-                        return new WebSocketUpgradeSuccessful(this);
+                        return new WebSocketUpgradeSuccessful(this, Task.CompletedTask);
 
                     case var other: throw new UnknownResource(other.Name);
                 }
@@ -257,9 +258,9 @@ namespace RESTar.Requests
             var terminal = _resource.MakeTerminal(Conditions);
             Context.WebSocket.SetContext(this);
             Context.WebSocket.ConnectTo(terminal, resource);
-            Context.WebSocket.Open();
+            var wsLifeTime = Context.WebSocket.Open();
             terminal.Open();
-            return new WebSocketUpgradeSuccessful(this);
+            return new WebSocketUpgradeSuccessful(this, wsLifeTime);
         }
 
         internal Request(IResource<T> resource, RequestParameters parameters)

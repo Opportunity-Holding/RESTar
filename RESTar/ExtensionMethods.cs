@@ -588,7 +588,7 @@ namespace RESTar
                     request.Context.WebSocket?.Open();
                 request.Context.WebSocket?.SendResult(error);
                 request.Context.WebSocket?.Disconnect();
-                return new WebSocketUpgradeSuccessful(request);
+                return new WebSocketUpgradeSuccessful(request, Task.CompletedTask);
             }
             if (request.Headers.Metadata.EqualsNoCase("full"))
                 error.Headers.Metadata = error.Metadata;

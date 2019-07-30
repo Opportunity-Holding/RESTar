@@ -100,17 +100,17 @@ namespace RESTar.WebSockets
             Headers = upgradeRequest.Headers;
         }
 
-        internal void Open()
+        internal Task Open()
         {
             switch (Status)
             {
                 case WebSocketStatus.Waiting:
-                    SendUpgrade();
+                    var lifeTime = SendUpgrade();
                     Status = WebSocketStatus.Open;
                     Opened = DateTime.Now;
                     if (TerminalConnection?.Resource.Name != Console.TypeName)
                         Console.Log(new WebSocketEvent(MessageType.WebSocketOpen, this));
-                    break;
+                    return lifeTime;
                 default: throw new InvalidOperationException($"Unable to open WebSocket with status '{Status}'");
             }
         }
@@ -170,7 +170,7 @@ namespace RESTar.WebSockets
         /// <summary>
         /// Sends the WebSocket upgrade and initiates the actual underlying WebSocket connection
         /// </summary>
-        protected abstract void SendUpgrade();
+        protected abstract Task SendUpgrade();
 
         /// <summary>
         /// Disconnects the actual underlying WebSocket connection

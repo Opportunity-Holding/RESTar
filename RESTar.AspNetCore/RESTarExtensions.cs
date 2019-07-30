@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using RESTar.ContentTypeProviders;
 using RESTar.NetworkProviders;
 using RESTar.ProtocolProviders;
@@ -30,31 +30,24 @@ namespace RESTar.AspNetCore
             bool allowAllOrigins = true,
             string configFilePath = null,
             bool prettyPrint = true,
-            LineEndings lineEndings = LineEndings.Windows,
-            IEnumerable<IEntityResourceProvider> entityResourceProviders = null,
-            IEnumerable<IProtocolProvider> protocolProviders = null,
-            IEnumerable<IContentTypeProvider> contentTypeProviders = null
+            LineEndings lineEndings = LineEndings.Windows
         )
         {
             builder.UseWebSockets();
-            builder.UseRouter(router =>
-            {
-                var networkProvider = new AspNetCoreNetworkProvider(router);
-                RESTarConfig.Init
-                (
-                    uri: uri,
-                    requireApiKey: requireApiKey,
-                    allowAllOrigins: allowAllOrigins,
-                    configFilePath: configFilePath,
-                    prettyPrint: prettyPrint,
-                    daysToSaveErrors: 30,
-                    lineEndings: lineEndings,
-                    entityResourceProviders: entityResourceProviders,
-                    protocolProviders: protocolProviders,
-                    contentTypeProviders: contentTypeProviders,
-                    networkProviders: new List<INetworkProvider> {networkProvider}
-                );
-            });
+            builder.UseRouter(router => RESTarConfig.Init
+            (
+                uri: uri,
+                requireApiKey: requireApiKey,
+                allowAllOrigins: allowAllOrigins,
+                configFilePath: configFilePath,
+                prettyPrint: prettyPrint,
+                daysToSaveErrors: 30,
+                lineEndings: lineEndings,
+                entityResourceProviders: builder.ApplicationServices.GetServices<IEntityResourceProvider>(),
+                protocolProviders: builder.ApplicationServices.GetServices<IProtocolProvider>(),
+                contentTypeProviders: builder.ApplicationServices.GetServices<IContentTypeProvider>(),
+                networkProviders: new INetworkProvider[] {new AspNetCoreNetworkProvider(router)}
+            ));
             return builder;
         }
     }

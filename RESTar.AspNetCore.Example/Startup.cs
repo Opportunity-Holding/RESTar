@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RESTar.AspNetCore;
+using RESTar.Excel;
+using RESTar.Starcounter;
 using Starcounter.Nova.Extensions.DependencyInjection;
 
 namespace RESTar.Example
@@ -20,6 +22,8 @@ namespace RESTar.Example
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddStarcounter();
+            services.AddStarcounterResourceProvider();
+            services.AddExcelContentProvider();
             services.AddMvc(o => o.EnableEndpointRouting = false);
             services.Configure<KestrelServerOptions>(o => o.AllowSynchronousIO = true);
         }

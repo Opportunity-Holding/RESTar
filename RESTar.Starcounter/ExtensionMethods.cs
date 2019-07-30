@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using RESTar.Requests;
+using RESTar.Resources;
 using static RESTar.Requests.Operators;
 
 namespace RESTar.Starcounter
 {
-    internal static class ExtensionMethods
+    public static class ExtensionMethods
     {
+        public static IServiceCollection AddStarcounterResourceProvider(this IServiceCollection services)
+        {
+            services.Add(new ServiceDescriptor(typeof(IEntityResourceProvider), new StarcounterDeclaredResourceProvider()));
+            return services;
+        }
+
         internal static (string WhereString, object[] Values) MakeWhereClause<T>
         (
             this IEnumerable<Condition<T>> conds,

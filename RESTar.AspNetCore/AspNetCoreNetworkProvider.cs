@@ -37,7 +37,8 @@ namespace RESTar.AspNetCore
                     var body = aspNetCoreContext.Request.Body.ReadFully();
                     using var request = context.CreateRequest(uri, method, body, headers);
                     using var result = request.Evaluate().Serialize();
-                    if (result is WebSocketUpgradeSuccessful) { }
+                    if (result is WebSocketUpgradeSuccessful ws)
+                        await ws.WebSocketLifeTime;
                     else await WriteResponse(aspNetCoreContext, result);
                 });
             }

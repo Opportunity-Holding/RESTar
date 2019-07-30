@@ -12,12 +12,12 @@ using RESTar.Requests;
 namespace RESTar.Excel
 {
     /// <inheritdoc />
-    public class ExcelProvider : JsonAdapter
+    internal class ExcelProvider : JsonAdapter
     {
         private const string ExcelMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         private const string RESTarSpecific = "application/restar-excel";
         private const string Brief = "excel";
-        
+
         /// <inheritdoc />
         public override string Name => "Microsoft Excel";
 

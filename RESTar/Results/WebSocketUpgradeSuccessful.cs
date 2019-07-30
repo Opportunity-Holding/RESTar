@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Threading.Tasks;
 using RESTar.Requests;
 
 namespace RESTar.Results
@@ -10,8 +11,10 @@ namespace RESTar.Results
     /// </summary>
     public class WebSocketUpgradeSuccessful : Success
     {
-        internal WebSocketUpgradeSuccessful(IRequest request) : base(request)
+        public Task WebSocketLifeTime { get; }
+        internal WebSocketUpgradeSuccessful(IRequest request, Task lifetimeTask) : base(request)
         {
+            WebSocketLifeTime = lifetimeTask;
             StatusCode = HttpStatusCode.SwitchingProtocols;
             StatusDescription = "Switching protocols";
             TimeElapsed = request.TimeElapsed;
