@@ -96,7 +96,7 @@ namespace RESTar.Resources.Templates
 
         private void PrintOptions()
         {
-            var stringBuilder = new StringBuilder($"### {GetType().RESTarTypeName()} ###\n\n");
+            var stringBuilder = new StringBuilder($"### {GetType().GetRESTarTypeName()} ###\n\n");
             if (!_options.Any())
             {
                 stringBuilder.Append("  No available options.\n\n");

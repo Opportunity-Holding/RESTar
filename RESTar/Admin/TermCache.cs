@@ -32,9 +32,9 @@ namespace RESTar.Admin
             if (request == null) throw new ArgumentNullException(nameof(request));
             return RESTarConfig.Resources.Select(r => new TermCache
             {
-                Type = r.Type.RESTarTypeName(),
+                Type = r.Type.GetRESTarTypeName(),
                 Terms = TypeCache.TermCache
-                    .Where(pair => pair.Key.Type == r.Type.RESTarTypeName())
+                    .Where(pair => pair.Key.Type == r.Type.GetRESTarTypeName())
                     .Select(pair => pair.Value.Key)
                     .ToArray()
             }).Where(request.Conditions);

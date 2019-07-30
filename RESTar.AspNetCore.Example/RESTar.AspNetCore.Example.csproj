@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Starcounter.Nova.App" Version="3.0.0-alpha-20190701-000000" />
-    <ProjectReference Include="..\RESTar.Core.AspNetCore\RESTar.Core.AspNetCore.csproj" />
+    <ProjectReference Include="..\RESTar.AspNetCore\RESTar.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

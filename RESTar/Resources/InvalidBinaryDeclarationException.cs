@@ -9,6 +9,6 @@ namespace RESTar.Resources
     public class InvalidBinaryDeclarationException : RESTarException
     {
         internal InvalidBinaryDeclarationException(Type binary, string message) : base(ErrorCodes.InvalidBinaryResourceDeclaration,
-            $"Invalid binary resource declaration '{binary.RESTarTypeName()}'. Binary resource types {message}") { }
+            $"Invalid binary resource declaration '{binary.GetRESTarTypeName()}'. Binary resource types {message}") { }
     }
 }

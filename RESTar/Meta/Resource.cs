@@ -147,13 +147,13 @@ namespace RESTar.Meta
         /// </summary>
         public static IResource ByTypeName(string typeName)
         {
-            return All.FirstOrDefault(r => string.Equals(r.Type.RESTarTypeName(), typeName, StringComparison.CurrentCultureIgnoreCase));
+            return All.FirstOrDefault(r => string.Equals(r.Type.GetRESTarTypeName(), typeName, StringComparison.CurrentCultureIgnoreCase));
         }
 
         /// <summary>
         /// Gets the resource for a given type, or throws an UnknownResource exception if there is no such resource
         /// </summary>
-        public static IResource Get(Type type) => RESTarConfig.ResourceByType.SafeGet(type) ?? throw new UnknownResource(type.RESTarTypeName());
+        public static IResource Get(Type type) => RESTarConfig.ResourceByType.SafeGet(type) ?? throw new UnknownResource(type.GetRESTarTypeName());
 
         /// <summary>
         /// Gets the resource for a given type or returns null if there is no such resource
@@ -185,7 +185,7 @@ namespace RESTar.Meta
         /// if there is no such resource
         /// </summary>
         public static IResource<T> Get => RESTarConfig.ResourceByType.SafeGet(typeof(T)) as IResource<T>
-                                          ?? throw new UnknownResource(typeof(T).RESTarTypeName());
+                                          ?? throw new UnknownResource(typeof(T).GetRESTarTypeName());
 
 
         /// <summary>

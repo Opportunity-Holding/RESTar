@@ -19,7 +19,7 @@ namespace RESTar.Internal
             if (provider == null)
                 throw new InvalidContentTypeProviderException("External content type provider cannot be null");
             if (!provider.CanRead && !provider.CanWrite)
-                throw new InvalidContentTypeProviderException($"Provider '{provider.GetType().RESTarTypeName()}' cannot read or write");
+                throw new InvalidContentTypeProviderException($"Provider '{provider.GetType().GetRESTarTypeName()}' cannot read or write");
         }
 
         internal static ContentType ResolveInputContentType(IRequestInternal request = null, ContentType? contentType = null)
@@ -92,9 +92,8 @@ namespace RESTar.Internal
         {
             InputContentTypeProviders = new Dictionary<string, IContentTypeProvider>(StringComparer.OrdinalIgnoreCase);
             OutputContentTypeProviders = new Dictionary<string, IContentTypeProvider>(StringComparer.OrdinalIgnoreCase);
-            contentTypeProviders = contentTypeProviders ?? new List<IContentTypeProvider>();
+            contentTypeProviders ??= new List<IContentTypeProvider>();
             contentTypeProviders.Insert(0, new XMLWriter());
-            contentTypeProviders.Insert(0, Providers.Excel);
             contentTypeProviders.Insert(0, Providers.Json);
             foreach (var provider in contentTypeProviders)
             {

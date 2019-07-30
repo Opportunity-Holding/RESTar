@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RESTar.ContentTypeProviders
+namespace RESTar.Excel
 {
     /// <inheritdoc />
     /// <summary>

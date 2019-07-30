@@ -57,14 +57,14 @@ namespace RESTar.Meta
         /// </summary>
         public static Term MakeOrGetCachedTerm(this Type resource, string key, string componentSeparator, TermBindingRule bindingRule)
         {
-            var tuple = (resource.RESTarTypeName(), key.ToLower(), bindingRule);
+            var tuple = (resource.GetRESTarTypeName(), key.ToLower(), bindingRule);
             if (!TermCache.TryGetValue(tuple, out var term))
                 term = TermCache[tuple] = Term.Parse(resource, key, componentSeparator, bindingRule, null);
             return term;
         }
 
         internal static void ClearTermsFor<T>() => TermCache
-            .Where(pair => pair.Key.Type == typeof(T).RESTarTypeName())
+            .Where(pair => pair.Key.Type == typeof(T).GetRESTarTypeName())
             .Select(pair => pair.Key)
             .ToList()
             .ForEach(key => TermCache.TryRemove(key, out _));
@@ -102,7 +102,7 @@ namespace RESTar.Meta
                             .SelectMany(i => i.GetProperties(BindingFlags.Instance | BindingFlags.Public))
                             .ParseDeclaredProperties(false);
                     case var _ when _type.GetRESTarInterfaceType() is Type t:
-                        var interfaceName = t.RESTarTypeName();
+                        var interfaceName = t.GetRESTarTypeName();
                         var targetsByProp = _type
                             .GetInterfaceMap(t)
                             .TargetMethods
@@ -164,7 +164,7 @@ namespace RESTar.Meta
                 }
             }
 
-            if (type?.RESTarTypeName() == null) return null;
+            if (type?.GetRESTarTypeName() == null) return null;
 
             if (!groupByActualName)
             {
@@ -191,7 +191,7 @@ namespace RESTar.Meta
         public static DeclaredProperty GetDeclaredProperty(this PropertyInfo member)
         {
             var declaringType = member.DeclaringType;
-            if (declaringType.RESTarTypeName() == null)
+            if (declaringType.GetRESTarTypeName() == null)
                 throw new Exception($"Cannot get declared property for member '{member}' of unknown type");
             declaringType.GetDeclaredProperties(true).TryGetValue(member.Name, out var property);
             return property;
@@ -203,7 +203,7 @@ namespace RESTar.Meta
         public static DeclaredProperty GetDeclaredProperty(this JsonProperty member)
         {
             var declaringType = member.DeclaringType;
-            if (declaringType.RESTarTypeName() == null)
+            if (declaringType.GetRESTarTypeName() == null)
                 throw new Exception($"Cannot get declared property for member '{member}' of unknown type");
             declaringType.GetDeclaredProperties().TryGetValue(member.PropertyName, out var property);
             return property;

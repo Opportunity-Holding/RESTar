@@ -9,6 +9,6 @@ namespace RESTar.Resources
     public class InvalidEntityResourceProviderException : RESTarException
     {
         internal InvalidEntityResourceProviderException(Type providerType, string message) : base(ErrorCodes.EntityResourceProviderError,
-            $"An error was found in the declaration of entity resource provider '{providerType.RESTarTypeName()}': {message}") { }
+            $"An error was found in the declaration of entity resource provider '{providerType.GetRESTarTypeName()}': {message}") { }
     }
 }

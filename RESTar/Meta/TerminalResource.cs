@@ -13,7 +13,7 @@ namespace RESTar.Meta
         /// if there is no such resource
         /// </summary>
         public static ITerminalResource<T> Get => RESTarConfig.ResourceByType.SafeGet(typeof(T)) as ITerminalResource<T>
-                                                  ?? throw new UnknownResource(typeof(T).RESTarTypeName());
+                                                  ?? throw new UnknownResource(typeof(T).GetRESTarTypeName());
 
 
         /// <summary>

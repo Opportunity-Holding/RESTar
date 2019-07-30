@@ -13,7 +13,7 @@ namespace RESTar.Meta
         /// if there is no such resource
         /// </summary>
         public static IEntityResource Get(Type type) => RESTarConfig.ResourceByType.SafeGet(type) as IEntityResource
-                                                        ?? throw new UnknownResource(type.RESTarTypeName());
+                                                        ?? throw new UnknownResource(type.GetRESTarTypeName());
 
         /// <summary>
         /// Gets the entity resource for a given type or returns null if there is no such resource
@@ -44,7 +44,7 @@ namespace RESTar.Meta
         /// if there is no such resource
         /// </summary>
         public static IEntityResource<T> Get => RESTarConfig.ResourceByType.SafeGet(typeof(T)) as IEntityResource<T>
-                                                ?? throw new UnknownResource(typeof(T).RESTarTypeName());
+                                                ?? throw new UnknownResource(typeof(T).GetRESTarTypeName());
 
         /// <summary>
         /// Gets the entity resource for a given type or null if there is no such resource

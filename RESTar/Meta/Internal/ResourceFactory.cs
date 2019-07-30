@@ -41,9 +41,9 @@ namespace RESTar.Meta.Internal
                     throw new ArgumentNullException(nameof(entityResourceProviders), "Found null value in entity resource providers collection");
                 p.Validate();
             });
-            if (entityResourceProviders.ContainsDuplicates(p => p.GetType().RESTarTypeName(), out var typeDupe))
+            if (entityResourceProviders.ContainsDuplicates(p => p.GetType().GetRESTarTypeName(), out var typeDupe))
                 throw new InvalidEntityResourceProviderException(typeDupe.GetType(),
-                    $"Two or more external ResourceProviders with the same type '{typeDupe.GetType().RESTarTypeName()}' was found. Include " +
+                    $"Two or more external ResourceProviders with the same type '{typeDupe.GetType().GetRESTarTypeName()}' was found. Include " +
                     "only one in the call to RESTarConfig.Init()");
             if (entityResourceProviders.Select(p => p.Id.ToLower()).ContainsDuplicates(out var idDupe))
                 throw new InvalidEntityResourceProviderException(idDupe.GetType(),
@@ -86,7 +86,7 @@ namespace RESTar.Meta.Internal
             var allTypes = typeof(object).GetSubclasses().ToList();
             var resourceTypes = allTypes.Where(t => t.HasAttribute<RESTarAttribute>(out var a) && !(a is RESTarProceduralAttribute)).ToArray();
             var viewTypes = allTypes.Where(t => t.HasAttribute<RESTarViewAttribute>()).ToArray();
-            if (resourceTypes.Union(viewTypes).ContainsDuplicates(t => t.RESTarTypeName()?.ToLower() ?? "unknown", out var dupe))
+            if (resourceTypes.Union(viewTypes).ContainsDuplicates(t => t.GetRESTarTypeName()?.ToLower() ?? "unknown", out var dupe))
                 throw new InvalidResourceDeclarationException("Types used by RESTar must have unique case insensitive names. Found " +
                                                               $"multiple types with case insensitive name '{dupe}'.");
 
@@ -106,11 +106,11 @@ namespace RESTar.Meta.Internal
                         var wrapped = resource.GetWrappedType();
                         if (!viewType.ImplementsGenericInterface(typeof(ISelector<>), out var param) || param[0] != wrapped)
                             throw new InvalidResourceViewDeclarationException(viewType,
-                                $"Expected view type to implement ISelector<{wrapped.RESTarTypeName()}>");
+                                $"Expected view type to implement ISelector<{wrapped.GetRESTarTypeName()}>");
                     }
                     else if (!viewType.ImplementsGenericInterface(typeof(ISelector<>), out var param) || param[0] != resource)
                         throw new InvalidResourceViewDeclarationException(viewType,
-                            $"Expected view type to implement ISelector<{resource.RESTarTypeName()}>");
+                            $"Expected view type to implement ISelector<{resource.GetRESTarTypeName()}>");
                     var resourceProperties = resource.GetDeclaredProperties();
                     foreach (var property in viewType.FindAndParseDeclaredProperties().Where(prop => resourceProperties.ContainsKey(prop.Name)))
                         throw new InvalidResourceViewDeclarationException(viewType,
@@ -220,7 +220,7 @@ namespace RESTar.Meta.Internal
             {
                 if (Enum.GetNames(enumType).Select(name => name.ToLower()).ContainsDuplicates(out var dupe))
                     throw new InvalidReferencedEnumDeclarationException("A reference was made in some resource type to an enum type with name " +
-                                                                        $"'{enumType.RESTarTypeName()}', containing multiple named constants equal to '{dupe}' " +
+                                                                        $"'{enumType.GetRESTarTypeName()}', containing multiple named constants equal to '{dupe}' " +
                                                                         "(case insensitive). All enum types referenced by some RESTar resource " +
                                                                         "type must have unique case insensitive named constants");
             }

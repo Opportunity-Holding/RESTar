@@ -67,7 +67,7 @@ namespace RESTar
 
         #region Type reflection
 
-        internal static string RESTarTypeName(this Type type) => type?.FullName?.Replace('+', '.');
+        public static string GetRESTarTypeName(this Type type) => type?.FullName?.Replace('+', '.');
 
         /// <summary>
         /// Can this type hold dynamic members? Defined as implementing the IDictionary`2 interface
@@ -191,7 +191,7 @@ namespace RESTar
                 case TypeCode.Object:
                     if (type.IsNullable(out var baseType)) return CountBytes(baseType);
                     if (type.HasAttribute<DatabaseAttribute>()) return 16;
-                    throw new Exception($"Unknown type encountered: '{type.RESTarTypeName()}'");
+                    throw new Exception($"Unknown type encountered: '{type.GetRESTarTypeName()}'");
                 case TypeCode.Boolean: return 4;
                 case TypeCode.Char: return 2;
                 case TypeCode.SByte: return 1;

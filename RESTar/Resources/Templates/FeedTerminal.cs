@@ -59,7 +59,7 @@ namespace RESTar.Resources.Templates
             var welcomeBody = WelcomeBody;
             if (welcomeBody != null)
                 welcomeBody = welcomeBody + "\n\n";
-            return $"### {WelcomeHeader ?? GetType().RESTarTypeName()} ###\n\n{welcomeBody}> Status: {Status}\n\n" +
+            return $"### {WelcomeHeader ?? GetType().GetRESTarTypeName()} ###\n\n{welcomeBody}> Status: {Status}\n\n" +
                    (IsOpen ? "" : "> To open the feed, type OPEN\n") +
                    "> To pause, type PAUSE\n> To close, type CLOSE\n";
         }

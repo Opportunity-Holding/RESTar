@@ -1,7 +1,7 @@
 ﻿namespace RESTar.ContentTypeProviders
 {
     /// <summary>
-    /// A static class that provides access to a static JsonProvider and ExcelProvider instances
+    /// A static class that provides access to a static JsonProvider
     /// </summary>
     public static class Providers
     {
@@ -10,15 +10,9 @@
         /// </summary>
         public static JsonProvider Json { get; }
 
-        /// <summary>
-        /// A statically accessable ExcelContentProvider
-        /// </summary>
-        public static ExcelProvider Excel { get; }
-
         static Providers()
         {
             Json = new JsonProvider();
-            Excel = new ExcelProvider();
         }
     }
 }

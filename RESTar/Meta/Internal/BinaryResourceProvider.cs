@@ -10,7 +10,7 @@ namespace RESTar.Meta.Internal
     internal class BinaryResourceProvider
     {
         internal void RegisterBinaryTypes(IEnumerable<Type> binaryTypes) => binaryTypes
-            .OrderBy(t => t.RESTarTypeName())
+            .OrderBy(t => t.GetRESTarTypeName())
             .ForEach(type =>
             {
                 var resource = (IResource) BuildBinaryMethod.MakeGenericMethod(type).Invoke(this, null);

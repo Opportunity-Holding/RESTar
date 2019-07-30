@@ -82,7 +82,7 @@ namespace RESTar.Requests
         /// <param name="viewName">An optional view name to use when selecting entities from the resource</param>
         public virtual IRequest<T> CreateRequest<T>(Method method = GET, string protocolId = "restar", string viewName = null) where T : class
         {
-            var resource = Resource<T>.SafeGet ?? throw new UnknownResource(typeof(T).RESTarTypeName());
+            var resource = Resource<T>.SafeGet ?? throw new UnknownResource(typeof(T).GetRESTarTypeName());
             var parameters = new RequestParameters(this, method, resource, protocolId, viewName);
             return new Request<T>(resource, parameters);
         }

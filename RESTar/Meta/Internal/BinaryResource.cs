@@ -50,7 +50,7 @@ namespace RESTar.Meta.Internal
 
         internal BinaryResource(BinarySelector<T> binarySelectorSelector)
         {
-            Name = typeof(T).RESTarTypeName() ?? throw new Exception();
+            Name = typeof(T).GetRESTarTypeName() ?? throw new Exception();
             Type = typeof(T);
             AvailableMethods = new[] {Method.GET};
             var attribute = typeof(T).GetCustomAttribute<RESTarAttribute>();

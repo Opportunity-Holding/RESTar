@@ -11,7 +11,7 @@ namespace RESTar.Meta.Internal
     {
         internal void RegisterTerminalTypes(List<Type> terminalTypes)
         {
-            terminalTypes.OrderBy(t => t.RESTarTypeName()).ForEach(type =>
+            terminalTypes.OrderBy(t => t.GetRESTarTypeName()).ForEach(type =>
             {
                 var resource = (IResource) BuildTerminalMethod.MakeGenericMethod(type).Invoke(this, null);
                 RESTarConfig.AddResource(resource);

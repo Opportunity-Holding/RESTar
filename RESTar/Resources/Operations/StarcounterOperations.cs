@@ -15,7 +15,7 @@ namespace RESTar.Resources.Operations
     public static class StarcounterOperations<T> where T : class
     {
         private const string ColumnByTable = "SELECT t FROM Starcounter.Metadata.Column t WHERE t.Table.Fullname =?";
-        private static readonly string TableName = typeof(T).RESTarTypeName();
+        private static readonly string TableName = typeof(T).GetRESTarTypeName();
         private static readonly string select = $"SELECT t FROM {TableName.Fnuttify()} t ";
         private const string ObjectNo = nameof(ObjectNo);
 
@@ -96,7 +96,7 @@ namespace RESTar.Resources.Operations
         {
             if (resource.InterfaceType != null)
             {
-                var interfaceName = resource.InterfaceType.RESTarTypeName();
+                var interfaceName = resource.InterfaceType.GetRESTarTypeName();
                 var members = resource.InterfaceType.GetDeclaredProperties();
                 if (members.ContainsKey("objectno"))
                 {

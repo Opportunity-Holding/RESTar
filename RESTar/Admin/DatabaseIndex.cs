@@ -121,7 +121,7 @@ namespace RESTar.Admin
                     $"Invalid call to DatabaseIndex.Register() with index name '{indexName}' for type '{typeof(T)}'. " +
                     "Cannot register database indexes before RESTarConfig.Init() has been called.");
             SelectionCondition.Value = indexName;
-            SelectionRequest.Selector = () => new[] {new DatabaseIndex(typeof(T).RESTarTypeName()) {Name = indexName, Columns = columns}};
+            SelectionRequest.Selector = () => new[] {new DatabaseIndex(typeof(T).GetRESTarTypeName()) {Name = indexName, Columns = columns}};
             SelectionRequest.Evaluate().ThrowIfError();
         }
 

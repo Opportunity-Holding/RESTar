@@ -242,7 +242,7 @@ namespace RESTar.Meta
             catch
             {
                 throw new Exception($"Invalid or unknown excel reduce function '{methodName}' for property '{p.Name}' in type '" +
-                                    $"{p.DeclaringType.RESTarTypeName()}'. Must be public instance method with signature 'public " +
+                                    $"{p.DeclaringType.GetRESTarTypeName()}'. Must be public instance method with signature 'public " +
                                     "string <insert-name-here>()'");
             }
         }
@@ -305,7 +305,7 @@ namespace RESTar.Meta
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"{Type.RESTarTypeName()}.{Name}";
+        public override string ToString() => $"{Type.GetRESTarTypeName()}.{Name}";
 
         /// <inheritdoc />
         public override bool Equals(object obj) => obj is DeclaredProperty p && p.MetadataToken == MetadataToken;

@@ -49,7 +49,7 @@ namespace RESTar.Meta
                         attributes: t.GetCustomAttributes<Attribute>()
                     ))
                     .ToArray()
-                : throw new ArgumentException($"Type must be enum, found '{enumType.RESTarTypeName()}'");
+                : throw new ArgumentException($"Type must be enum, found '{enumType.GetRESTarTypeName()}'");
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace RESTar.Meta
                         attributes: field.GetCustomAttributes<Attribute>()
                     ))
                     .ToArray()
-                : throw new ArgumentException($"Type must be enum, found '{typeof(T).RESTarTypeName()}'");
+                : throw new ArgumentException($"Type must be enum, found '{typeof(T).GetRESTarTypeName()}'");
         }
 
         /// <summary>
@@ -137,14 +137,14 @@ namespace RESTar.Meta
                 .Where(field => field.FieldType.IsEnum)
                 .Select(field => (T) (field.GetValue(null) ?? -1))
                 .ToArray()
-            : throw new ArgumentException($"Type must be enum, found '{typeof(T).RESTarTypeName()}'");
+            : throw new ArgumentException($"Type must be enum, found '{typeof(T).GetRESTarTypeName()}'");
 
         /// <summary>
         /// Gets all names for named constants of an enumeration
         /// </summary>
         public static string[] Names => typeof(T).IsEnum
             ? Enum.GetNames(typeof(T))
-            : throw new ArgumentException($"Type must be enum, found '{typeof(T).RESTarTypeName()}'");
+            : throw new ArgumentException($"Type must be enum, found '{typeof(T).GetRESTarTypeName()}'");
 
         /// <summary>
         /// Returns true if and only if the enumeration member has an attribute

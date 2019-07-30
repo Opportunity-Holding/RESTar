@@ -9,6 +9,6 @@ namespace RESTar.Resources
     public class InvalidEventDeclarationException : RESTarException
     {
         internal InvalidEventDeclarationException(Type eventType, string message) : base(ErrorCodes.InvalidEventDeclaration,
-            $"Invalid event resource type declaration for '{eventType.RESTarTypeName()}'. Event resource types {message}") { }
+            $"Invalid event resource type declaration for '{eventType.GetRESTarTypeName()}'. Event resource types {message}") { }
     }
 }

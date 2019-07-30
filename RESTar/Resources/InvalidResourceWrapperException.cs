@@ -9,6 +9,6 @@ namespace RESTar.Resources
     public class InvalidResourceWrapperException : RESTarException
     {
         internal InvalidResourceWrapperException((Type wrapper, Type wrapped) types, string message) : base(ErrorCodes.ResourceWrapperError,
-            $"Invalid resource wrapper declaration '{types.wrapper.RESTarTypeName()}' for wrapped type '{types.wrapped.RESTarTypeName()}'. Resource wrappers {message}") { }
+            $"Invalid resource wrapper declaration '{types.wrapper.GetRESTarTypeName()}' for wrapped type '{types.wrapped.GetRESTarTypeName()}'. Resource wrappers {message}") { }
     }
 }
