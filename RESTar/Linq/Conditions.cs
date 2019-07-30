@@ -12,29 +12,6 @@ namespace RESTar.Linq
     /// </summary>
     public static class Conditions
     {
-        #region Internal
-
-        internal static bool HasSQL<T>(this IEnumerable<Condition<T>> conds, out IEnumerable<Condition<T>> sql)
-            where T : class
-        {
-            sql = conds.Where(c => c.ScQueryable).ToList();
-            return sql.Any();
-        }
-
-        internal static IEnumerable<Condition<T>> GetSQL<T>(this IEnumerable<Condition<T>> conds) where T : class
-        {
-            return conds.Where(c => c.ScQueryable);
-        }
-
-        internal static bool HasPost<T>(this IEnumerable<Condition<T>> conds, out IEnumerable<Condition<T>> post)
-            where T : class
-        {
-            post = conds.Where(c => !c.ScQueryable || c.IsOfType<string>() && c.Value != null).ToList();
-            return post.Any();
-        }
-
-        #endregion
-
         /// <summary>
         /// Filters an IEnumerable of resource entities and returns all entities x such that all the 
         /// conditions are true of x.

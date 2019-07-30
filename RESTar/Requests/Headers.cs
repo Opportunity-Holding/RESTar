@@ -36,7 +36,7 @@ namespace RESTar.Requests
 
         #endregion
 
-        internal string Info
+        public string Info
         {
             get => this[_Info];
             set => this[_Info] = value;

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.CSharp.RuntimeBinder;
-using Starcounter.Nova;
 
 namespace RESTar.Meta
 {
@@ -141,7 +140,7 @@ namespace RESTar.Meta
                 case TypeCode.DBNull: return false;
                 case TypeCode.Object when type.IsNullable(out var t): return IsStarcounterCompatible(t);
                 case TypeCode.Object when type == typeof(byte[]): return true;
-                case TypeCode.Object: return type.HasAttribute<DatabaseAttribute>();
+                case TypeCode.Object: return type.IsStarcounterDatabaseType();
             }
             return false;
         }

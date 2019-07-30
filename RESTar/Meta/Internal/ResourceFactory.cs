@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RESTar.Internal.Sc;
 using RESTar.Linq;
 using RESTar.Resources;
 using RESTar.Resources.Operations;
@@ -12,16 +11,13 @@ namespace RESTar.Meta.Internal
 {
     internal static class ResourceFactory
     {
-        private static IEntityResourceProviderInternal StarcounterDeclaredProvider { get; }
         private static IEntityResourceProviderInternal VrProvider { get; }
         private static TerminalResourceProvider TerminalProvider { get; }
         private static BinaryResourceProvider BinaryProvider { get; }
         
         static ResourceFactory()
         {
-            StarcounterDeclaredProvider = new StarcounterDeclaredResourceProvider();
             VrProvider = new VirtualResourceProvider();
-            EntityResourceProviders.Add(StarcounterDeclaredProvider.Id, StarcounterDeclaredProvider);
             EntityResourceProviders.Add(VrProvider.Id, VrProvider);
             TerminalProvider = new TerminalResourceProvider();
             BinaryProvider = new BinaryResourceProvider();

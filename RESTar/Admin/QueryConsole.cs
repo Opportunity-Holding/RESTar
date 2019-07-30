@@ -27,7 +27,7 @@ namespace RESTar.Admin
         /// <inheritdoc />
         public override void Dispose() => Consoles.Remove(this);
 
-        internal static void Publish<T>(string query, object[] args, Func<IEnumerator<T>> getEnumerator)
+        public static void Publish<T>(string query, object[] args, Func<IEnumerator<T>> getEnumerator)
         {
             if (Consoles.Count == 0) return;
             var argsString = args == null ? null : "\r\nArgs: " + string.Join(", ", args);

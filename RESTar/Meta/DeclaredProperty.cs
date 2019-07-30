@@ -9,7 +9,6 @@ using RESTar.Meta.Internal;
 using RESTar.Requests;
 using RESTar.Resources;
 using RESTar.Results;
-using Starcounter.Nova;
 
 namespace RESTar.Meta
 {
@@ -195,7 +194,9 @@ namespace RESTar.Meta
             CustomDateTimeFormat = memberAttribute?.DateTimeFormat;
             MergeOntoOwner = memberAttribute?.MergeOntoOwner ?? false;
             Order = memberAttribute?.Order ?? jsonAttribute?.Order;
-            IsScQueryable = p.DeclaringType?.HasAttribute<DatabaseAttribute>() == true && p.PropertyType.IsStarcounterCompatible();
+
+            IsScQueryable = p.DeclaringType?.IsStarcounterDatabaseType() == true && p.PropertyType.IsStarcounterCompatible();
+
             SkipConditions = memberAttribute?.SkipConditions == true || p.DeclaringType.HasAttribute<RESTarViewAttribute>();
             Hidden = memberAttribute?.Hidden == true;
             HiddenIfNull = memberAttribute?.HiddenIfNull == true || jsonAttribute?.NullValueHandling == NullValueHandling.Ignore;

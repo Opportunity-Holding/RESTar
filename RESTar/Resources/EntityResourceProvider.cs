@@ -203,7 +203,7 @@ namespace RESTar.Resources
 
         #region Internal virtual 
 
-        internal virtual bool Include(Type type)
+        protected virtual bool Include(Type type)
         {
             if (!typeof(TBase).IsAssignableFrom(type))
                 throw new InvalidResourceDeclarationException(
@@ -213,7 +213,7 @@ namespace RESTar.Resources
             return type.HasAttribute(AttributeType);
         }
 
-        internal virtual void Validate()
+        protected virtual void Validate()
         {
             if (AttributeType == null)
                 throw new InvalidEntityResourceProviderException(GetType(), "AttributeType cannot be null");

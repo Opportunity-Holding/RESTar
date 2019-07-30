@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTar.AspNetCore.Example",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.Excel", "RESTar.Excel\RESTar.Excel.csproj", "{65837CD5-C3E4-4189-92FB-63A388784AA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTar.Starcounter", "RESTar.Starcounter\RESTar.Starcounter.csproj", "{7F578800-6514-4FBE-863E-18E88F409103}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{65837CD5-C3E4-4189-92FB-63A388784AA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65837CD5-C3E4-4189-92FB-63A388784AA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65837CD5-C3E4-4189-92FB-63A388784AA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F578800-6514-4FBE-863E-18E88F409103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F578800-6514-4FBE-863E-18E88F409103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F578800-6514-4FBE-863E-18E88F409103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F578800-6514-4FBE-863E-18E88F409103}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

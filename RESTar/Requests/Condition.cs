@@ -89,15 +89,15 @@ namespace RESTar.Requests
         /// <inheritdoc />
         public TypeCode ValueTypeCode { get; private set; }
 
-        internal Operator InternalOperator => Operator;
+        public Operator InternalOperator => Operator;
 
         /// <summary>
         /// Is this condition queryable using Starcounter SQL?
         /// </summary>
-        internal bool ScQueryable => Term.ScQueryable;
+        public bool ScQueryable => Term.ScQueryable;
 
         internal Type Type => Term.IsDeclared ? Term.LastAs<DeclaredProperty>()?.Type : null;
-        internal bool IsOfType<T1>() => Type == typeof(T1);
+        public bool IsOfType<T1>() => Type == typeof(T1);
 
         /// <inheritdoc />
         [Pure]

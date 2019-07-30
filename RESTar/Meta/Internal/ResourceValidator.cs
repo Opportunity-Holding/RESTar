@@ -9,7 +9,6 @@ using RESTar.Linq;
 using RESTar.Meta.IL;
 using RESTar.Resources;
 using RESTar.Resources.Operations;
-using Starcounter.Nova;
 
 namespace RESTar.Meta.Internal
 {
@@ -266,7 +265,7 @@ namespace RESTar.Meta.Internal
                         throw new InvalidTerminalDeclarationException(terminal, "must not be collections");
                     if (terminal.HasResourceProviderAttribute())
                         throw new InvalidTerminalDeclarationException(terminal, "must not be decorated with a resource provider attribute");
-                    if (terminal.HasAttribute<DatabaseAttribute>())
+                    if (terminal.IsStarcounterDatabaseType())
                         throw new InvalidTerminalDeclarationException(terminal,
                             "must not be decorated with the Starcounter.DatabaseAttribute attribute");
                     if (typeof(IOperationsInterface).IsAssignableFrom(terminal))
@@ -285,7 +284,7 @@ namespace RESTar.Meta.Internal
                         throw new InvalidBinaryDeclarationException(binary, "must not be collections");
                     if (binary.HasResourceProviderAttribute())
                         throw new InvalidBinaryDeclarationException(binary, "must not be decorated with a resource provider attribute");
-                    if (binary.HasAttribute<DatabaseAttribute>())
+                    if (binary.IsStarcounterDatabaseType())
                         throw new InvalidBinaryDeclarationException(binary, "must not be decorated with the 'Starcounter.DatabaseAttribute' attribute");
                     if (typeof(IOperationsInterface).IsAssignableFrom(binary))
                         throw new InvalidBinaryDeclarationException(binary, "must not implement any other RESTar operations interfaces");
@@ -303,7 +302,7 @@ namespace RESTar.Meta.Internal
                         throw new InvalidEventDeclarationException(@event, "must not be collections");
                     if (@event.HasResourceProviderAttribute())
                         throw new InvalidEventDeclarationException(@event, "must not be decorated with a resource provider attribute");
-                    if (@event.HasAttribute<DatabaseAttribute>())
+                    if (@event.IsStarcounterDatabaseType())
                         throw new InvalidEventDeclarationException(@event, "must not be decorated with the 'Starcounter.DatabaseAttribute' attribute");
                     if (typeof(IOperationsInterface).IsAssignableFrom(@event))
                         throw new InvalidEventDeclarationException(@event, "must not implement any RESTar operations interfaces");

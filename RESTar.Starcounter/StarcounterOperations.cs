@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RESTar.Admin;
 using RESTar.Linq;
 using RESTar.Meta;
 using RESTar.Requests;
 using Starcounter.Nova;
-using static System.StringComparison;
 
-namespace RESTar.Resources.Operations
+namespace RESTar.Starcounter
 {
     /// <summary>
     /// The default operations for static Starcounter database resources
@@ -32,7 +32,7 @@ namespace RESTar.Resources.Operations
                     QueryConsole.Publish(sql, null, () => result.GetEnumerator());
                     return result;
                 case 1 when request.Conditions[0] is var only && only.Operator == Operators.EQUALS:
-                    if (string.Equals(ObjectNo, only.Key, OrdinalIgnoreCase))
+                    if (string.Equals(ObjectNo, only.Key, StringComparison.OrdinalIgnoreCase))
                         return GetFromObjectNo(only.SafeSelect(o => (ulong) only.Value));
                     else goto default;
                 default:

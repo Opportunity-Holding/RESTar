@@ -5,8 +5,8 @@ namespace RESTar.Meta.Internal
 {
     internal class VirtualResourceProvider : EntityResourceProvider<object>
     {
-        internal override bool Include(Type type) => !type.HasResourceProviderAttribute();
-        internal override void Validate() { }
+        protected override bool Include(Type type) => !type.HasResourceProviderAttribute();
+        protected override void Validate() { }
         protected override Type AttributeType { get; } = null;
     }
 }

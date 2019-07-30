@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using RESTar.Requests;
-using Starcounter.Nova;
 
 namespace RESTar.Resources.Operations
 {
@@ -49,7 +48,7 @@ namespace RESTar.Resources.Operations
             var method = target.GetInterfaceMap(i).TargetMethods.First();
             if (method.DeclaringType != target)
             {
-                if (target.HasAttribute<DatabaseAttribute>())
+                if (target.IsStarcounterDatabaseType())
                     throw new InvalidResourceDeclarationException($"Invalid resource declaration for type '{target}'. Starcounter " +
                                                                   "resource types cannot inherit operation implementations from " +
                                                                   "generic base types.");

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RESTar.Internal.Sc
+namespace RESTar.Starcounter
 {
     /// <inheritdoc />
     /// <summary>

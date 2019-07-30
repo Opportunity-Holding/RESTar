@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
@@ -16,7 +15,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RESTar.ContentTypeProviders;
 using RESTar.Internal;
-using RESTar.Internal.Sc;
 using RESTar.Linq;
 using RESTar.Meta;
 using RESTar.Meta.Internal;
@@ -26,7 +24,6 @@ using RESTar.Requests.Processors;
 using RESTar.Resources;
 using RESTar.Results;
 using RESTar.WebSockets;
-using Starcounter.Nova;
 using static System.Globalization.DateTimeStyles;
 using static System.Reflection.BindingFlags;
 using static System.StringComparison;
@@ -104,17 +101,22 @@ namespace RESTar
             return (type?.GetCustomAttributes(attributeType).Any()).GetValueOrDefault();
         }
 
-        internal static bool HasResourceProviderAttribute(this Type resource)
+        public static bool HasResourceProviderAttribute(this Type resource)
         {
             return resource.GetCustomAttributes().OfType<EntityResourceProviderAttribute>().Any();
         }
 
-        internal static bool HasAttribute<TAttribute>(this MemberInfo type) where TAttribute : Attribute
+        internal static bool IsStarcounterDatabaseType(this MemberInfo type)
+        {
+            return type.GetCustomAttributes().Any(attribute => attribute.GetType().Name == "DatabaseAttribute");
+        }
+
+        public static bool HasAttribute<TAttribute>(this MemberInfo type) where TAttribute : Attribute
         {
             return type?.GetCustomAttribute<TAttribute>() != null;
         }
 
-        internal static bool HasAttribute<TAttribute>(this MemberInfo type, out TAttribute attribute) where TAttribute : Attribute
+        public static bool HasAttribute<TAttribute>(this MemberInfo type, out TAttribute attribute) where TAttribute : Attribute
         {
             attribute = type?.GetCustomAttribute<TAttribute>();
             return attribute != null;
@@ -190,7 +192,7 @@ namespace RESTar
             {
                 case TypeCode.Object:
                     if (type.IsNullable(out var baseType)) return CountBytes(baseType);
-                    if (type.HasAttribute<DatabaseAttribute>()) return 16;
+                    if (type.IsStarcounterDatabaseType()) return 16;
                     throw new Exception($"Unknown type encountered: '{type.GetRESTarTypeName()}'");
                 case TypeCode.Boolean: return 4;
                 case TypeCode.Char: return 2;
@@ -210,8 +212,6 @@ namespace RESTar
             }
         }
 
-
-
         #endregion
 
         #region Other
@@ -230,6 +230,7 @@ namespace RESTar
 
         internal static bool EqualsNoCase(this string s1, string s2) => string.Equals(s1, s2, OrdinalIgnoreCase);
         internal static string ToMethodsString(this IEnumerable<Method> ie) => string.Join(", ", ie);
+
         internal static object GetDefault(this Type type)
         {
             if (type == null)
@@ -242,7 +243,7 @@ namespace RESTar
 
         private static object DEFAULT<T>() => default(T);
 
-        internal static string Fnuttify(this string sqlKey) => $"\"{sqlKey.Replace(".", "\".\"")}\"";
+        public static string Fnuttify(this string sqlKey) => $"\"{sqlKey.Replace(".", "\".\"")}\"";
 
         /// <summary>
         /// Checks if the type is a Nullable struct, and - if so -  returns the underlying type in the out parameter.
@@ -393,9 +394,9 @@ namespace RESTar
             return typeName;
         }
 
-        internal static Type GetWrappedType(this Type wrapperType) => wrapperType.BaseType?.GetGenericArguments()[0];
+        public static Type GetWrappedType(this Type wrapperType) => wrapperType.BaseType?.GetGenericArguments()[0];
 
-        internal static bool IsWrapper(this Type type) => typeof(IResourceWrapper).IsAssignableFrom(type);
+        public static bool IsWrapper(this Type type) => typeof(IResourceWrapper).IsAssignableFrom(type);
 
         #endregion
 
@@ -410,74 +411,6 @@ namespace RESTar
             where T : class
         {
             return processors.Aggregate(default(IEnumerable<JObject>), (e, p) => e != null ? p.Apply(e) : p.Apply(entities));
-        }
-
-        internal static (string WhereString, object[] Values) MakeWhereClause<T>(this IEnumerable<Condition<T>> conds, string orderByIndexName,
-            out Dictionary<int, int> valuesAssignments, out bool useOrderBy) where T : class
-        {
-            var _valuesAssignments = new Dictionary<int, int>();
-            var literals = new List<object>();
-            var hasOtherIndex = true;
-            var clause = string.Join(" AND ", conds.Where(c => !c.Skip).Select((c, index) =>
-            {
-                var (key, op, value) = (c.Term.DbKey.Fnuttify(), c.InternalOperator.SQL, (object) c.Value);
-                if (value == null)
-                {
-                    switch (c.Operator)
-                    {
-                        case EQUALS:
-                            op = "IS NULL";
-                            break;
-                        case NOT_EQUALS:
-                            op = "IS NOT NULL";
-                            break;
-                        default: throw new Exception($"Operator '{op}' is not valid for comparison with NULL");
-                    }
-                    return $"t.{key} {op}";
-                }
-                literals.Add(c.Value);
-                hasOtherIndex = false;
-                _valuesAssignments[index] = literals.Count - 1;
-                return $"t.{key} {c.InternalOperator.SQL} ? ";
-            }));
-            useOrderBy = !hasOtherIndex;
-            if (clause.Length == 0)
-            {
-                valuesAssignments = null;
-                return (null, null);
-            }
-            valuesAssignments = _valuesAssignments;
-            return ($"WHERE {clause}", literals.ToArray());
-        }
-
-        internal static (string WhereString, object[] Values) MakeWhereClause<T>(this IEnumerable<Condition<T>> conds, string orderByIndexName,
-            out bool useOrderBy) where T : class
-        {
-            var literals = new List<object>();
-            var hasOtherIndex = false;
-            var clause = string.Join(" AND ", conds.Where(c => !c.Skip).Select(c =>
-            {
-                var (key, op, value) = (c.Term.DbKey.Fnuttify(), c.InternalOperator.SQL, (object) c.Value);
-                if (value == null)
-                {
-                    switch (c.Operator)
-                    {
-                        case EQUALS:
-                            op = "IS NULL";
-                            break;
-                        case NOT_EQUALS:
-                            op = "IS NOT NULL";
-                            break;
-                        default: throw new Exception($"Operator '{op}' is not valid for comparison with NULL");
-                    }
-                    return $"t.{key} {op}";
-                }
-                literals.Add(c.Value);
-                hasOtherIndex = false;
-                return $"t.{key} {c.InternalOperator.SQL} ? ";
-            }));
-            useOrderBy = !hasOtherIndex;
-            return clause.Length > 0 ? ($"WHERE {clause} ", literals.ToArray()) : (null, null);
         }
 
         #endregion
@@ -633,7 +566,6 @@ namespace RESTar
                 case Error re: return re;
                 case FormatException _: return new UnsupportedContent(exception);
                 case JsonReaderException jre: return new FailedJsonDeserialization(jre);
-                case DbException _: return new ScDatabaseError(exception);
                 case RuntimeBinderException _: return new BinderPermissions(exception);
                 case NotImplementedException _: return new FeatureNotImplemented("RESTar encountered a call to a non-implemented method");
                 default: return new Unknown(exception);

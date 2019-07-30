@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using RESTar.Meta;
 using RESTar.Requests;
 using RESTar.Resources;
-using RESTar.Resources.Operations;
 using Starcounter.Nova;
 
-namespace RESTar.Internal.Sc
+namespace RESTar.Starcounter
 {
     internal class StarcounterDeclaredResourceProvider : EntityResourceProvider<object>
     {
@@ -15,9 +14,9 @@ namespace RESTar.Internal.Sc
 
         internal IDatabaseIndexer GetDatabaseIndexer() => DatabaseIndexer;
 
-        internal override void Validate() { }
+        protected override void Validate() { }
 
-        internal override bool Include(Type type)
+        protected override bool Include(Type type)
         {
             if (type.IsWrapper())
                 return type.GetWrappedType().HasAttribute<DatabaseAttribute>() && !type.HasResourceProviderAttribute();

@@ -8,7 +8,7 @@ namespace RESTar.Internal
     /// <summary>
     /// Encodes an operator, used in conditions
     /// </summary>
-    internal struct Operator
+    public struct Operator
     {
         /// <summary>
         /// The code for this operator
