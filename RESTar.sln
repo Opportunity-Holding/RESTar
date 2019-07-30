@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTar.Core", "RESTar.Core\RESTar.Core.csproj", "{C530402D-15CD-4386-A592-3BB7C165DEF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTar", "RESTar\RESTar.csproj", "{C530402D-15CD-4386-A592-3BB7C165DEF8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTar.AspNetCore", "RESTar.AspNetCore\RESTar.AspNetCore.csproj", "{2701B374-7221-49FF-AB9E-3121F7DAEC0B}"
 EndProject
