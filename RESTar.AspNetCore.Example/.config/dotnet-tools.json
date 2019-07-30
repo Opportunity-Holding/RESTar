@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "starcounter.star.tool": {
+      "version": "3.0.0-alpha-20190701-000000",
+      "commands": [
+        "dotnet-star"
+      ]
+    }
+  }
+}
