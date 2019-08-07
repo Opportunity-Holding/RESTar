@@ -26,6 +26,7 @@ namespace RESTar.Example
             services.AddExcelContentProvider();
             services.AddMvc(o => o.EnableEndpointRouting = false);
             services.Configure<KestrelServerOptions>(o => o.AllowSynchronousIO = true);
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

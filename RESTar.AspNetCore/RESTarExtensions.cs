@@ -48,6 +48,7 @@ namespace RESTar.AspNetCore
                 contentTypeProviders: builder.ApplicationServices.GetServices<IContentTypeProvider>(),
                 networkProviders: new INetworkProvider[] {new AspNetCoreNetworkProvider(router)}
             ));
+            Application.Services = builder.ApplicationServices;
             return builder;
         }
     }

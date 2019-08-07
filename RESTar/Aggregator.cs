@@ -53,9 +53,9 @@ namespace RESTar
                 switch (node)
                 {
                     case Aggregator aggregator:
-                        foreach (var pair in aggregator.ToList())
+                        foreach (var (key, obj) in aggregator.ToList())
                         {
-                            var (key, value) = (pair.Key, populator(pair.Value));
+                            var value = populator(obj);
                             switch (key)
                             {
                                 case "$add" when IsNumberArray(value, out var terms): return terms.Sum();
@@ -68,7 +68,7 @@ namespace RESTar
                                 case "$mul": throw GetArithmeticException(key);
                                 case "$mod": throw GetArithmeticException(key, "For $mod, the integer list must have a length of exacly 2");
                             }
-                            aggregator[pair.Key] = value;
+                            aggregator[key] = value;
                         }
                         return aggregator;
                     case JArray array:

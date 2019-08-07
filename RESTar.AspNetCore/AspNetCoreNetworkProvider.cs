@@ -14,16 +14,17 @@ namespace RESTar.AspNetCore
     {
         private IRouteBuilder RouteBuilder { get; }
 
-        internal AspNetCoreNetworkProvider(IRouteBuilder routeBuilder)
+        public AspNetCoreNetworkProvider(IRouteBuilder routeBuilder)
         {
             RouteBuilder = routeBuilder;
         }
 
         public void AddRoutes(Method[] methods, string rootUri, ushort _)
         {
+            var template = rootUri + "/{resource?}/{conditions?}/{metaconditions?}";
             foreach (var method in methods)
             {
-                RouteBuilder.MapVerb(method.ToString(), rootUri + "/{r?}/{c?}/{m?}", async aspNetCoreContext =>
+                RouteBuilder.MapVerb(method.ToString(), template, async aspNetCoreContext =>
                 {
                     var (_, uri) = aspNetCoreContext.Request.Path.Value.TSplit(rootUri);
                     var headers = new Headers(aspNetCoreContext.Request.Headers);
